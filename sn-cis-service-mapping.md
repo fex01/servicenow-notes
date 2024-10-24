@@ -27,7 +27,6 @@ Back to [SNow ITOM](./sn-itom.md)
 
 ### Links
 
-- [Link Shortcut](shortcuts://run-shortcut?name=SNow%20Docs%20URL)
 - [Docs](https://docs.servicenow.com/)
 - [Developer](http://developer.servicenow.com/)
 - [CSC (Customer Success Center)](https://www.servicenow.com/success.html)
@@ -109,13 +108,69 @@ Back to [SNow ITOM](./sn-itom.md)
 - View the Service Mapping Discovery Log
 - View the Results
 
-##### L5.1
+##### L5.1: Delimited Text Parsing Strategy
 
 - [lab pdf](https://nowlearning.servicenow.com/sys_attachment.do?sys_id=908a11d2874a8e1452417445dabb3505)
+- Review Apache Configuration File
+  - All > Service Mapping > Application Services > [EMEA Dispatch Scanning Service] > View Map
+  - select [Apache] > Properties > Application
+    - notice: no field _App Release Version_
+- Add New Field Attribute to the Apache Web Server Class
+  - All > Configuration > CI Class Manager
+  - Hierarchy > Apache Web Server > Attributes > Tab _Added_
+  - Insert a new row...
+    - Column label: App Release Version
+    - Column name: u_app_release_version
+    - Type: string
+    - Max length: 40
+    - Save
+- Modify an Existing Discovery Pattern
+  - All > Pattern Designer > Discovery Patterns
+  - select _Apache On Windows_ pattern
+  - Extension Section
+    - New
+      - Name: Apache On Windows Extension
+      - Done
+    - select _Apache On Windows Extension_
+      - rename first step: _Collect App Release Version_
+      - activate Debug Mode:
+        - Select MID Server: Automatic MID Server selection
+        - Debug Type: Top down
+        - Select Entry Point Type: HTTP(S) Endpoint
+        - URL: `http://198.51.147.201`
+        - Connect, wait to finish
+      - configure _Collect App Release Version_
+        - Operation: Parse File
+        - Browse & Select File: `$install_directory+"/conf/apache.cfg.txt"`
+        - Retrieve File Content
+        - Includes Lines: `AppReleaseVersion`
+        - Add Variable
+          - Name: `u_app_release_version` (double click _Name_ and replace)
+        - Delimiter: (space)
+        - Positions: `2`
+        - verify with _Test_ button
+        - _Add step comments_: "Collect and store App Release for deployed Apache Server."
+      - _Save_
+  - verify via Discovery Run, Service Map Attributes & Discovery Log
+- Navigate Easily to a Discovery Pattern
+  - from _Discovery Log_:
+    - select Extension section _Apache On Windows Extension_
+    - select _Debug_ (top, next to _Incoming Connections_ Dropdown)
 
-##### L5.2
+##### L5.2: Regular Expression Parsing Strategy
 
 - [lab pdf](https://nowlearning.servicenow.com/sys_attachment.do?sys_id=ccbfd0c5874e42d052417445dabb3582)
+- View Configuration File Using Command Line Console
+- Add New Field Attribute for Apache Web Server
+- Modify Apache on Windows Extension Section
+  - activate Debug Mode
+  - new step _Collect Country Name_
+    - Operation: Parse File
+    - Select File: `$install_directory+"/conf/apache.cfg.txt"`
+    - Define Parsing: Regular Expression
+    - Variable: `u_country_name`
+    - Regular Expression: `CountryLocation (.*)`
+    - Add step comments: "Collect and store Country Name for deployed Apache Server."
 
 ##### L7
 
@@ -223,7 +278,7 @@ Back to [SNow ITOM](./sn-itom.md)
     - Deployment of the service to production based on use case
     - Activation of the service on the Dashboard
 
-#### Service mapping
+#### Service Mapping
 
 - focus on **Start** (details see [Service Lifecycle](#service-lifecycle))
   - ensure `Service Mapping` plugin is purchased and activated
@@ -315,12 +370,136 @@ Back to [SNow ITOM](./sn-itom.md)
     - User can drill down into specific category and error group and try to resolve multiple errors at once
     - User task to delegate work to other teams (e.g. network, Unix)
     - Define SLAs on tasks if needed
+- focus on **Review** (details see [Service Lifecycle](#service-lifecycle))
+  - **Review** <> **Fix** cycle until approval:
+    - SM Admin adapts service map and sends for review
+    - Owner reviews service map and sends back / approves
+- focus on **Approve** (details see [Service Lifecycle](#service-lifecycle))
+  - service after approval:
+    - Process Status -> Approved
+    - appears in SM > Home > Completed
+    - Operational Status -> Operational
+    - appears on the Event Management Dashboard
+    - Discovery Schedule can be created to rediscover supporting application service / CIs
+  - Event Management:
+    - operational services are displayed on the Event Management Operator Workspace
+    - Service health can be monitored (Nagios, SolarWinds, ...)
+  - Discovery Schedules:
+    - rediscover service CIs based on:
+      - CI Type
+      - Specific CI
+      - Service Attributes
+      - Service Group Attributes
+    - use default `All Applications` schedule to rediscover all applications for all services
 
 #### Extending Patterns
 
+- Cl Type/Class Definition
+  - every application needs a corresponding CI type / classifier
+  - CI type is used by Discovery Patterns to identify applications
+  - used by Identification Rules to determine if application needs to be updated or inserted
+- Patterns
+  - pattern identify: applications, CI Type Attributes and Outgoing Connections
+    - predefined patterns for common enterprise applications
+    - create custom patterns for unique applications
+  - structure: Identification, Extension, Connection Sections
+    - Identification: determine if application is present
+    - Extension: add additional attributes to CI
+    - Connection: determine connections between CIs
+  - steps: each Section leverages steps to: collect information, set variables and populate CI Type attributes
+- Parsing Strategies
+  - [Delimited Text Parsing](https://docs.servicenow.com/bundle/vancouver-it-operations-management/page/product/service-mapping/task/t_DelimitedTextParsStratPatDef.html)
+  - [Regular Expression Parsing](https://docs.servicenow.com/bundle/vancouver-it-operations-management/page/product/service-mapping/task/t_RegularExpParsStratPatDef.html)
+- Gathering
+  - Command Prompt: Pattern Designer, requires active Debug Mode
+  - Command Line Console: `[instance]/SaCmdManager.do?ip=[Target IP]`
+    - Requires horizontal discovery to run if the host is not in the CMDB
+    - Works only if the target IP is reachable by a validated MID Server
+    - Leverages the credentials already entered into the credentials
+  - helpful Unix commands
+    - `find /home/ubuntu -name "Ibapp*"` - Determine if a file starting with Ibapp exists in the Ubuntu directory
+    - `find. -name "Ibapp*"` - Search for a file starting with Ibapp in the current directory or one of its sub directories
+    - `grep location /home/ubuntu/Ibappinfo` - Display any lines in the Ibappinfo file containing the word location
+    - `sudo netstat-anp | grep :8080` - Returns the process ID listening on port 8080 as a non root user
+  - tracked configuration files
+    - requires Horizontal Discovery
+    - supports file path variables
+    - Tracked files have their changes collected and can be viewed by comparing them to previous versions
+  - Pattern Orchestrator
+    - allows to run multiple patterns in a specific order
+    - can address issues with large datasets (or large payloads)
+      - speed up discovery
+      - avoid OOM (out-of-memory) issues on MID server
+
 #### Building Identification Sections
 
+- goals for application patterns Identification Section:
+  - fail fast to apply the next pattern immediately
+  - apply appropriate patterns (no Windows patterns for a Linux host)
+  - if no specific pattern matches, apply generic application pattern
+- patterns are tried in random order
+  - use Run order on specific patterns to define dependencies (run after...)
+    - Pattern, Tab Basic
+- filter applied patterns based on host OS and Entry Point protocols
+  - OS: Pattern, Tab Basic
+  - Entry Point: Pattern, Identification Section
+- steps:
+  - Identify and match on process information
+    - first to fail fast
+  - Retrieve data from configuration files
+  - Set variables
+  - Perform evaluations
+  - Populate variables, tables, and CI Type attributes
+  - each step can have a precondition. Failure skips the step, but does not fail the Identification Section
+  - example steps:
+    - Get Registry Key
+    - Match
+    - Set Parameter Value
+    - Parse File
+- Shared Libraries
+  - groups of reusable steps
+  - to be used in multiple patterns
+  - access in patterns via _Library Reference_ operation
+- Variables
+  - Scalar: single value
+  - Tabular: multiple values like a table (column names, row numbers)
+    - only option if a step wants to populate multiple variables
+- Identification Section strategies
+  - fails fast: identify the application or fail the pattern
+  - populate any required attributes for the CI Type Identification Rule
+  - populate any other required (mandatory) attributes
+  - collect any recommended attributes and additional attributes requested by the customer
+  - set variables for long file paths that may be referenced in following steps (both Identification and Connection Sections)
+- Generic Application Pattern
+  - when no discovery pattern matches the criteria of the application
+    - Patterns fail because one step in each of its identification sections fail or terminate
+    - Steps in an identification section terminate because some condition is not met such as performing a match on a process executable name
+  - generic applications use a cog wheel icon
+  - two ways to handle generic applications
+    - manually create a CI Type and pattern
+    - action "Create pattern from generic application": Service Map, right-click on generic application
+      - creates CI Type, skeleton Pattern, and a Process Classifier
+
 #### Building Connection Sections
+
+- order of execution
+  - if Identification Section succeeds, **all** Connection Subsections are tried
+    - subsections for each Protocol and End Point Type
+    - if all subsection steps are successful:
+      - create connection
+      - connection type defines connection relationship
+- connection parameters
+  - step _Create Connection_:
+    1. Connection Type
+    2. Entry Point
+    3. Connection Attributes (specific to Entry Point Type)
+    4. Target CI Type
+  - obtain connection parameters:
+    - research connection parameters via Google, application SMEs, application docs or configuration files
+    - use _Command Prompt_ and _Command Line Console_ to determine parameters
+  - target application
+    - should have a valid CI Type and pattern to avoid generic applications
+    - target application Entry Point Type determines Connection Attributes
 
 #### CMDB Reconciliation
 

@@ -14,7 +14,6 @@
 
 ### Links
 
-- [Link Shortcut](shortcuts://run-shortcut?name=SNow%20Docs%20URL)
 - [Docs](https://docs.servicenow.com/)
 - [Developer](http://developer.servicenow.com/)
 - [CSC (Customer Success Center)](https://www.servicenow.com/success.html)
