@@ -2,28 +2,22 @@
 
 Back to [SNow ITOM](./sn-itom.md)
 
-[[toc]]
-
-## TODO
-
-- [ ]
-
 ## Resources
 
 ### Requirements CIS Voucher
 
-- [ ] Service Mapping Fundamentals
-- [ ] [Service Mapping Advanced Simulator](https://nowlearning.servicenow.com/lxp/en/it-operations-management/service-mapping-advanced-simulator-washington?id=learning_course_prev&course_id=e3db6a8487760a1024e0bb39dabb35b7)
+- [x] Service Mapping Fundamentals
 - [ ] [Service Mapping Advanced](https://nowlearning.servicenow.com/lxp/en/it-operations-management/service-mapping-advanced?id=learning_course_prev&course_id=72774609c3b77d905922751ce00131d2)
   - [eBook](https://servicenow.read.inkling.com/a/b/19c4613ca7d841ee9b3cc5f1bd05302d/p/18356415fd69484b9dd3100dfd444379)
+- [ ] [Service Mapping Advanced Simulator](https://nowlearning.servicenow.com/lxp/en/it-operations-management/service-mapping-advanced-simulator-washington?id=learning_course_prev&course_id=e3db6a8487760a1024e0bb39dabb35b7)
+  - testing knowledge from SM Fundamentals and Advanced courses
 - Recommended:
+  - [ ] [Service Mapping Extras](https://nowlearning.servicenow.com/lxp/en/it-operations-management/service-mapping-extras?id=learning_course_prev&course_id=293e0527477d19505cbdaf44846d4383)
+    - additional material on ML Power Mapping
+    - additional material on integrating Service Mapping with Event Management
+    - more stuff
   - [x] [Discovery Fundamentals](./sn-cis-discovery.md#discovery-fundamentals)
-  - [ ] Event Management Fundamentals
-  - [ ] ServiceNow Learning Library courses (CMDB Reconciliation, Event Management)
-
-### Further Courses
-
-- [ ]
+  - [ ] [Event Management Fundamentals](https://nowlearning.servicenow.com/lxp/en/it-operations-management/event-management-fundamentals?id=learning_course_prev&course_id=4f84d9c7c323315043395230a0013108)
 
 ### Links
 
@@ -39,7 +33,9 @@ Back to [SNow ITOM](./sn-itom.md)
 
 ### Labs
 
-#### Service Mapping Fundamentals
+#### Labs: Service Mapping Advanced
+
+#### Labs: Service Mapping Fundamentals
 
 ##### L1: Navigate Service Mapping
 
@@ -172,20 +168,154 @@ Back to [SNow ITOM](./sn-itom.md)
     - Regular Expression: `CountryLocation (.*)`
     - Add step comments: "Collect and store Country Name for deployed Apache Server."
 
-##### L7
+##### L7: Build Connection Section
 
 - [lab pdf](https://nowlearning.servicenow.com/sys_attachment.do?sys_id=81bb24c1878282d052417445dabb355b)
+- Add a New Connection Section
+  - build an Apache to Tomcat connection section
+  - All > Pattern Designer > Discovery Patterns
+  - open _Apache On Windows_ pattern
+    - Connection Section > New
+      - Name: `CD Apache to Tomcat Connection`
+      - _Done_
+    - _Save_
+    - open _CD Apache to Tomcat Connection_
+      - activate _Debug Mode_
+        - URL: `http://198.51.147.201`
+      - rename step _Get Tomcat proxy params_
+        - Operation: Parse File
+        - Select File: `$process.currentDir+"conf\httpd.conf"`
+        - Define Parsing: Delimited text
+        - Include Lines: `ProxyPass`
+          - (use `|` as OR to filter for multiple strings)
+        - Exclude Lines: `Reverse`
+        - Variables: Table
+          - Name: `proxy_params_table`
+          - Columns: `key_column`, `path_column`, `url_column`
+        - Delimiter: (space)
+        - Positions: `1,2,3`
+      - _Test_
+      - new step _Parse Proxy URL_
+        - Operation: Parse URL
+        - Source: `$proxy_params_table[*].url_column`
+        - Target: `$proxy_url_table`
+      - _Test_
+      - new step _Create Tomcat Connection_
+        - Connection Type: Apache to Tomcat
+        - Operation: Create connection
+        - Select Connection Type: Application Flow
+        - Select Entry Point: HTTP(S) Endpoint
+        - Connection attributes:
+          - host: `$proxy_url_table[*].host`
+          - port: `$proxy_url_table[*].port`
+          - protocol: `$proxy_url_table[*].protocol`
+          - url `$proxy_url_table[*].url`
+      - _Test_
+      - _Save_
+      - _Publish_
+- Verify via All > Service Mapping > Application Services > [EMEA Dispatch Scanning Service] > View Map > Run Discovery
+  - should showcase new Apache to Tomcat connection
 
-##### L9.1
+##### L9.1: Dynamic CI Groups
 
 - [lab pdf](https://nowlearning.servicenow.com/sys_attachment.do?sys_id=34da985d87c6c6d052417445dabb354b)
+- Create a CMDB Group
+  - All > Configuration > CMDB Groups > New
+    - Group Name: `Windows SAP Servers`
+    - _Save_
+    - Tab _CMDB Group Contains Encoded Queries_ > New
+      - Group: `Windows SAP Servers`
+      - Class: `Windows Server [cmdb_ci_win_server]`
+      - Filter Condition (NOT “CI Overview Condition”): `Name` | `starts with` | `SAP`
+      - _Submit_
+    - _Show All CI_
+      - _<_ (back)
+    - _Update_
+  - All > Service Mapping > Services > Dynamic CI Groups > New
+    - Name `Windows SAP Dynamic Group`
+    - Business criticality: `1 – most critical`
+    - CMDB Group: `Windows SAP Servers`
+    - _Save_
 
-##### L9.2
+##### L9.2: Create a Tag-based Service
 
 - [lab pdf](https://nowlearning.servicenow.com/sys_attachment.do?sys_id=696f281b878e8654af9f213acebb3599)
   - [cmdb key value import file](https://nowlearning.servicenow.com/sys_attachment.do?sys_id=9efbdc55870ac6d052417445dabb3552)
+- Import Tagging Data in the CMDB
+  - All > cmdb_key_value.list
+    - delete old records
+    - import new records from file
+- Configure Tag Categories
+  - All > Service Mapping > Administration > CI Tag Categories
+    - delete old records
+    - _New_
+      - Tag category name: `Application`
+      - CI tag keys: `Application`, `App`, `AppName`
+      - _Submit_
+    - _New_
+      - Tag category name: `Environment`
+      - CI tag keys: `Environment`, `Env`
+      - _Submit_
+- Create Tag-based Service Families and Service Candidates
+  - All > Service Mapping > Administration > Tag-based Service Families
+    - delete old records
+    - _New_
+      - Service family name: `Services by App-Env`
+      - Tag category: `Application`, `Environment`
+      - _Save_
+      - Related Links > Manually update candidates
+      - _View service candidates_
+        - select candidates
+        - _Map selected_
+      - select _View Map_ for _hr::production_
+        - _Service Map Form button_ (cogwheel)
+          - Related Links > Recalculate Service
+          - _View Map_
 
 ## Courses
+
+### Service Mapping Advanced
+
+#### Introduction
+
+- ITOM Overview
+  - ITOM Visibility
+    - [Discovery](./sn-cis-discovery.md)
+      - populate the CMDB with devices and applications
+    - [Service Mapping](./sn-cis-service-mapping.md)
+      - provide a service-centric CMDB
+  - ITOM Health
+    - Event Management
+      - Event and Alert processing to provide overall service health
+    - Agent Client Collector
+    - Predictive AIOps
+  - ITOM Optimization
+    - Cloud Provisioning & Governance
+    - Site Reliability Operations
+  - holistic approach to eliminate service outages:
+    1. map services to infrastructure
+    2. keep service maps current
+    3. ingest events from across the IT landscape
+    4. prioritize issues and automate fixes
+    5. gain visibility into services health
+- Discovery vs. Service Mapping
+  - Discovery provides a comprehensive inventory of IT resources and relationships
+    - Horizontal Discovery: get a complete inventory
+  - Service Mapping connects services with underlying infrastructure (service aware CMDB)
+    - Top-Down Mapping: map services to infrastructure
+  - both work together to decrease service outages and costs and increase service availability
+- ServiceNow Store
+- Service Mapping Business Value
+
+#### Level Set ITOM Knowledge
+
+#### Discovery Patterns
+
+#### Identification Rules
+
+#### Security
+
+#### Engagement Readiness
 
 ### Service Mapping Fundamentals On Demand
 
@@ -206,17 +336,7 @@ Back to [SNow ITOM](./sn-itom.md)
   - Internal Web Service - relies on: IIS, Windows Server, Load Balancer, MSSQL, Storage and Network
   - Database Service - relies on: Unix, ESX, Storage
   - Stock Trader Service - relies on: IIS, Windows Server, MSSQL
-- ITOM Solutions
-  - ITOM Visibility
-    - [Discovery](./sn-cis-discovery.md)
-    - [Service Mapping](./sn-cis-service-mapping.md)
-  - ITOM Health
-    - Event Management
-    - Agent Client Collector
-    - Predictive AIOps
-  - ITOM Optimization
-    - Cloud Provisioning & Governance
-    - Site Reliability Operations
+- ITOM Solutions: see [SMA Introduction](#introduction)
 - business problem to be addressed: bridging The Gap between IT Operations managing Technology Silos and Business Users consuming software services
   - Which IT components deliver this service?
   - The fund transfer service is down. Which IT component caused it?
@@ -394,7 +514,7 @@ Back to [SNow ITOM](./sn-itom.md)
 
 #### Extending Patterns
 
-- Cl Type/Class Definition
+- CI Type/Class Definition
   - every application needs a corresponding CI type / classifier
   - CI type is used by Discovery Patterns to identify applications
   - used by Identification Rules to determine if application needs to be updated or inserted
@@ -503,4 +623,55 @@ Back to [SNow ITOM](./sn-itom.md)
 
 #### CMDB Reconciliation
 
+- Identification and Reconciliation Engine (IRE): centralized framework for identifying and reconciling data from different data sources
+- IRE modules:
+  - CI Identifier
+    - for both hardware and application CIs
+    - one or more identification entries that specify the attributes that uniquely identify a CI
+  - Reconciliation Rules
+    - which data sources can update which tables or table attributes
+    - assign priorities to data sources
+    - assign time window after which a lower priority data source can overwrite
+  - De-Duplication Tasks: track duplicate Cls until resolved
+  - Reclassification Tasks
+    - either reclassify automatically or create tasks
+    - sys properties:
+      - allow upgrading: `glide.class.upgrade.enabled`
+      - allow downgrading: `glide.class.downgrade.enabled`
+      - allow switching: `glide.class.switch.enabled`
+  - Metadata Rules Editor: defines dependency structure of the Cl types and relationship types in service definitions
+
 #### Other Service Mapping Approaches
+
+- Dynamic CI Groups
+  - group CIs by shared criteria - example: all Windows Server in location X
+- Tag-based Mapping
+  - requires Cloud Discovery
+  - used for (dynamic) cloud resources
+  - requires tagging standards
+  - includes tag normalization approach
+  - advantages:
+    - no configuration credentials required
+    - no elevated user rights required
+  - disadvantage: only correctly tagged CIs are discovered
+  - relationships:
+    - Application Services [svc_traversal_rules] table
+    - preconfigured CI relationships can not be deleted or edited
+  - configuration
+    - All > Service Mapping > Administration > Properties
+      - include CIs based on classes
+      - exclude CIs based on installation status
+    - Service Mapping > Administration > Tag-based Service Traversal Rules
+      - Modify Cl relationships used for tag-based discovery
+- ML Powered Mapping
+  - Discovery of Running processes / TCP Traffic
+  - requires Predictive Intelligence Plug-in
+  - part of Service Mapping Plus, includes the Service Mapping Workspace
+    - Application readiness dashboard
+    - ML powered candidates
+    - Unified map
+      - required roles
+        - access: sn_cmdb_user, sn_cmdb_editor or sn_cmdb_admin roles
+        - access maps with operational application services: app_service_user, and sm_user or sm_admin
+        - access maps with operational and non-operational application services: app_service_admin, and sm_user or sm_admin
+        - access and view related items: itil

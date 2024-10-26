@@ -1,7 +1,5 @@
 # SNow CIS Service Mapping
 
-[[toc]]
-
 ## TODO
 
 - [ ]
