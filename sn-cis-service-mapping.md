@@ -305,7 +305,24 @@ Back to [SNow ITOM](./sn-itom.md)
     - Top-Down Mapping: map services to infrastructure
   - both work together to decrease service outages and costs and increase service availability
 - ServiceNow Store
+  - install _Discovery and Service Mapping Patterns_ to keep up-to-date
 - Service Mapping Business Value
+  - business problem to be addressed: bridging The Gap between IT Operations managing Technology Silos and Business Users consuming software services
+    - Which IT components deliver this service?
+    - The fund transfer service is down. Which IT component caused it?
+    - Which services are affected by this failure?
+    - Will my change have a business impact? On which services?
+  - addressed business cases:
+    - Reduce Mapping Efforts
+      - avg. manual mapping time: 2 weeks
+      - with SM support: 1-4 days
+    - Reduce Mapping Maintenance Efforts
+    - Reduce MTTR by Restoring Services Faster
+      - missing up-to-date knowledge of underlying infrastructure makes service outages hard to diagnose and resolve
+      - a service-aware CMDB helps to quickly identify the root cause
+    - Reduce Risk of Change
+      - without up-to-date and comprehensive understanding of underlying infrastructure, the impact of changes is hard to predict
+      - a service-aware CMDB helps to predict the impact of changes and schedule them accordingly
 
 #### Level Set ITOM Knowledge
 
@@ -337,11 +354,7 @@ Back to [SNow ITOM](./sn-itom.md)
   - Database Service - relies on: Unix, ESX, Storage
   - Stock Trader Service - relies on: IIS, Windows Server, MSSQL
 - ITOM Solutions: see [SMA Introduction](#introduction)
-- business problem to be addressed: bridging The Gap between IT Operations managing Technology Silos and Business Users consuming software services
-  - Which IT components deliver this service?
-  - The fund transfer service is down. Which IT component caused it?
-  - Which services are affected by this failure?
-  - Will my change have a business impact? On which services?
+- Service Mapping Business Value: see [SMA Introduction](#introduction)
 - architecture
   - requires MID server (see [SNow MID Server](./sn-mid-server.md))
 
