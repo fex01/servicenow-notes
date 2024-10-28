@@ -16,7 +16,7 @@ Back to [SNow ITOM](./sn-itom.md)
     - additional material on ML Power Mapping
     - additional material on integrating Service Mapping with Event Management
     - more stuff
-  - [x] [Discovery Fundamentals](./sn-cis-discovery.md#discovery-fundamentals)
+  - [x] [Discovery Fundamentals](./sn-discovery.md#discovery-fundamentals)
   - [ ] [Event Management Fundamentals](https://nowlearning.servicenow.com/lxp/en/it-operations-management/event-management-fundamentals?id=learning_course_prev&course_id=4f84d9c7c323315043395230a0013108)
 
 ### Links
@@ -280,9 +280,9 @@ Back to [SNow ITOM](./sn-itom.md)
 
 - ITOM Overview
   - ITOM Visibility
-    - [Discovery](./sn-cis-discovery.md)
+    - [Discovery](./sn-discovery.md)
       - populate the CMDB with devices and applications
-    - [Service Mapping](./sn-cis-service-mapping.md)
+    - [Service Mapping](./sn-service-mapping.md)
       - provide a service-centric CMDB
   - ITOM Health
     - Event Management
@@ -356,7 +356,7 @@ Back to [SNow ITOM](./sn-itom.md)
 - ITOM Solutions: see [SMA Introduction](#introduction)
 - Service Mapping Business Value: see [SMA Introduction](#introduction)
 - architecture
-  - requires MID server (see [SNow MID Server](./sn-mid-server.md))
+  - requires MID server (see [SNow MID Server](./sn-discovery-mid-server.md))
 
 #### Horizontal Discovery
 
@@ -489,7 +489,7 @@ Back to [SNow ITOM](./sn-itom.md)
       - Identification
       - Extension
       - Connection (only for Application Patterns)
-    - ![Service Mapping Process Flow: With Connections](./attachments/sn-cis-service-mapping-process-flow.png)
+    - ![Service Mapping Process Flow: With Connections](./attachments/sn-service-mapping-process-flow.png)
 - focus on **Fix** (details see [Service Lifecycle](#service-lifecycle))
   - Errors
     - are categorized and displayed in prioritized tiles

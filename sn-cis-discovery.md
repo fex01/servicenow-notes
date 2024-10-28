@@ -1,3 +1,0 @@
-# CIS Discovery
-
-## Discovery Fundamentals
