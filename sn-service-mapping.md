@@ -35,6 +35,278 @@ Back to [SNow ITOM](./sn-itom.md)
 
 #### Labs: Service Mapping Advanced
 
+##### L2.3: Map Services with CI Tagging
+
+- [course book](https://servicenow.read.inkling.com/a/b/19c4613ca7d841ee9b3cc5f1bd05302d/p/52d7650bd2bd4e8f855131b64d62dd32)
+  - [TagMappingCIs.txt](https://nowlearning.servicenow.com/sys_attachment.do?sys_id=d02ccac68796421424e0bb39dabb354a)
+    - create 2 x Windows Servers CIs
+    - create 3 x application Cis
+    - create Tags for the Applications and Windows Servers
+- Run the TagMappingCIs.txt as a Background Script
+  - All > System Definition > Scripts - Background
+  - paste and _Run Script_
+- Observe the New CIs, Relationships and Tag Key Values
+  - All > Configuration > Servers > Windows
+  - open record
+    - Related Items > _Show dependency views_
+  - All > `cmdb_key_value.list`
+    - see tags
+- Create Tag Categories and Tag Based Service Families
+  - All > Service Mapping > Administration > CI Tag Categories > New
+    - Tag category name: `Service`
+    - CI tag keys: `Service`, `Serv`
+    - _Submit_
+  - All > Service Mapping > Administration > Tag-based Service Families > New
+    - Service family name: `Services by Service and Environment`
+    - Tag category: `Service`, `Environment`
+    - _Save_
+    - Related Links > _Manually update candidates_
+    - _View service candidates_
+      - select all
+      - _Map selected_
+      - _OK_
+- Manually Calculate the Two New Application Services
+  - All > Service Mapping > Services > Tag-based Services
+    - open record
+    - Related Links > _Recalculate Service_
+    - _View Map_
+
+##### L2.4: Discover Ruby on Rails Service
+
+- [course book](https://servicenow.read.inkling.com/a/b/19c4613ca7d841ee9b3cc5f1bd05302d/p/5d1c9bc81a794619aba09355e2155671)
+- Create and Discover the Ruby on Rails Service
+  - All > Service Mapping > Home
+    - _Additional Options_ > _Define A Single Service Map_
+      - Name: `Ruby on Rails Application`
+      - Owner: `<Service Owner>`
+      - Web Application
+        - Entry Point URL: `http://<ip>/posts`
+        - _Add_
+      - _Save_
+      - Traffic based discovery: false
+      - _Update_
+      - _View Map_
+- Create Custom CI Type
+  - All > Configuration > CI Class Manager
+  - Hierarchie > Application Server > [right-click] > Add Child Class
+    - Display Name: `Ruby on Rails Application Server`
+    - Table Name: _auto-generates_
+    - _Next_ (until _Set Identification Rule_)
+    - _Replace_
+      - Dependent: true
+      - _Save_
+    - _Add_
+      - _Use attributes from main table_
+      - _Next_
+      - Criterion Attributes: Class, Configuration file
+      - Allow fallback to parent's rules: true
+      - _Save_
+    - _Next_ until and including _Done_
+- Create Custom Discovery Pattern
+  - All > Pattern Designer > Discovery Patterns
+  - New
+    - Name: `Ruby on Rails Application`
+    - CI Type: `Ruby on Rails Application Server`
+    - Operating System: All
+    - _Done_
+    - Identification Section > New
+      - Name: `Identify Ruby on Rails Application Server`
+      - Entry Point Type: `HTTP(S) Endpoint`
+      - _Done_
+    - _Save_
+    - Identification Section > _Identify Ruby on Rails Application Server_
+      - Debug Mode
+        - URL: `http://<ip>:8080/posts`
+      - step _Match Process Name_
+        - Operation: Match
+        - Condition: `$process.executable` | `equals` | `"ruby"`
+        - _Test_
+      - _Command Prompt_: 
+        - Command: `cat /usr/local/rvm/rubies/ruby-3.0.0/config`
+        - _Run Command_
+        - notice output and _Close_
+      - step _Set Config File_
+        - Operation: Set Parameter Value
+        - Value: `$process.environmentVariables.MY_RUBY_HOME.value +"/config"`
+      - _Save_
+      - _Publish_
+- Test New Identification Rule and Pattern
+  - All > Service Mapping > Services > Application Services
+  - open record > View Map > Run Discovery
+- Create New Connectivity Section
+  - pattern _Ruby on Rails Application_
+  - Connection Section > New
+    - Name: `Connect to Database`
+    - _Done_
+  - _Save_
+  - Connection Section > _Connect to Database_
+    - Debug Mode
+      - URL: `http://<ip>:8080/posts`
+    - step 1 _Find DBMS_
+      - Operation: Parse File
+      - Select File: `$process.currentDir + "/config/database.yml"`
+      - Define Parsing: Delimited text
+      - Include Lines: `adapter`
+      - Variable: `DBMS`
+        - Delimiter: (space)
+        - Positions: `2`
+      - _Test_
+      - _Save_
+    - step 2 _Get Database Connection Host_
+      - Operation: Parse File
+      - Select File: `$process.currentDir + "/config/database.yml"`
+      - Define Parsing: Delimited text
+      - Include Lines: `host`
+      - Exclude Lines: `#`
+      - Variable: `database_host`
+        - Delimiter: (space)
+        - Positions: `2`
+      - _Test_
+      - _Save_
+    - step 3 _Get Port Information_
+      - Operation: Parse File
+      - Select File: `$process.currentDir + "/config/database.yml"`
+      - Define Parsing: Delimited text
+      - Include Lines: `port`
+      - Exclude Lines: `#`
+      - Variable: `port`
+        - Delimiter: (space)
+        - Positions: `2`
+      - _Test_
+      - _Save_
+    - challenge step _Get Instance Information_
+      - Operation: Parse File
+      - Select File: `$process.currentDir + "/config/database.yml"`
+      - Define Parsing: Delimited text
+      - Include Lines: `database`
+      - Exclude Lines: `#`
+      - Variable: `instance`
+        - Delimiter: (space)
+        - Positions: `2`
+      - _Test_
+      - _Save_
+    - step 4 _Create Database Connection_
+      - Operation: Create Connection
+      - Precondition: true
+        - `$DBMS` | `equals` | `"postgresql"`
+      - Select Connection Type: `Application Flow`
+      - Entry point type: `PostgresQL DB Endpoint`
+      - Connection attributes:
+        - host: `$database_host`
+        - instance: `$instance` (challenge step)
+        - port: `$port`
+      - _Test_
+      - _Save_
+    - _Publish_
+- Create Discovery Schedule
+  - All > Discovery > Discovery Schedules
+  - New
+    - Name: `198.51.0.0/16 subnet`
+    - Discover: `Configuration Items`
+    - MID Server selection method: `Auto-Select Mid Server`
+    - Run: `Daily`
+    - Time: `20` (Hours)
+    - _Save_
+    - Related Lists > Discovery IP Ranges > New
+      - Name: `IP Network`
+      - Type: `IP Network`
+      - Network IP: `198.51.0.0`
+      - Network mask (or bits): `16`
+      - _Submit_
+    - _Update_
+  - All > Service Mapping > Administration > Discovery Schedules
+  - New
+    - Name: `Ruby Application Schedule`
+    - Discover by: `CI Type`
+    - CI Type: `Ruby on Rails Application Server`
+    - Run: `Daily`
+    - Time: `4` (Hours)
+    - _Submit_
+- View Configuration Items Associated to the Service
+  - All > `svc_ci_assoc.list`
+  - All > Service Mapping > Services > Application Services
+    - open record
+    - Related Links > List CIs
+
+##### L2.5: Create a CSDM Model for Services and Link to Service Maps
+
+![CSDM Model](./attachments/sn-csdm-model.png)
+![CSDM Example: Sage Payroll](./attachments/sn-csdm-example-sage-payroll.png)
+
+- [course book](https://servicenow.read.inkling.com/a/b/19c4613ca7d841ee9b3cc5f1bd05302d/p/9183f4220faf4fdfa83cc050850fc700)
+  - [CSDM-SagePayroll.txt](https://nowlearning.servicenow.com/sys_attachment.do?sys_id=5433ee0e875e421424e0bb39dabb359e)
+- Review the Tables That Will Be Populated and Their Purpose
+
+| Table Name                                | Function                                                                                                                                                          | CSDM Domain     | Example records for this Lab                   |
+|-------------------------------------------|-------------------------------------------------------------------------------------------------------------------------------------------------------------------|-----------------|------------------------------------------------|
+| Business Capability [cmdb_ci_business_capability]      | A high-level capability that an organization must have to complete a business objective – Non-Operational                                                        | Design          | Payroll Analysis Payroll Administration       |
+| Information Object [cmdb_ci_information_object]        | Used to identify types of data being used in the Application (e.g., sensitive personal info or financial info) – Non-Operational                                 | Design          | Personal Employee Information                 |
+| Business Application [cmdb_ci_business_app]            | An organizational definition of a Business Application that is used to provide key business functionality – Non-Operational                                       | Design          | Sage Payroll                                   |
+| Application Service [cmdb_ci_service_auto]             | An operational implementation of the Business Application. This type of record can be linked to Incidents, Problems, and Changes and is also discovered via Service Mapping – Operational | Manage          | Sage Payroll Prod, Sage Payroll QA, Sage Payroll Test, Sage Payroll Dev |
+| Business Service Offering [service_offering] – Service Classification attribute = Business Service | A Service Offering is subscribed to by users, groups and departments and uses a service level definition to measure performance. Performance is defined with linked SLAs, response times, etc. – Can be linked to Incidents, Problems, and Changes | Sell/Consume    | Employee Payroll Desktop, Employee Payroll Mobile |
+| Business Service [cmdb_ci_service]                     | A container to define the service to end users. The Business Service contains one or more Service Offerings – Can be linked to Incidents, Problems, and Changes   | Sell/Consume    | Sage Payroll Self-Service                      |
+| Technical Service Offering [service_offering] – Service Classification attribute = Technical Service | Similar to a Business Service Offering but refers to an infrastructure technology (e.g., Windows Servers, Networking)                                           | Manage          | Linux Host Management, Windows Host Management |
+
+- Run Script to Populate the CSDM Tables for This Lab Example
+  - All > System Definition > Scripts - Background
+    - paste and _Run Script_
+  - All > CSDM > Design > Business Application
+    - open record _Sage Payroll_ and adapt to:
+      - Application type: `COTS`
+      - Department: `Finance`
+      - User base: `1000+`
+      - Related Lists > Owners
+        - Business Owner: set a Finance Manager
+        - IT Application Owner: set an IT Manager
+      - _Save_
+      - _View Dependency Map_
+- Configure the Business Application
+  - All > CSDM > Application Service Settings
+    - Required attributes: `Number`, `Name`, `Version`, `Environment`, `Operational Status`, `Support Group`, `Change Group`
+    - Required relationships: `Business Application`, `Technical Service Offering`,  `Business Service Offering`
+    - _Save_
+  - All > CSDM > Manage Technical Services > Application Service > New
+    - key to linking operational Application to operational CI stack in the Manage domain - and to the Design and Consume domains
+    - Name: `Sage Payroll Prod`
+    - Environment: `Production`
+    - Version: `2.0`
+    - Operational Status: `Operational`
+    - Support Group: `Service Desk`
+    - Change Group: `ITSM Engineering`
+    - Set Relationships
+      - Business Application: `Sage Payroll`
+      - Technical Service Offering: `Linux Host Management`
+      - Business Service Offering: `Employee Payroll Desktop`, `Employee Payroll Mobile`
+    - _Next_
+    - Chose a Method
+      - Service Population Method: `Manual`
+      - Class: `Web Server`
+      - CI: `Apache Sage Payroll`
+      - _Save_
+    - _Next_
+    - _Done_
+    - _View Map_
+      - select Apache Web Server CI > right-click > Add a CI
+        - CI Type: `Linux Server`
+        - CI Name: select Linux server CI
+        - _Add_
+- View the New Dependency Map
+  - All > CSDM > Design > Business Application > record [Sage Payroll] > Show Dependency Map
+    - select Mapped Application _Sage Payroll Prod_ > right-click > Load more
+- Use the CSDM Data Model to Provide Full Information for Incident Management
+  - All > Incident > Create New
+    - Caller: select
+    - Category: `Hardware`
+    - Subcategory: `CPU`
+    - Impact: `1-High`
+    - Urgency: `1-High`
+    - Configuration Item: select application service Linux server
+    - Short Description: describe a server CPU issue
+    - _Save_
+    - Additional Actions > Refresh Impacted Services
+    - Refresh page
+    - see Related Lists > Impacted Services/CIs
+
 #### Labs: Service Mapping Fundamentals
 
 ##### L1: Navigate Service Mapping
@@ -326,6 +598,49 @@ Back to [SNow ITOM](./sn-itom.md)
 
 #### Level Set ITOM Knowledge
 
+- [MID server](./sn-discovery-mid_server.md)
+- [Discovery](./sn-discovery.md)
+- [Service Mapping Overview](#service-mapping-overview)
+- Event Management
+  - definition: consolidates events from existing monitoring systems to provide real-time state of it infrastructure
+  - alerts and impact profiles
+    - Alerts apportioned against the CMDB and the Service Map
+    - Impact defined against the Parent CI or the Service
+    - Impact Calculation based upon
+      - Impact Rules Table [em_impact_rule]
+      - If an association exists between the CI and the Service as defined in the Service Configuration Table [svc_ci_assoc]
+      - CI linked to Service or CI linked to Parent
+      - A cluster member always effects the cluster and not the Service directly
+  - process
+    - event sources provide events via REST APIs
+    - Event Management applies:
+      - Mapping Rules
+      - Transform Rules
+      - Threshold Rules
+      - Filters
+    - to produce Alerts
+    - Alert Management creates Incidents
+- what is a Service?
+  - ITIL: A Service that is delivered to customers by business units
+  - ServiceNow:
+    - **Business Service**: An offering that is delivered to business customers or internal customers
+    - **Application Service**: An Application Service is a discoverable running Application that processes IT transactions in real-time
+    - **Business Application**: A business application is a general representation of an IT system that provides a business function
+  - Application Service
+    - table `[cmdb_ci_service_auto]`
+      - extended by:
+        - Mapped Application Service `[cmdb_ci_service_discovered]`
+        - Dynamic CI Group `[cmdb_ci_query_based_service]`
+        - Manual Service `[cmdb_ci_service_manual]`
+    - represents a deployed Application Stack
+    - can be populated through:
+      - Service Mapping discovery through Entry Points `[cmdb_ci_service_discovered]`
+      - Tag based mapping `[cmdb_ci_service_by_tags]`
+      - Query based Dynamic CI Groups `[cmdb_ci_query_based_service]`
+      - Manual Configuration `[cmdb_service_manual]`
+    - CSDM: Links Services and Infrastructure to performance levels (Offerings)
+      - guidance on service modeling by recommending CI relationships
+
 #### Discovery Patterns
 
 #### Identification Rules
@@ -357,6 +672,12 @@ Back to [SNow ITOM](./sn-itom.md)
 - Service Mapping Business Value: see [SMA Introduction](#introduction)
 - architecture
   - requires MID server (see [SNow MID Server](./sn-discovery-mid-server.md))
+- phases:
+  - Entry Point: identify entry point, e.g. URL, TCP connection, Citrix entry point, ...
+  - ServiceNow Discovery: targeted port scan, classification, identification, exploration
+  - Process Detection: determine process behind IP and port (entry point)
+  - Identification/Classification of Applications: pattern identification section
+  - Connection: discover outgoing connections -> new entry point to start with first step
 
 #### Horizontal Discovery
 
@@ -645,14 +966,14 @@ Back to [SNow ITOM](./sn-itom.md)
     - which data sources can update which tables or table attributes
     - assign priorities to data sources
     - assign time window after which a lower priority data source can overwrite
-  - De-Duplication Tasks: track duplicate Cls until resolved
+  - De-Duplication Tasks: track duplicate CIs until resolved
   - Reclassification Tasks
     - either reclassify automatically or create tasks
     - sys properties:
       - allow upgrading: `glide.class.upgrade.enabled`
       - allow downgrading: `glide.class.downgrade.enabled`
       - allow switching: `glide.class.switch.enabled`
-  - Metadata Rules Editor: defines dependency structure of the Cl types and relationship types in service definitions
+  - Metadata Rules Editor: defines dependency structure of the CI types and relationship types in service definitions
 
 #### Other Service Mapping Approaches
 
@@ -675,7 +996,7 @@ Back to [SNow ITOM](./sn-itom.md)
       - include CIs based on classes
       - exclude CIs based on installation status
     - Service Mapping > Administration > Tag-based Service Traversal Rules
-      - Modify Cl relationships used for tag-based discovery
+      - Modify CI relationships used for tag-based discovery
 - ML Powered Mapping
   - Discovery of Running processes / TCP Traffic
   - requires Predictive Intelligence Plug-in
