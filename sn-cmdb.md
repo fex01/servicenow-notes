@@ -1,11 +1,27 @@
 # CMDB
 
-- requirements (Carnival Draft):
-  - 3.4, p6: "Published change management procedures to update the CMDB with any changes in asset status, configuration, or ownership."
-  - 3.5:
-    - Restrict access to the CMDB to authorized ITSM providers, reviewers, approvers, asset owners, custodians, and any of the roles listed above.
-    - Implement access controls to ensure users can only view or modify the data relevant to their responsibilities.
-    - Ensure the CMDB platform adheres to the organization’s overall IT security policies.
+## Tag Governance
+
+- [docs: Tag Governance](https://docs.servicenow.com/bundle/washingtondc-it-operations-management/page/product/it-operations-management/concept/tag-governance.html)
+- summary (ChatGPT):
+  - Tag Governance App: Identifies non-compliant cloud/on-premises resources against organizational tag policies.
+  - Tags: Key-value pairs used to categorize assets for better visibility into cloud usage and costs.
+  - Discovery Features:
+    - Collects cloud tags for VMs and saves them in the Key Value table.
+    - Supports major cloud providers (AWS, Azure, GCP) and container ecosystems.
+  - Tagging Policies:
+    - Establish policies based on organizational needs (e.g., finance, IT security).
+    - Consider user access levels and real-time checks for effective management.
+  - Dashboard Functions:
+    - Monitor compliance with tag policies.
+    - Identify non-compliant CIs and use remediation flows for bulk updates.
+  - Policy Types for Auditing:
+    - Tag Count: Checks specified tag key counts.
+    - Tag Presence: Verifies presence of specified tag key values.
+    - Tag Key & Value: Confirms presence of specific key-value pairs.
+  - Auto-Remediation: Automates tagging of cloud resources using AWS permissions.
+  - Requirements: ITOM Visibility entitlements needed for remediation tasks.
+
 
 ## Change Management
 
@@ -48,7 +64,7 @@
   - [community: How to Enable Audit History for CI and Asset Tables](https://www.servicenow.com/community/cmdb-forum/how-to-enable-audit-history-for-ci-and-asset-tables/m-p/2842781)
     - All > System Definition -> Dictionary
       - open table record and set Audit to true
-      - can have performance impact, 
+      - can have performance impact, configure data cleanups
 - check: have ITIL user CMDB write permissions
   - yes: [sn_cmdb_editor]
   - [itil_admin] contains [sn_cmdb_admin]
@@ -65,5 +81,5 @@
     - Technical Service Offerings for Application Services Managed by Group: down to Application level
     - Technical Service Offerings for Infrastructure (Dynamic CI Groups) Managed by Groups: all CIs in Dynamic CI Group
     - discovery source service accounts: restrict to CI Classes according to Reconciliation Rules
-  - Services CIs restricted according to service roles: [service_author], [service_admin], [service_ editor]
+  - Services CIs restricted according to service roles: [service_author], [service_admin], [service_editor]
   - erweitert: Schreibschutz auf spezifischen Feldern möglich
