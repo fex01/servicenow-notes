@@ -612,7 +612,7 @@
   - Process Classification
   - IP Address(Only) Classification
 
-#### DF: Asset Discovery and Agent Client Collector for Visibility(s)
+#### DF: Asset Discovery and Agent Client Collector
 
 - [Asset Management](./sn-asset.md)
 - Assets and Cls - how are they related?
@@ -660,61 +660,81 @@
     - Newly created CIs requires verification through a Ul action to:
       - Create Asset - Creates an Asset associated with the newly created Cl record
       - Merge Cl - Merge duplicates of a Cl if the Asset for the Cl was created through a different process and a Cl record already exists
-- Agent Client Collector for Visibility (ACC-V)
-  - Overview ACC-V
-    - installed on Windows, Mac and Linux to collect host data
-    - multiple capabilities based on installed plugins:
-      - Agent Client Collector Framework (ACC-F)
-      - Agent Client Collector Monitoring (ACC-M)
-      - Agent Client Collector For Visibility (ACC-V)
-        - Discovery & SAM
-    - Deploys Ruby scripts that execute OS Query and OS-specific commands to gather information such as:
-      - Basic Inventory
-      - Serial Numbers
-      - Storage Devices
-      - File Systems
-      - Network Adapters
-      - TCP Connections
-      - Running Processes
-      - Installed Software
-      - Local User
-    - Powershell is not being used in any of the ACC-V modules
+
+##### DF: Agent Client Collector for Visibility (ACC-V)
+
+- installation
+  - required license: ITOM Discovery v2, ITOM Visibility or any bundle that includes ITOM Visibility
   - required plugins
-    - Discovery plugin (com.snc.discovery) must be installed and activated
-    - Agent Client Collector Framework (ACC-F)
+    - _Discovery_ plugin (com.snc.discovery) must be installed and activated
+    - _Agent Client Collector Framework_ (ACC-F)
     - ITOM-Discovery or ITOM-Visibility SKUs (SU-based licensing) is required
-    - Agent Client Collector for Visibility (ACC-V) application is downloaded from the ServiceNow Store or from the instance (sn_acc_visibility)
-  - Process: applies Checks and Policies to schedule and collect host data which is triggered during the following cases:
-    - Periodic scheduling: A policy-based approach where Discovery is triggered on a periodic basis
-    - On Cl delete: When the computer or server Cl record is deleted
-    - MID Server cycle: When the MID Server goes down and comes back up
-    - Target host cycle: When the target host goes down and comes back up
-    - Network break: When there is a break in the network link to the target
-  - MID server
-    - ACC Listener needs to be installed
-    - Agents use the MID server to send data to the ServiceNow Instance
-    - Agent send first data > CI is created > CI Class policies are send back to the MID server > policies are pushed to the agent devices
-    - Policies include:
-      - checks
-      - check parameter
-      - plugins
-      - frequency
-  - Check Definitions
-    - All > Agent Client Collector > Configuration > Check Definitions
-      - checks are stored, created and updated on the instance
-    - executes the osquery command on agents
-    - osquery commands are used to gather specific attribute details from a Cl such as serial number, file systems, running processes, etc
-    - four Check Definitions are used by four ACC-V Policies
-  - Policies
-    - four policies for ACC-V
-      - Enhanced Discovery Policy
-      - Software Installed Policy
-      - SAM discovery
-      - SAM background policy
-    - define which Cl type to monitor
-    - defines interval-based scheduling
-    - default interval is 86400 seconds, which is every 24
-  - Discovery Source: ACC-Visibility
+    - _Discovery and Service Mapping Patterns_ plugin
+    - _Visibility Content_ plugin
+    - _Agent Client Collector for Visibility_ (ACC-V) application is downloaded from the ServiceNow Store or from the instance (sn_acc_visibility)
+  - MID properties to be enabled
+    - mid.sa.ssh.use_sncssh set to true
+    - mid.ssh.use_snc set to true
+  - ACC: check allow list at the responsibility of the user Activation:
+    - sn_agent.appl_classification_behavior set to `full` (enable pattern execution)
+    - sn_agent.disco_disable_ci_clobber_of_agentless_disco set to false (for horizontal discovery)
+  - full prerequisites for patterns with ACC: [Pattern Execution with Agent Client Collector](https://support.servicenow.com/kb?id=kb_article_view&sysparm_article=KB1323623)
+- Overview ACC-V
+  - installed on Windows, Mac and Linux to collect host data
+  - multiple capabilities based on installed plugins:
+    - Agent Client Collector Framework (ACC-F)
+    - Agent Client Collector Monitoring (ACC-M)
+    - Agent Client Collector For Visibility (ACC-V)
+      - Discovery & SAM
+  - Deploys Ruby scripts that execute OS Query and OS-specific commands to gather information such as:
+    - Basic Inventory
+    - Serial Numbers
+    - Storage Devices
+    - File Systems
+    - Network Adapters
+    - TCP Connections
+    - Running Processes
+    - Installed Software
+    - Local User
+  - Powershell is not being used in any of the ACC-V modules
+- Process: applies Checks and Policies to schedule and collect host data which is triggered during the following cases:
+  - Periodic scheduling: A policy-based approach where Discovery is triggered on a periodic basis
+  - On Cl delete: When the computer or server Cl record is deleted
+  - MID Server cycle: When the MID Server goes down and comes back up
+  - Target host cycle: When the target host goes down and comes back up
+  - Network break: When there is a break in the network link to the target
+- MID server
+  - ACC Listener needs to be installed
+  - Agents use the MID server to send data to the ServiceNow Instance
+  - Agent send first data > CI is created > CI Class policies are send back to the MID server > policies are pushed to the agent devices
+  - Policies include:
+    - checks
+    - check parameter
+    - plugins
+    - frequency
+- Check Definitions
+  - All > Agent Client Collector > Configuration > Check Definitions
+    - checks are stored, created and updated on the instance
+  - executes the osquery command on agents
+  - osquery commands are used to gather specific attribute details from a Cl such as serial number, file systems, running processes, etc
+  - four Check Definitions are used by four ACC-V Policies
+- Policies
+  - four policies for ACC-V
+    - Enhanced Discovery Policy
+    - Software Installed Policy
+    - SAM discovery
+    - SAM background policy
+  - define which Cl type to monitor
+  - defines interval-based scheduling
+  - default interval is 86400 seconds, which is every 24
+- Discovery Source: ACC-Visibility
+- Pattern Execution from the ACC
+  - [community post](https://www.servicenow.com/community/itom-blog/running-patterns-with-the-agent-client-collector-check-out-what/ba-p/2568742)
+  - Execute discovery patterns on environments that are not typically accessible for agentless discovery
+  - Leverage existing connection from the ACC instead of trying SSH and WinRM/ PowerShell to connect to the system
+  - Flexibility to execute discovery patterns for both agentless & agent-based discovery
+  - Allow discovery admins to run Service Mapping in Hybrid mode (Agentless + Agent-based)
+  - Supported from Washington release onwards with Service Mapping Plus application
 
 #### DF: Horizontal Discovery Patterns
 

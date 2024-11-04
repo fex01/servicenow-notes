@@ -121,7 +121,7 @@ Back to [SNow ITOM](./sn-itom.md)
         - Operation: Match
         - Condition: `$process.executable` | `equals` | `"ruby"`
         - _Test_
-      - _Command Prompt_: 
+      - _Command Prompt_:
         - Command: `cat /usr/local/rvm/rubies/ruby-3.0.0/config`
         - _Run Command_
         - notice output and _Close_
@@ -237,15 +237,15 @@ Back to [SNow ITOM](./sn-itom.md)
   - [CSDM-SagePayroll.txt](https://nowlearning.servicenow.com/sys_attachment.do?sys_id=5433ee0e875e421424e0bb39dabb359e)
 - Review the Tables That Will Be Populated and Their Purpose
 
-| Table Name                                | Function                                                                                                                                                          | CSDM Domain     | Example records for this Lab                   |
-|-------------------------------------------|-------------------------------------------------------------------------------------------------------------------------------------------------------------------|-----------------|------------------------------------------------|
-| Business Capability [cmdb_ci_business_capability]      | A high-level capability that an organization must have to complete a business objective – Non-Operational                                                        | Design          | Payroll Analysis Payroll Administration       |
-| Information Object [cmdb_ci_information_object]        | Used to identify types of data being used in the Application (e.g., sensitive personal info or financial info) – Non-Operational                                 | Design          | Personal Employee Information                 |
-| Business Application [cmdb_ci_business_app]            | An organizational definition of a Business Application that is used to provide key business functionality – Non-Operational                                       | Design          | Sage Payroll                                   |
-| Application Service [cmdb_ci_service_auto]             | An operational implementation of the Business Application. This type of record can be linked to Incidents, Problems, and Changes and is also discovered via Service Mapping – Operational | Manage          | Sage Payroll Prod, Sage Payroll QA, Sage Payroll Test, Sage Payroll Dev |
-| Business Service Offering [service_offering] – Service Classification attribute = Business Service | A Service Offering is subscribed to by users, groups and departments and uses a service level definition to measure performance. Performance is defined with linked SLAs, response times, etc. – Can be linked to Incidents, Problems, and Changes | Sell/Consume    | Employee Payroll Desktop, Employee Payroll Mobile |
-| Business Service [cmdb_ci_service]                     | A container to define the service to end users. The Business Service contains one or more Service Offerings – Can be linked to Incidents, Problems, and Changes   | Sell/Consume    | Sage Payroll Self-Service                      |
-| Technical Service Offering [service_offering] – Service Classification attribute = Technical Service | Similar to a Business Service Offering but refers to an infrastructure technology (e.g., Windows Servers, Networking)                                           | Manage          | Linux Host Management, Windows Host Management |
+| Table Name                                                                                           | Function                                                                                                                                                                                                                                           | CSDM Domain  | Example records for this Lab                                            |
+| ---------------------------------------------------------------------------------------------------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | ------------ | ----------------------------------------------------------------------- |
+| Business Capability [cmdb_ci_business_capability]                                                    | A high-level capability that an organization must have to complete a business objective – Non-Operational                                                                                                                                          | Design       | Payroll Analysis Payroll Administration                                 |
+| Information Object [cmdb_ci_information_object]                                                      | Used to identify types of data being used in the Application (e.g., sensitive personal info or financial info) – Non-Operational                                                                                                                   | Design       | Personal Employee Information                                           |
+| Business Application [cmdb_ci_business_app]                                                          | An organizational definition of a Business Application that is used to provide key business functionality – Non-Operational                                                                                                                        | Design       | Sage Payroll                                                            |
+| Application Service [cmdb_ci_service_auto]                                                           | An operational implementation of the Business Application. This type of record can be linked to Incidents, Problems, and Changes and is also discovered via Service Mapping – Operational                                                          | Manage       | Sage Payroll Prod, Sage Payroll QA, Sage Payroll Test, Sage Payroll Dev |
+| Business Service Offering [service_offering] – Service Classification attribute = Business Service   | A Service Offering is subscribed to by users, groups and departments and uses a service level definition to measure performance. Performance is defined with linked SLAs, response times, etc. – Can be linked to Incidents, Problems, and Changes | Sell/Consume | Employee Payroll Desktop, Employee Payroll Mobile                       |
+| Business Service [cmdb_ci_service]                                                                   | A container to define the service to end users. The Business Service contains one or more Service Offerings – Can be linked to Incidents, Problems, and Changes                                                                                    | Sell/Consume | Sage Payroll Self-Service                                               |
+| Technical Service Offering [service_offering] – Service Classification attribute = Technical Service | Similar to a Business Service Offering but refers to an infrastructure technology (e.g., Windows Servers, Networking)                                                                                                                              | Manage       | Linux Host Management, Windows Host Management                          |
 
 - Run Script to Populate the CSDM Tables for This Lab Example
   - All > System Definition > Scripts - Background
@@ -263,7 +263,7 @@ Back to [SNow ITOM](./sn-itom.md)
 - Configure the Business Application
   - All > CSDM > Application Service Settings
     - Required attributes: `Number`, `Name`, `Version`, `Environment`, `Operational Status`, `Support Group`, `Change Group`
-    - Required relationships: `Business Application`, `Technical Service Offering`,  `Business Service Offering`
+    - Required relationships: `Business Application`, `Technical Service Offering`, `Business Service Offering`
     - _Save_
   - All > CSDM > Manage Technical Services > Application Service > New
     - key to linking operational Application to operational CI stack in the Manage domain - and to the Design and Consume domains
@@ -306,6 +306,137 @@ Back to [SNow ITOM](./sn-itom.md)
     - Additional Actions > Refresh Impacted Services
     - Refresh page
     - see Related Lists > Impacted Services/CIs
+
+##### L3.1: Service Mapping Pattern Techniques
+
+- [course book](https://servicenow.read.inkling.com/a/b/19c4613ca7d841ee9b3cc5f1bd05302d/p/efd89c1726e64d768822c33324e61f5e#ab226878187f4c38bda26322c6e64a55)
+- Run Discovery on Your Windows MID Server
+  - All > Discovery > Discovery Schedules > Quick Discovery
+    - Target IP: MID Server IP (can be found in the MID server record)
+- Add New Attributes to the Window Cl Class
+  - All > Configuration > CI Class Manager > Hierarchy > Windows Server > Attributes > Added
+    - Insert a new row (all String):
+      - `OS architecture`, max=10
+      - `OS system dir`, max=75
+      - `DHCP enabled`, max=10
+      - `DHCP server`, max=25
+      - `Server Domain Role`, max=25
+    - _Save_
+- Configure the Windows Server Form to Display the New Attributes
+  - All > Configuration > Servers > Windows > [mid server record]
+    - Additional Actions > Configure > Form Layout
+      - Section: `Configuration`
+      - add _OS architecture_ and _OS system dir_ under _OS Service Pack_
+      - _Save_
+    - Additional Actions > Configure > Form Layout
+      - Section (New): `Networking`
+      - add the other three new attributes
+      - _Save_
+- Configure the Window OS - Server Pattern to Add an Extension Section
+  - All > Pattern Designer > Discovery Patterns > record [Windows OS - Servers]
+    - Extension Section > New
+      - Name: `Windows extra data`
+      - _Done_
+- Develop an Extension Pattern to Collect the New Windows Data
+  - Windows OS - Servers pattern > Extension Section > Windows extra data
+    - Debug Mode
+      - Host name/IP: MID Server IP
+      - _Connect_
+    - step 1 `Collect WMI OS data`
+      - Operation: `WMI Query`
+      - _Get Data_
+      - Namespace: `"root/CIMV2"`
+      - Select Table Name And Fields: `Win32_OperatingSystem` | `OSArchitecture`, `SystemDirectory`
+      - Target Table: `$os_data`
+      - _Test_
+    - _Save_
+    - step 2 `Update OS Architecture`
+      - Operation: `Set Parameter Value`
+      - Value: `$os_data[1].OSArchitecture`
+      - Name: `$cmdb_ci_win_server[1].u_os_architecture`
+      - _Test_
+    - _Save_
+    - step 3 `Update OS System Dir`
+      - Operation: `Set Parameter Value`
+      - Value: `$os_data[1].SystemDirectory`
+      - Name: `$cmdb_ci_win_server[1].u_os_system_dir`
+      - _Test_
+    - _Save_
+    - step 4 `Collect DHCP data`
+      - Operation: `Parse Command Output`
+      - Set command details: `systeminfo`
+        - [MS systeminfo docs](https://docs.microsoft.com/en-us/windows-server/administration/windows-commands/systeminfo)
+        - _Run Command_
+      - Define Parsing: `Delimited text`
+      - Include Lines: `DHCP`
+      - Variables: Table
+        - Name: `dhcp_data`
+        - Columns: `name`, `value`
+      - Delimiter: `\n`, `:`
+      - Positions: `1,2`
+      - _Test_
+    - _Save_
+    - step 5 `Extract DHCP Enabled`
+      - Operation: `Filter Table`
+      - Source table: `$dhcp_data`
+      - Target table: `$dhcp_enabled`
+      - Condition: `$dhcp_data[].name` | `contains` | `"DHCP Enabled"`
+      - _Test_
+    - _Save_
+    - step 6 `Extract DHCP Server`
+      - Operation: `Filter Table`
+      - Source table: `$dhcp_data`
+      - Target table: `$dhcp_server`
+      - Condition: `$dhcp_data[].name` | `contains` | `"DHCP Server"`
+      - _Test_
+    - _Save_
+    - step 7 `Populate DHCP Enabled`
+      - Operation: `Set Parameter Value`
+      - Value: `$dhcp_enabled[1].value`
+      - Name: `$cmdb_ci_win_server[1].u_dhcp_enabled`
+      - _Test_
+    - _Save_
+    - step 8 `Populate DHCP Server`
+      - Operation: `Set Parameter Value`
+      - Value: `$dhcp_server[1].value`
+      - Name: `$cmdb_ci_win_server[1].u_dhcp_server`
+      - _Test_
+    - _Save_
+    - step 9 `Collect System Data PS`
+      - Operation: `Parse Command Output`
+      - Set command details: `"powershell -command Get-ComputerInfo"`
+      - Define Parsing: `Delimited text`
+      - Include Lines: `CsDomainRole`
+      - Variables: `domain_role`
+        - Delimiter: `:`
+        - Positions: `2`
+      - _Test_
+    - _Save_
+    - step 10 `Populate the Domain Role`
+      - Operation: `Set Parameter Value`
+      - Value: `$domain_role`
+      - Name: `$cmdb_ci_win_server[1].u_server_domain_role`
+      - _Test_
+    - _Save_
+- Rediscover Your MID Server Host and Validate the Pattern Extension
+  - All > Discovery > Discovery Schedules > Quick Discovery
+    - Target IP: MID Server IP
+  - open Discovery Status record and wait for completion
+    - Devices > open CI record
+      - observe new attributes
+
+##### L3.2: Discover Felinism Service
+
+(skipped - test server not available?)
+
+- [course book](https://servicenow.read.inkling.com/a/b/19c4613ca7d841ee9b3cc5f1bd05302d/p/f663939c3a624f01a0cb2a9779655e61#76529dc41bc84af9b94562948e130958)
+- Configure Credentials
+- Start Discovery of Felinism Service
+- Identify Load Balancer
+- Create Nginx Load Balancer Outbound Connection to Web Server Tier
+- Identity/Create the Apache on Windows Outbound Connection to Application Tier
+- Identify the Application Tier as ServiceWatch
+- Create Service Watch Outbound Connection to the Database
 
 #### Labs: Service Mapping Fundamentals
 
@@ -548,7 +679,7 @@ Back to [SNow ITOM](./sn-itom.md)
 
 ### Service Mapping Advanced
 
-#### Introduction
+#### SMA: Introduction
 
 - ITOM Overview
   - ITOM Visibility
@@ -596,7 +727,7 @@ Back to [SNow ITOM](./sn-itom.md)
       - without up-to-date and comprehensive understanding of underlying infrastructure, the impact of changes is hard to predict
       - a service-aware CMDB helps to predict the impact of changes and schedule them accordingly
 
-#### Level Set ITOM Knowledge
+#### SMA: Level Set ITOM Knowledge
 
 - [MID server](./sn-discovery-mid_server.md)
 - [Discovery](./sn-discovery.md)
@@ -641,19 +772,256 @@ Back to [SNow ITOM](./sn-itom.md)
     - CSDM: Links Services and Infrastructure to performance levels (Offerings)
       - guidance on service modeling by recommending CI relationships
 
-#### Discovery Patterns
+#### SMA: Discovery Patterns
 
-#### Identification Rules
+##### SMA: Service Mapping Patterns
 
-#### Security
+- what are Service Mapping patterns?
+  - templates to identify applications and create connections to other applications
+  - create and extend with Pattern Designer
+  - stored in the _Neebula Discovery Language_ (NDL)
+  - synced with MID server upon _Publish_ or manually
+    - stored on MID server in `agent/work/ndl` directory
+- when do patterns and sections execute?
+  - Patterns:
+    - only on OS specified in the pattern
+    - in random order, but can be specified to run before / after specific patterns
+  - Identification Sections:
+    - run in order until match is found
+    - run only if _Entry Point Type_ matches
+  - Extension Sections:
+    - after all Identification Sections
+    - only if at least one Identification Section succeeded
+  - Connection Sections: if at least one Identification Section succeeded, all Connection Sections are tried
+- it is possible to (temporary) deactivate a pattern / step:
+  - pattern: set Active = false
+  - section steps: set Active = false
+- best practices:
+  - **Extend Baseline Patterns**: use Extension Sections, do not touch oob Identification Sections
+  - **Create New Patterns**: for proprietary applications / when extensive modifications to a baseline pattern would be required
+  - **Set Relevant OS and Entry Point(s)**: saves time during discovery, as non relevant patterns do not have to be tested
+  - **Avoid Hardcoding Paths**: use variables
+- strategies for identification sections
+  - fails fast: identify the application or fail the pattern
+  - populate any required attributes for the CI Type Identification Rule
+  - populate any other required (mandatory) attributes
+  - collect any recommended attributes and additional attributes requested by the customer
+  - set variables for long file paths that may be referenced in following steps (both Identification and Connection Sections)
+  - use Extension Sections to populate custom attributes
+- for using Service Mapping with ACC see [Discovery: ACC-V](./sn-discovery.md#df-agent-client-collector-for-visibility-acc-v)
 
-#### Engagement Readiness
+##### SMA: Migrating Patterns and Services
+
+- exporting patterns
+  - All > Pattern Designer > Discovery Patterns > Actions on selected rows
+    - Export Pattern: use to migrate updates to an existing pattern in the target instance
+      - Patterns
+      - Related Libraries
+      - Related Extensions
+      - Related References to Related CI types
+      - Related References to Classifications
+      - Related Custom Operations and Strategies
+      - Related Tracked files
+    - Export patterns with CMDB items: used to migrate new patterns to the target instance
+      - Everything from Export Patterns, plus:
+      - CI Type
+      - Related CI Types
+      - Entry point types
+      - Identifiers
+      - Hosting and reconciliation rules
+      - Lookup tables
+  - no shared libraries
+  - only Infrastructure and Application patterns
+  - does not export service or entry point
+  - exported as Update Sets
+- export/import services
+  - export:
+    - an Application Service table > Actions on selected rows > Export Service Definitions
+    - exports metadata: Service Name, Business Criticality, Traffic Based Discovery flag, Comments, Entry Points, Group to which the service belongs
+    - does not export full service maps, manual services and manual entry points
+  - import: Import Service Definitions
+    - unclear where to find this option
+- migrating: transfer pattern + service!
+  - easiest solution: export
+    - source instance (DEV)
+      - Configure:
+        - Credential
+        - Service
+        - CI Type
+        - CI Identifier
+        - Discovery Pattern
+      - Export patterns with CMDB items
+      - Export Service Definitions
+    - target instance (TEST/PROD)
+      - Import Update Set
+      - Verify the following:
+        - CI Type
+        - CI Identifier
+        - Discovery Pattern
+      - Recreate Credential
+      - Import Service Definition
+      - Run Service Mapping Discovery
+  - when manually creating an Update Set:
+    - source:
+      - Create an Update Set
+      - Configure:
+        - Credential
+        - Service
+        - CI Type
+        - CI Identifier
+        - Discovery Pattern
+      - Use [Add to Update Set Utility](https://community.servicenow.com/community?id=community_blog&sys_id=dd0d9079db858098d58ea345ca961925) to add Service, Entry Point and Credential to Update Set
+      - Complete and Export Update Set
+    - target: as before, just skip step _Import Service Definition_
+
+##### SMA: Variables and Pattern Operations
+
+- variables
+  - parsing tables
+    - `$table_name[].field_name` - use for filter, does not work for parsing
+      - result: table with all rows matching the filter
+    - `$table_name[1].field_name` - parse the value from column `field_name`, row 1
+      - result: single value
+    - `$table_name[*].field_name` - parse the values from column `field_name`, all rows
+      - result: all values
+  - syntax
+    - `+` - concatenation
+    - `"hardcoded value"` - use `" "` to hardcode a value
+    - `$variable_name` - use `$` to reference a variable
+- useful operations
+  - **Parse File**: parse a file
+    - Delimited Text: split text by delimiter
+    - Regular Expression: split text by regex
+    - use `Line Separator` to split by line
+  - **Parse URL**: parse a URL, for example `$entry_point.url`
+    - result: table with columns path, protocol, file, port, query, host, url
+  - **Filter Table**: filter a table for columns with a specific value
+  - **Upstream Table**: get a table from a parent pattern
+  - **Connections Table**: get a table of connections
+  - **Transform Table**: can add computed columns, target table can be source table or a new table
+- custom pattern operations
+  - All > Pattern Designer > Custom Operations
+  - create new, reusable script-defined operations
+    - define with Javascript
+    - define input parameters
+    - make input parameters mandatory or optional
+- regular expressions - [docs: Regular Expression Parsing](https://docs.servicenow.com/bundle/vancouver-it-operations-management/page/product/service-mapping/task/t_RegularExpParsStratPatDef.html)
+
+#### SMA: Identification Rules
+
+- application CI types
+  - each application CI Type is stored in it's own table
+  - extending a generic parent class, for example Application Server [cmdb_ci_app_server] is extended by Tomcat [cmdb_ci_app_server_tomcat]
+  - can have attributes unique to the application CI Type (added attributes), for example Tomcat attribute `configuration_directory`
+  - all applications extend from [cmdb_ci_appl]
+
+##### SMA: Identification and Reconciliation Engine (IRE)
+
+- centralized framework for identifying and reconciling data from different data sources
+- hardware identification rules:
+  - multiple prioritized criteria based on one or more attributes
+    - default Hardware Identification Rule [cmdb_ci_hardware]:
+      - serial number + serial number type
+      - serial number
+      - name
+      - IP Address + MAC Address
+  - independent of other CIs
+- application identification rules
+  - default Application Identification Rule [cmdb_ci_appl]:
+    - running process command + running process command parameters + class
+  - depending on _runs on_ relationship if _Independent_ = false
+- bad practices
+  - identify applications based on _name_ and _version_:
+    - each new version would be an new CI
+    - if an application runs twice on the same host, they would be identified as the same CI and overwrite each other
+  - identify applications based on _version_ and _cfg file name_:
+    - each new version would be an new CI
+- best practice: identify application based on _config file path_:
+  - unique by host based on _runs on_ relationship
+  - unique on host based on _config file path_
+  - unique between different applications based on _config file path_
+- Identification Engine Logs
+  - for temporary debug session / on dev systems activate verbose IE logging:
+    - All > Service Mapping > Administration > Properties
+      - _Enable verbose mode for identification engine_ = true
+      - _Identification Engine Logging: Identification Engine severity level_ = DebugVerbose
+  - find entries in System Log
+    - **Input**: Displays the payload passed to the identification engine for the run
+    - **Logs**: Displays all the logged messages generated from the identification engine while
+      running the payload based on log level
+    - **Output**: Displays the output payload returned by the identification engine
+  - use a(n online) JSON Beautifier for improved readability
+
+#### SMA: Security
+
+- types:
+  - **SSH**
+    - used for Linux and Unix
+    - username password or Private Key
+    - default port: 22 (TCP)
+    - selective sudo access
+  - **SNMP**
+    - used for Network and print Devices
+    - SNMP v2 and v3
+    - default port: 161 (UDP)
+    - read only community string
+    - if Access Control List (ACL) is used, ensure MID server IPs are allowed
+  - **Windows**
+    - default port: 135 (WMI), 445 (SMB) (TCP)
+    - Domain user with local admin rights
+    - SMB admin access to `C$`
+    - for domain controller: domain admin rights
+  - **VMware vCenter**
+    - discover vCenter running on Windows
+  - **CIM**
+    - used for ESX servers - obtain serial number
+    - Common Information Model (CIM)
+  - **Applicative Credentials**
+    - used when an application requires separate credentials from the host
+- specific storage devices
+  - NetApp Filer Credentials
+    - SNMP V1/v2c read-only community string
+    - Read-only user via HTTP for config data
+  - NetApp Filer Connectivity
+    - SNMP via open UDP port (configurable, default 161)
+    - HTTP via open TCP port 80
+  - EMC Credentials
+    - SYMCLI server user with access to symcfg, symdev, symmaskdb, symaccess
+  - EMC Connectivity
+    - SSH via open TCP port (configurable, default 22)
+- Credential Affinity
+  - associate credentials and CIs
+  - find affinities by trying all available credentials
+  - stored in the Credential Affinity [dscy_credentials_affinity] table
+    - delete records to reset affinities
+- `netstat`
+  - credentials required to run `netstat` on a host
+  - Discovery: determine application dependencies
+  - Service Mapping: perform process detection
+
+##### SMA: External Storage Credentials
+
+- plugin: _External Credential Storage_
+  - activate via Support Portal
+- mechanism
+  - instance stores
+    - unique identifier for each credential
+    - credential type
+    - credential affinities
+  - MID server
+    - obtains credential identifier from instance
+    - uses a customer-provided JAR file to retrieve credentials from external storage
+  - Credential record needs flag _External Storage_ to be true
+- example: CyberArk Integration
+  - requires _CyberArk AIM client_ on MID server
+
+#### SMA: Engagement Readiness
 
 ### Service Mapping Fundamentals On Demand
 
 - [course](https://nowlearning.servicenow.com/lxp/en/pages/learning-course?id=learning_course&course_id=8a3364af87bf71505aa9ca2d0ebb35a5&group_id=1b43ecefc33fbd14acc871f9d0013136&child_id=6f43ecefc33fbd14acc871f9d0013195&spa=1)
 
-#### Service Mapping Overview
+#### SMF: Service Mapping Overview
 
 - Services Mapping
   - does: Map all software and hardware components associated with a service.
@@ -668,8 +1036,8 @@ Back to [SNow ITOM](./sn-itom.md)
   - Internal Web Service - relies on: IIS, Windows Server, Load Balancer, MSSQL, Storage and Network
   - Database Service - relies on: Unix, ESX, Storage
   - Stock Trader Service - relies on: IIS, Windows Server, MSSQL
-- ITOM Solutions: see [SMA Introduction](#introduction)
-- Service Mapping Business Value: see [SMA Introduction](#introduction)
+- ITOM Solutions: see [SMA Introduction](#sma-introduction)
+- Service Mapping Business Value: see [SMA Introduction](#sma-introduction)
 - architecture
   - requires MID server (see [SNow MID Server](./sn-discovery-mid-server.md))
 - phases:
@@ -679,7 +1047,7 @@ Back to [SNow ITOM](./sn-itom.md)
   - Identification/Classification of Applications: pattern identification section
   - Connection: discover outgoing connections -> new entry point to start with first step
 
-#### Horizontal Discovery
+#### SMF: Horizontal Discovery
 
 - Application Dependency Mapping (ADM)
   - Dependency View / Unified Map displays relevant dependency relationships:
@@ -693,7 +1061,7 @@ Back to [SNow ITOM](./sn-itom.md)
     - Determine unique conditions for process
     - Configure new or update process classifier and discovery pattern
 
-#### Service Lifecycle
+#### SMF: Service Lifecycle
 
 - Mapping Discovery Lifecycle Flow
   - **Start**: Readiness Checklist (All > Service Mapping > Home)
@@ -732,7 +1100,7 @@ Back to [SNow ITOM](./sn-itom.md)
     - Deployment of the service to production based on use case
     - Activation of the service on the Dashboard
 
-#### Service Mapping
+#### SMF: Service Mapping
 
 - focus on **Start** (details see [Service Lifecycle](#service-lifecycle))
   - ensure `Service Mapping` plugin is purchased and activated
@@ -846,7 +1214,7 @@ Back to [SNow ITOM](./sn-itom.md)
       - Service Group Attributes
     - use default `All Applications` schedule to rediscover all applications for all services
 
-#### Extending Patterns
+#### SMF: Extending Patterns
 
 - CI Type/Class Definition
   - every application needs a corresponding CI type / classifier
@@ -885,7 +1253,7 @@ Back to [SNow ITOM](./sn-itom.md)
       - speed up discovery
       - avoid OOM (out-of-memory) issues on MID server
 
-#### Building Identification Sections
+#### SMF: Building Identification Sections
 
 - goals for application patterns Identification Section:
   - fail fast to apply the next pattern immediately
@@ -934,7 +1302,7 @@ Back to [SNow ITOM](./sn-itom.md)
     - action "Create pattern from generic application": Service Map, right-click on generic application
       - creates CI Type, skeleton Pattern, and a Process Classifier
 
-#### Building Connection Sections
+#### SMF: Building Connection Sections
 
 - order of execution
   - if Identification Section succeeds, **all** Connection Subsections are tried
@@ -955,7 +1323,7 @@ Back to [SNow ITOM](./sn-itom.md)
     - should have a valid CI Type and pattern to avoid generic applications
     - target application Entry Point Type determines Connection Attributes
 
-#### CMDB Reconciliation
+#### SMF: CMDB Reconciliation
 
 - Identification and Reconciliation Engine (IRE): centralized framework for identifying and reconciling data from different data sources
 - IRE modules:
@@ -975,7 +1343,7 @@ Back to [SNow ITOM](./sn-itom.md)
       - allow switching: `glide.class.switch.enabled`
   - Metadata Rules Editor: defines dependency structure of the CI types and relationship types in service definitions
 
-#### Other Service Mapping Approaches
+#### SMF: Other Service Mapping Approaches
 
 - Dynamic CI Groups
   - group CIs by shared criteria - example: all Windows Server in location X
