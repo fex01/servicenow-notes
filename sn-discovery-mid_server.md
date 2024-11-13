@@ -2,6 +2,10 @@
 
 Back to [ServiceNow Discovery](./sn-discovery.md)
 
+## Resources
+
+- [KB0746702: How to Update a MID Server password](https://support.servicenow.com/kb?id=kb_article_view&sysparm_article=KB0746702)
+
 ## Overview
 
 - MID: Management, Instrumentation, and Discovery
@@ -31,8 +35,10 @@ Back to [ServiceNow Discovery](./sn-discovery.md)
     - Windows Server 2012 R2
       - Linux possible, but Win recommended
     - PowerShell V3.0-5.1
+      - `$PSVersionTable`
     - JRE min 11.0.8
-    - connectivity to:
+      - `java -XshowSettings:properties -version`
+    - connectivity to (only 443/80? or also any other ports required?):
       - servicenow.com
       - install.service-now.com
       - ocsp.entrust.net (or other OCSP CA)
@@ -48,7 +54,8 @@ Back to [ServiceNow Discovery](./sn-discovery.md)
     - create service account
       - no local or domain admin
       - log on as a service permission
-      - step-by-step: ￼
+      - [step-by-step](#windows)
+  - install MID server: elevated CMD Prompt ``
   - Validate: run validation before server is usable
   - Verify connectivity with Quick Discovery or scheduled Discovery
     - Quick Discovery
@@ -64,11 +71,11 @@ Back to [ServiceNow Discovery](./sn-discovery.md)
 - MID server looks for work in the ECC queue via outbound port 443
 - return results are placed by the MID server as input record into the queue
 - Example: Discovery steps:
-    1. instructions put into the  ECC queue as outgoing probes
-    2. MID Server monitors ECC Queue for jobs
-    3. MID Server interrogates devices for information according to probe instructions
-    4. MID Server reports responses as input record via the ECC queue
-    5. XML payload of the input records is processed to update the CMDB
+  1. instructions put into the ECC queue as outgoing probes
+  2. MID Server monitors ECC Queue for jobs
+  3. MID Server interrogates devices for information according to probe instructions
+  4. MID Server reports responses as input record via the ECC queue
+  5. XML payload of the input records is processed to update the CMDB
 - default pull interval: 40 seconds
 - process flow - Queue / State:
   - Output / Ready: new probe instructions in ECC Queue

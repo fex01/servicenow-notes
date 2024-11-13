@@ -22,7 +22,6 @@
   - Auto-Remediation: Automates tagging of cloud resources using AWS permissions.
   - Requirements: ITOM Visibility entitlements needed for remediation tasks.
 
-
 ## Change Management
 
 - [CMDB - Process Guide](https://nowlearning.servicenow.com/nowcreate/en/pages/assets?id=nc_asset&nc_ai_search=true&sys_id=8efe3ca0db289c1077c0ce46b99619ef&table=x_snc_accel_asset&asset_id=31ac790b474112504f97dc84f16d438b&searchTerm=CMDB%20-%20Process%20Guide)
@@ -83,3 +82,131 @@
     - discovery source service accounts: restrict to CI Classes according to Reconciliation Rules
   - Services CIs restricted according to service roles: [service_author], [service_admin], [service_editor]
   - erweitert: Schreibschutz auf spezifischen Feldern möglich
+  - sensitive tables:
+    - [cmdb_ci_config_file_tracked]
+
+## Workshop Topics
+
+### Themenliste
+
+- Business goals and Use Cases
+  - ITOM Starter Package_SN_v003.pptx, s13,
+  - CMDB - PreWorkshop Readiness Kickoff.pptx, s12-14
+- Begriffsklärung
+  - Configuration Management
+    - CMDB - PreWorkshop Readiness Kickoff.pptx, s13
+  - CMDB
+    - CMDB - PreWorkshop Readiness Kickoff.pptx, s14
+    - ITOM Starter Package_SN_v003.pptx, s17
+      - inkl. Ziele Configuration Management
+  - Discovery
+    - ITOM Starter Package_SN_v003.pptx, s32
+  - CI
+    - CMDB - Project Workshop.pptx, s40
+  - Asset vs CI
+    - ITOM Starter Package_SN_v003.pptx, s18, s76
+    - CMDB - Project Workshop.pptx, s41-42
+    - Starterpaket ITOM/01 Input/CMDB v0.1.pptx, s37-40, s67
+  - Key Concepts
+    - ITOM Starter Package_SN_v003.pptx, s73
+    - CMDB - Project Workshop.pptx, s44
+- ServiceNow Application Interactions
+  - CMDB - PreWorkshop Readiness Kickoff.pptx, s15
+  - ITOM Starter Package_SN_v003.pptx, s19
+    - Interaktionen ITSM Prozesse
+- Design CMDB Data Model
+  - CMDB - PreWorkshop Readiness Kickoff.pptx, s19
+  - CMDB - Project Workshop.pptx, s30-35
+    - incl. CSDM
+  - ITOM Starter Package_SN_v003.pptx, s20-21
+    - only CSDM
+- Configuration Management Prozess
+  - ITOM Starter Package_SN_v003.pptx, s22-23
+  - Operationalize CMDB
+    - CMDB - PreWorkshop Readiness Kickoff.pptx, s20
+    - CMDB - Project Workshop.pptx, s36
+- Personas and Roles
+  - ITOM Starter Package_SN_v003.pptx, s26, s60
+  - CMDB - PreWorkshop Readiness Kickoff.pptx, s24-29
+  - CMDB - Project Workshop.pptx, s25-29
+- Populating the CMDB
+  - ITOM Starter Package_SN_v003.pptx, s34
+    - Typical CIs for Crawl Phase Discovery s41
+  - CMDB - PreWorkshop Readiness Kickoff.pptx, s29-30
+- Implementation and Maintenance Plan – High Level
+  - ITOM Starter Package_SN_v003.pptx, s33
+- MID server implementation
+  - ITOM Starter Package_SN_v003.pptx, s52-58
+    Starterpaket ITOM/ITOM_MID_Server Konfig.pptx, 29 slides
+- Final Slides
+  - Links to Resources
+    - CMDB - PreWorkshop Readiness Kickoff.pptx, s32
+
+### Steps
+
+- according to `CMDB - Project Workshop.pptx`
+  - 1. Set your direction - s12ff, Business goals and use cases
+    - Plan your successful CMDB deployment.pdf, p5-6
+  - 2. Build a team - s25ff, Personas and Roles
+  - 3. Design Data Model - s30ff
+  - 4. Operationalize and Maintain the CMDB - s36
+- further slidedeck structure
+  - 5. CMDB definitions and concepts - s37ff
+  - 6. ServiceNow CMDB Basics
+    - s44 Key Concepts
+    - s45-46 Data Tables
+      - ITOM Starter Package_SN_v003.pptx, s72
+    - s47-52 Class Structure
+      - Crawl CIs also in ITOM...: s24, s41
+    - s53-58 CI Attributes
+      - CI Groups also in ITOM...: s74
+      - CI Record Form also in ITOM...: s44
+    - s59-68 Product Models and CSDM
+    - s69-76 Lifecycle Stage/Status
+    - s77-80 CI Groups
+      - CI Groups also in ITOM...: s74
+    - s81-87 Dynamic CI Groups
+      - Verantwortlichkeiten CI Klassen (TS, TSO), Starterpaket ITOM/01 Input/CMDB v0.1.pptx, s55
+  - 7. Populating the CMDB - s88-94
+    - s95-112 Identification and Reconciliation
+      - Discovery and IRE Engine Process Flow also in ITOM...: s104
+    - s113-120 CMDB 360
+  - 8. Manage - Data Management and CMDB Health - s120ff
+    - s121-136 Data Manager
+    - s137-157 CMDB Health
+    - s158-174 CMDB Management
+  - 9. Decisions - s175
+    - also Itom...: s45-48
+    - s179-180 CMDB Story Themes
+  - 10. Additional Resources - s181
+    - s182 links
+    - s183 plugins
+      - ITOM..., s6
+    - 185 Next steps
+
+
+- Agenda
+  - first draft:
+    - 1 CMDB
+      - 1.1 CMDB Einführung
+      - 1.2 Strategie
+        - Ziele 
+        - CMDB Team 
+        - Data Model
+        - Operation & Management
+      - 1.3 CMDB Konzepte
+      - 1.4 CMDB Grundlagen
+      - 1.5 CMDB Datenimport
+      - 1.6 CMDB Pflege
+      - 1.7 Entscheidungen
+    - 2 Discovery
+    - 3 Asset Management
+  - second try
+    - Ziele
+    - Einführung und Begriffsklärung
+    - Grundlagen CSDM
+    - Grundlagen CMDB Health
+    - CMDB Use Cases, Datenmodell und CI-Quellen
+    - CMDB Discovery - Grundlagen und Zulieferleistungen
+    - CMDB Rollen und Verantwortlichkeiten
+    - Config Management Prozess / Pflegeprozesse

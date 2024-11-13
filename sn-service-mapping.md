@@ -7,12 +7,15 @@ Back to [SNow ITOM](./sn-itom.md)
 ### Requirements CIS Voucher
 
 - [x] Service Mapping Fundamentals
-- [ ] [Service Mapping Advanced](https://nowlearning.servicenow.com/lxp/en/it-operations-management/service-mapping-advanced?id=learning_course_prev&course_id=72774609c3b77d905922751ce00131d2)
+  - [notes](#service-mapping-fundamentals-on-demand)
+- [x] [Service Mapping Advanced](https://nowlearning.servicenow.com/lxp/en/it-operations-management/service-mapping-advanced?id=learning_course_prev&course_id=72774609c3b77d905922751ce00131d2)
   - [eBook](https://servicenow.read.inkling.com/a/b/19c4613ca7d841ee9b3cc5f1bd05302d/p/18356415fd69484b9dd3100dfd444379)
-- [ ] [Service Mapping Advanced Simulator](https://nowlearning.servicenow.com/lxp/en/it-operations-management/service-mapping-advanced-simulator-washington?id=learning_course_prev&course_id=e3db6a8487760a1024e0bb39dabb35b7)
+  - [notes](#service-mapping-advanced)
+- [x] [Service Mapping Advanced Simulator](https://nowlearning.servicenow.com/lxp/en/it-operations-management/service-mapping-advanced-simulator-washington?id=learning_course_prev&course_id=e3db6a8487760a1024e0bb39dabb35b7)
   - testing knowledge from SM Fundamentals and Advanced courses
 - Recommended:
   - [ ] [Service Mapping Extras](https://nowlearning.servicenow.com/lxp/en/it-operations-management/service-mapping-extras?id=learning_course_prev&course_id=293e0527477d19505cbdaf44846d4383)
+    - [notes](#extras)
     - additional material on ML Power Mapping
     - additional material on integrating Service Mapping with Event Management
     - more stuff
@@ -690,8 +693,11 @@ Back to [SNow ITOM](./sn-itom.md)
   - ITOM Health
     - Event Management
       - Event and Alert processing to provide overall service health
-    - Agent Client Collector
+      - incorporate existing monitoring systems for a real-time state of IT infrastructure
+      - process and consolidate events to produce relevant alerts
+    - Agent Client Collector and Metric Intelligence: proactively identify anomalies before they impact services
     - Predictive AIOps
+    - Orchestration and IntegrationHub leverage workflows, MID server and network processing for automated investigation and remediation
   - ITOM Optimization
     - Cloud Provisioning & Governance
     - Site Reliability Operations
@@ -732,25 +738,7 @@ Back to [SNow ITOM](./sn-itom.md)
 - [MID server](./sn-discovery-mid_server.md)
 - [Discovery](./sn-discovery.md)
 - [Service Mapping Overview](#service-mapping-overview)
-- Event Management
-  - definition: consolidates events from existing monitoring systems to provide real-time state of it infrastructure
-  - alerts and impact profiles
-    - Alerts apportioned against the CMDB and the Service Map
-    - Impact defined against the Parent CI or the Service
-    - Impact Calculation based upon
-      - Impact Rules Table [em_impact_rule]
-      - If an association exists between the CI and the Service as defined in the Service Configuration Table [svc_ci_assoc]
-      - CI linked to Service or CI linked to Parent
-      - A cluster member always effects the cluster and not the Service directly
-  - process
-    - event sources provide events via REST APIs
-    - Event Management applies:
-      - Mapping Rules
-      - Transform Rules
-      - Threshold Rules
-      - Filters
-    - to produce Alerts
-    - Alert Management creates Incidents
+- [Event Management notes](#event-management-and-service-mapping)
 - what is a Service?
   - ITIL: A Service that is delivered to customers by business units
   - ServiceNow:
@@ -1377,3 +1365,62 @@ Back to [SNow ITOM](./sn-itom.md)
         - access maps with operational application services: app_service_user, and sm_user or sm_admin
         - access maps with operational and non-operational application services: app_service_admin, and sm_user or sm_admin
         - access and view related items: itil
+
+### Extras
+
+#### Event Management and Service Mapping
+
+- ITOM Spectrum
+  - ITOM Visibility
+    - Discovery
+    - Service Mapping
+  - ITOM Health: Event Management and ACC
+  - ITOM Optimization
+    - Cloud Provisioning & Governance
+    - Site Reliability Operations
+  - more details see [SMA Introduction](#sma-introduction)
+- Event Management tools:
+  - **Operator Workspace**: service-centric view showing how alerts impact application services
+  - **Event Management Overview Dashboard**: quick summary of active alerts and affected services
+  - Custom Reports
+- Event Management
+  - definition: consolidates events from existing monitoring systems to provide real-time state of it infrastructure
+  - alerts and impact profiles
+    - Alerts apportioned against the CMDB and the Service Map
+    - Impact defined against the Parent CI or the Service
+    - Impact Calculation based upon
+      - Impact Rules Table [em_impact_rule]
+      - If an association exists between the CI and the Service as defined in the Service Configuration Table [svc_ci_assoc]
+      - CI linked to Service or CI linked to Parent
+      - A cluster member always effects the cluster and not the Service directly
+  - process
+    - event sources provide events via REST APIs
+    - Event Management applies:
+      - Mapping Rules
+      - Transform Rules
+      - Threshold Rules
+      - Filters
+    - to produce Alerts
+    - Alert Management creates Incidents
+
+##### Event Processing in the ServiceNow Platform
+
+- connectors:
+  - definition: Configurations for specific vendors that define the MID Server script used to pull events from external sources
+  - Available Connectors: SolarWinds, Microsoft, IBM Netcool, HP Operations Manager, vRealize, Hyperic, and SCOM
+  - Connector Instances: Configurations that establish connections to specific monitoring systems for event data integration
+- tables:
+  - Events Table: Receives real-time events with details like Source, Severity, Node, and Description
+  - Alerts Table: Processes events, promoting significant ones to actionable alerts tied to IT infrastructure
+- rules:
+  - Event Rules: Filter, transform, and process events to ignore or promote them to alerts.
+  - Event Field Mapping: Maps source data to corresponding ServiceNow attributes.
+  - Alert Management Rules: Configure alerts to trigger related records (e.g., Incident, Knowledge, Problem) and enable remediation via Flow Designer.
+- event vs Metric vs Alert
+  - **Event**: Notification of a notable occurrence in infrastructure (e.g., “Gateway down,” “Low disk space”). Processed through event rules (ignore, create/update alert)
+  - **Metric**: Measurement of a device’s operating characteristic over time (e.g., CPU load, disk usage).
+  - **Alert**: Created for important events or when no event rule applies. Alerts can be acknowledged, trigger tasks (e.g., Incident), or initiate remediation (e.g., run scripts, restart services). Alerts display impact on application services via Service Mapping integration
+- Event Table Rotation: Clears events older than 5 days daily for performance. Altering rotation is not recommended
+
+##### Event Management Application and Use Case
+

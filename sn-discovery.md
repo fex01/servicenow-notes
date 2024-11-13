@@ -655,11 +655,11 @@
       - If a Cl record is imported into the Computer table, the Model ID will be associated to a specific Model category Computer
       - Model Category Computer also creates an Asset class Hardware record
   - Enforce Cl Class Verification
-    - Model categories can override the automatic creation of an Asset using Enforce Cl Verification option
+    - Model categories can override the automatic creation of an Asset using Enforce CI Verification option
     - will affect all Models associated with the Model Category
     - Newly created CIs requires verification through a Ul action to:
       - Create Asset - Creates an Asset associated with the newly created Cl record
-      - Merge Cl - Merge duplicates of a Cl if the Asset for the Cl was created through a different process and a Cl record already exists
+      - Merge CI - Merge duplicates of a Cl if the Asset for the Cl was created through a different process and a Cl record already exists
 
 ##### DF: Agent Client Collector for Visibility (ACC-V)
 
@@ -1266,3 +1266,11 @@
   - The fund transfer service is down. Which IT component caused it?
   - Which services are affected by this failure?
   - Will my change have a business impact? On which services?
+
+## Miscellaneous
+
+### Discovery Configuration Console
+
+Configure which CI Classes are discovered.
+
+- [docs: Discovery Configuration Console](https://docs.servicenow.com/bundle/xanadu-it-operations-management/page/product/discovery/concept/c_DiscoveryConfigurationConsole.html)
