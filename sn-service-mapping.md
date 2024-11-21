@@ -4,6 +4,8 @@ Back to [SNow ITOM](./sn-itom.md)
 
 ## Resources
 
+- [KB: Probe to Pattern Migration: Procedure for switching from probe-based Discovery to pattern-based Discovery](https://support.servicenow.com/kb?id=kb_article_view&sysparm_article=KB0694477)
+
 ### Requirements CIS Voucher
 
 - [x] Service Mapping Fundamentals
@@ -14,7 +16,7 @@ Back to [SNow ITOM](./sn-itom.md)
 - [x] [Service Mapping Advanced Simulator](https://nowlearning.servicenow.com/lxp/en/it-operations-management/service-mapping-advanced-simulator-washington?id=learning_course_prev&course_id=e3db6a8487760a1024e0bb39dabb35b7)
   - testing knowledge from SM Fundamentals and Advanced courses
 - Recommended:
-  - [ ] [Service Mapping Extras](https://nowlearning.servicenow.com/lxp/en/it-operations-management/service-mapping-extras?id=learning_course_prev&course_id=293e0527477d19505cbdaf44846d4383)
+  - [x] [Service Mapping Extras](https://nowlearning.servicenow.com/lxp/en/it-operations-management/service-mapping-extras?id=learning_course_prev&course_id=293e0527477d19505cbdaf44846d4383)
     - [notes](#extras)
     - additional material on ML Power Mapping
     - additional material on integrating Service Mapping with Event Management
