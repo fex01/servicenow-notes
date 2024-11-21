@@ -1542,3 +1542,70 @@ Back to [SNow ITOM](./sn-itom.md)
          - **Add to Existing Service**:
            - Search and select an existing service.
       5. Select **Map service** and view the newly created or modified service.
+
+## Probe to Pattern Migration
+
+### PtPM: Verify Prerequisites
+
+- Instance must be on **New York release or later** and using probes for OS Discovery.
+- Deactivate **Discovery**, **Service Mapping jobs**, and any import jobs that could affect CMDB data.
+- Confirm the presence of **Horizontal Pattern probe records** in the `discovery_probes` table.
+- Ensure required **relationship type records** exist in the `cmdb_rel_type` table with correct `sys_id` values.
+- Validate the existence of required **classifier records** and their associated **trigger probes** (e.g., Windows, Linux, Load Balancers).
+- Ensure corresponding **patterns** (e.g., Windows OS - Servers, Linux Server) are available in the `sa_pattern` table.
+
+### PtPM: Run Prerequisite Script
+
+- For **Orlando release or later**, execute the `ProbeToPatternPrerequisiteScript` to validate prerequisites.
+
+### PtPM: Migration Procedure
+
+- **Option 1: Individual Conversion Scripts** (Recommended for larger CMDBs):
+
+  - Navigate to `System Definition > Scheduled Jobs`.
+  - Create jobs for each CI type (e.g., Windows, Unix, Load Balancers).
+  - Use the provided script snippets, such as:
+
+    ```javascript
+    var fix = new FixWindowsModelForPatterns();
+    fix.addMissingRelationsForWindows();
+    ```
+
+  - Repeat for other CI types (Unix, Routers & Switches, Load Balancers).
+
+- **Option 2: Full Conversion Script** (Recommended for smaller CMDBs):
+
+  - Navigate to `System Definition > Scheduled Jobs`.
+  - Create a job with the script:
+
+    ```javascript
+    FixMissingRelationsFromProbesToPatterns.moveProbesToPatterns();
+    ```
+
+### PtPM: Post-Migration Steps
+
+- Confirm that the property `glide.discovery.ip_based.active` is set to `false`.
+- Address any known issues, such as duplicate storage devices or unsupported OS packages.
+- Review logs in the `syslog` table (`Source: DiscoveryMigrateToPatterns`) or the `probe_to_pattern_log` table for troubleshooting.
+
+### PtPM: Address Custom Configurations
+
+- Update custom probes, classifier names, or pattern records in the migration scripts.
+- Recreate missing relationship or classifier records if they deviate from out-of-box configurations.
+
+### PtPM: Known Issues and Workarounds
+
+- Duplicate storage devices during Windows migration (refer to KB0748332).
+- OS packages migration supported in **Orlando Patch 7** and later (refer to KB0827777).
+- Additional discrepancies between probes and patterns (see KB0827212 for details).
+
+### PtPM: Logs and Support
+
+- Review logs in `syslog` or `probe_to_pattern_log` for details on migration steps and errors.
+- Contact **ServiceNow Technical Support** for further assistance if required.
+
+### PtPM: Related KB articles
+
+- [KB: Probe to Pattern Migration: Procedure for switching from probe-based Discovery to pattern-based Discovery](https://support.servicenow.com/kb?id=kb_article_view&sysparm_article=KB0694477)
+- [Using Patterns For Horizontal Discovery](https://docs.servicenow.com/bundle/new-york-it-operations-management/page/product/discovery/concept/pattern-based-discovery.html)
+- [Probe to Pattern Migration Log Details (KB0781470)](https://support.servicenow.com/kb?id=kb_article_view&sysparm_article=KB0781470)
