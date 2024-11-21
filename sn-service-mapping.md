@@ -1424,3 +1424,119 @@ Back to [SNow ITOM](./sn-itom.md)
 
 ##### Event Management Application and Use Case
 
+- application overview:
+  - Combines monitoring tools into a single dashboard to enhance service availability and performance.
+  - Uses machine learning to assess service health and the impact of issues.
+  - Integrates with a service-aware CMDB to manage service availability and performance
+- operator workspace
+  - Offers a single, color-coded view of application service states.
+  - Allows grouping of services with summary and drill-down options.
+  - Includes advanced mapping with alerts, incidents, and changes.
+  - Designed for operators to work efficiently without switching between multiple screens.
+  - Aids in root cause analysis.
+- Event Integration Key Tables:
+  - Events [em_event]: Generated from monitoring sources and integrated into ServiceNow.
+  - Alerts [em_alert]: Correlated events consolidated in the Alerts module; can link to incidents.
+  - Incidents [incident]: Created automatically via alert management rules or manually.
+
+#### Introduction: Service Mapping with Machine Learning
+
+- introduction
+  - acronyms
+    - **AFP** Application Fingerprinting
+    - **ASC** Application Service Candidate
+    - **EP** Entry Point
+    - **ML** Machine Learning
+    - **SM** Service Mapping
+    - **SME** Subject Matter Expert
+  - SM options
+    - **Top Down**: use pattern-based discovery to identify service connections
+    - **Tag-Based**: harness metadata from virtualization, cloud, and container technologies
+    - **ML-Based**: identify entry points and add meaningful traffic-based connections from ML
+  - ML-based SM evolution
+    - Quebec (spring 2021): introduced
+    - Rome (fall 2021):
+      - added **Rules Engine** to automatically add connections to service maps
+      - Service Mapping Plus app introduced
+    - San Diego (spring 2022): added load balancer connection suggestions to detect virtual IP connections
+    - Tokyo (fall 2022): added **Automated Service Suggestions** to identify entry points wit sets of pre-identified resources
+  - Automated Service Suggestions
+    - Identifies potential application services using Predictive Intelligence.
+    - Creates application fingerprints from discovered processes.
+    - Evaluates traffic between fingerprints and CIs to form connections.
+    - Calculates entry points using machine learning clustering.
+    - Generates a list of service candidates for review.
+    - Simplifies the creation of application services to a few steps
+- implementation
+  - **Prerequisites**:
+    - Service Mapping plugin
+    - Service Mapping Plus via ServiceNow Store
+  - **Verify Prerequisites**:
+    - Enable ADME Property:
+      - Ensure the property `glide.discovery.enable_adme` is set to `True` in the system.
+      - Follow [additional instructions](https://www.servicenow.com/docs/bundle/xanadu-it-operations-management/page/product/discovery/reference/r_ApplicationDependencyMapping.html) to enable ADME probes for specific operating systems.
+    - Install and Enable Predictive Intelligence Plugin:
+      - Confirm the **Predictive Intelligence** plugin is installed and active.
+      - Navigate to the Predictive Intelligence tile and verify the **Status** is `Active`.
+      - If inactive, click the **Activate/Repair** link under **Related Links**.
+    - Enable Relevant ADME Probes:
+      - Activate all necessary ADME data collector probes to discover Configuration Items (CIs) in your environment.
+      - Ensure probes match the operating systems in use.
+    - Enable Application Fingerprint (AFP) Scheduled Job:
+      - Confirm the scheduled job _Applications suggestion - ITOM Autodiscovery_ is set to `Active`.
+      - This job manages fingerprint-based discovery processes.
+    - Enable Connection Suggestion Property:
+      - Navigate to the System Property [sys_properties] table.
+      - Verify the property `sa_ml.connection_suggestions.active` is set to `True` to enable Predictive Intelligence-based discovery.
+    - Enable Connection Suggestion Scheduled Job:
+      - Ensure the **Service Mapping - Traffic Process to Process** scheduled job is set to `Active`.
+      - This job triggers the generation of connection suggestions.
+    - Assure Minimum Number of Running Processes:
+      - Verify that the clustering solution created enough process groups for suggestions.
+      - Calibrate fingerprint-based discovery if there are insufficient processes.
+    - Allow IP Address Expansion:
+      - Check the `sn.adm.ip_expansion_limit` property:
+        - A value of `0` disables expansion.
+        - A negative value allows expansion to all IPs.
+        - A positive value limits expansion to the specified number (default: `1000`).
+  - **Application Service Readiness Dashboard**:
+    - Displays service discovery readiness and tracks ML-based connection suggestions.
+    - Relies on:
+      - **TCP data** in `cmdb_tcp` table.
+      - **Running processes** in `cmdb_running_process` table.
+    - Suggests connections for servers and load balancers using Predictive Intelligence.
+  - **Dashboard Reports**:
+    - Mapping Status of Application Services:
+      - **Source Table**: `ML-Related Service Status [ml_related_service_status]`
+      - **Description**: Summarizes ML-related issues in mapped application services.
+    - Application Fingerprints Training Status:
+      - **Source Table**: `AFP Training Status [afp_training_status]`
+      - **Description**: Displays the training status of application fingerprints.
+        - Reflects the readiness of Predictive Intelligence for application service mapping.
+    - Discovered Connection Suggestion Status:
+      - **Source Table**: `Connection Suggestions Training Status [connection_suggestion_training_status]`
+      - **Description**: Shows the training status of connection suggestions, indicating readiness for Predictive Intelligence-driven connections.
+  - **Service Issues**: Lists services with ML-related problems and traffic-based feature status.
+- mapping service candidates
+  - **Connection Suggestions**:
+    - **Predictive Intelligence** ranks the relevancy of connections between application fingerprints, CIs, and processes.
+    - Generates connection suggestions for servers and load balancers to decide on inclusion in application services.
+    - **Confidence Levels**:
+      - **High**: Likely an internal connection for a specific component or application.
+      - **Medium**: Likely a middleware connection (e.g., IBM MQ, Oracle WebLogic Server).
+      - **Low**: Likely a connection to monitoring applications (e.g., Tivoli, MID Server).
+      - **Very Low**: Likely a central application connection (e.g., Active Directory, Okta).
+  - **Mapping Application Services Based on Suggestions**:
+    - **How It Works**:
+      - Uses Predictive Intelligence to identify application fingerprints and relationships to CIs.
+      - Generates entry points and application service candidates for review and mapping.
+    - **Procedure**:
+      1. Navigate to **Service Mapping Workspace** and select **ML powered candidates**.
+      2. Review the list of candidates and their AFP-based suggestions.
+      3. Select **Preview map** to evaluate the suitability of a candidate.
+      4. Choose **Map application service** to:
+         - **Create a New Service**:
+           - Fill out fields: `Name`, `Number`, `Description`, `Service owner`, and `Service group`.
+         - **Add to Existing Service**:
+           - Search and select an existing service.
+      5. Select **Map service** and view the newly created or modified service.
