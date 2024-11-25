@@ -20,7 +20,9 @@
   - Publish an application to the ServiceNow Store
 - **YouTube**: [Academy Session #10: Getting Started with Decision Builder](https://www.youtube.com/watch?v=0edK6z6yFAs)
 - **Courses**:
-  - [Flow Designer: Error Handling](https://nowlearning.servicenow.com/lxp/en/pages/lxp-search?id=search&q=Flow%20Designer:%20Error%20Handling&spa=1)
+  - [x] [Flow Designer: Introduction - Washington](https://nowlearning.servicenow.com/lxp/en/pages/lxp-search?id=search&q=Flow%20Designer:%20Introduction%20-%20Washington&spa=1)
+  - [x] [Configure Orchestration, Flow Designer, and Integration Hub](https://nowlearning.servicenow.com/lxp/en/it-operations-management/configure-orchestration-flow-designer-and?id=learning_course_prev&course_id=4f63e5f7db3f4010785e2a59139619a7)
+  - [ ] [Flow Designer: Error Handling](https://nowlearning.servicenow.com/lxp/en/pages/lxp-search?id=search&q=Flow%20Designer:%20Error%20Handling&spa=1)
 
 ---
 
@@ -100,6 +102,14 @@
 - Common types include:
   - Boolean, Date/Time, Integer, String, Email, File Attachment.
   - Reference, List, HTML, Password, URL, Workflow, XML, and more.
+
+### Troubleshooting and Logs
+
+- Use Flow Designer > Active Flows to confirm whether a flow was triggered.
+- View logs to inspect:
+  - Inputs and outputs for each step.
+  - Action execution results (e.g., command outputs).
+- Ensure the flow is activated for production scenarios.
 
 ---
 
@@ -242,3 +252,75 @@ Subflows in Flow Designer can call orchestration workflows, passing dynamic inpu
 - **ScratchPad Variables**:
   - Used to store outputs like command results or error messages.
   - Available in JSON format for logging or further processing.
+
+### Creating a UI Action to Call a Subflow
+
+UI Actions provide the ability to trigger subflows directly from record forms, enabling users to execute commands or processes based on context-specific inputs.
+
+#### Steps to Create a UI Action for a Subflow
+
+1. **Build the Subflow**:
+   - **Define Inputs**: Include a `sys_id` input to identify the record calling the subflow.
+   - **Lookup Record**:
+     - Use the `Lookup Record` action to find the record matching the `sys_id` provided.
+   - **Call an Action**:
+     - Use an action (e.g., SSH action) to execute commands.
+     - Pass dynamic inputs (e.g., IP address and command) from the record fields.
+   - **Update Record**:
+     - Use an `Update Record` action to write results (e.g., action output) back to a specific field (e.g., comments or work notes).
+   - **Test**:
+     - Test the subflow by providing a `sys_id` and verifying the results.
+2. **Publish the Subflow**:
+   - Publish the subflow to generate a **code snippet** for triggering it:
+     - Click **More Actions menu** (three vertical dots) > **Copy snippet**.
+3. **Create the UI Action**: System Definitions > UI Actions > New
+   - **Define Properties**:
+     - **Name**: Assign a meaningful name (e.g., "Execute Subflow").
+     - **Table**: Specify the target table (e.g., Linux Server or Incident).
+     - **Type**: Choose button or form link as the UI action type.
+   - **Insert Script**:
+     - Paste the copied code snippet from the subflow.
+     - Modify the script to dynamically pass the `sys_id` of the current record to the subflow input:
+       - Replace the hardcoded `sys_id` with `current.getValue('sys_id');`.
+4. **Test the UI Action**:
+   - Access a record on the target table.
+   - Trigger the UI action.
+   - Verify that:
+     - The subflow executes correctly using the record’s data.
+     - Results are updated in the specified field (e.g., comments or work notes).
+
+#### Use Cases Examples for UI Actions
+
+1. **CI Record**:
+   - **Scenario**: Execute commands like `ifconfig` against a Linux server.
+   - **Steps**:
+     - Use `sys_id` to find the server record.
+     - Pass the server's IP address and a command (e.g., from a description field) to the action.
+     - Write action output to the **comments** field.
+2. **Incident Record**:
+   - **Scenario**: ITIL users execute commands against devices linked to an incident’s configuration item (CI).
+   - **Steps**:
+     - Add a **command** field to the incident form for user input.
+     - Use the incident’s CI to retrieve the target IP address.
+     - Execute the command via the subflow.
+     - Write results to the **work notes** field.
+
+#### Best Practices for UI Actions with Subflows
+
+- **Dynamic Inputs**: Ensure subflows dynamically use record-specific data to avoid hardcoding values.
+- **Test Thoroughly**: Verify the subflow works with various record configurations and inputs.
+- **Field Selection**:
+  - Use meaningful fields for user inputs (e.g., `description` or custom fields like `command`).
+  - Update relevant fields (e.g., `comments` or `work notes`) to reflect results.
+- **Activate Subflows and UI Actions**: Ensure both are published and active in the system.
+
+#### Summary for UI Actions with Subflows
+
+- **Subflow Creation**:
+  - Input: `sys_id`.
+  - Actions: Lookup, execution (via action), and update.
+- **UI Action**:
+  - Links subflow to the record form.
+  - Executes the subflow dynamically based on the record's `sys_id`.
+- **Results**:
+  - Automates command execution and writes results back to records, enhancing operational efficiency.

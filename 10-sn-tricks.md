@@ -96,3 +96,9 @@ Subscription Management
 ## Manually Set a Password
 
 [Password Policy Properties](https://www.servicenow.com/docs/bundle/washingtondc-platform-security/page/integrate/authentication/reference/password-policy-properties.html)
+
+## Check Customizations
+
+- [community: How to trace customizations in ServiceNow?](https://www.servicenow.com/community/now-platform-forum/how-to-trace-customizations-in-servicenow/m-p/3008258)
+  - check `sys_metadata_customization`
+  - check `sys_update_xml`
