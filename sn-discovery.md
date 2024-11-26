@@ -1018,6 +1018,7 @@
 
 #### DF: Troubleshooting Discovery
 
+- [community post: Phase by phase Discovery Troubleshooting](https://www.servicenow.com/community/itom-articles/phase-by-phase-discovery-troubleshooting/ta-p/2317698)
 - Discovery Phase Process - Review
   - Identify the error message
   - Determine the Discovery Phase the error occurred
