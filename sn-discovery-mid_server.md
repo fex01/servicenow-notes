@@ -55,7 +55,15 @@ Back to [ServiceNow Discovery](./sn-discovery.md)
       - no local or domain admin
       - log on as a service permission
       - [step-by-step](#windows)
-  - install MID server: elevated CMD Prompt ``
+  - install MID server: elevated CMD Prompt `msiexec /i "Path\to\your\file.msi"`
+    - SHIFT + Right-click > Copy as path
+    - required information:
+      - ServiceNow Instance URL, e.g. `https://instance.service-now.com`
+      - ServiceNow MID Server Username
+      - ServiceNow MID Server Password
+      - MID Server Name - name for the MID server record in the SNow instance
+      - Service Account Name - configured local service account with log on as a service permissions
+      - Service Account Password
   - Validate: run validation before server is usable
   - Verify connectivity with Quick Discovery or scheduled Discovery
     - Quick Discovery
@@ -168,3 +176,9 @@ Configuration
   - mid.instance.username: instance mid server user
   - mid.instance.password: instance mid server user password hash
   - name: mid server name
+
+## Troubleshooting
+
+### MID Server FileNameComplianceInSync Error
+
+- [community: MID Server FileNameComplianceInSync Error](https://www.servicenow.com/community/itom-forum/mid-server-filenamecomplianceinsync-error/td-p/3017630)
