@@ -1,5 +1,7 @@
 # Hardware Asset Management (HAM)
 
+back to [Asset Management](./sn-asset.md)
+
 ## TODO
 
 - [ ]
