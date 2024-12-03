@@ -9,6 +9,7 @@
   - [Kubernetes Discovery](./sn-discovery-kubernetes.md)
   - [AWS Discovery](./sn-discovery-aws.md)
   - [VMWare Discovery](./sn-discovery-vmware.md)
+  - [Hyper-V discovery](./sn-discovery-hyper-v.md)
 - CMDB
   - [CMDB](./sn-cmdb.md)
   - [CMDB Health](./sn-cmdb-health.md)
