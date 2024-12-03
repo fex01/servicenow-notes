@@ -103,6 +103,8 @@ back to [Asset Management](./sn-asset.md)
     - Disposition
   - Governance
 
+![IT HW Asset Lifecycle](./attachments/sn-asset-ham-lifecycle.png)
+
 ### Requirements and Recommended Practices
 
 - ISO 19770-1 IT Asset Management process standard: Capability Blueprint
