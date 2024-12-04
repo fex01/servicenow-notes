@@ -133,3 +133,159 @@ back to [Asset Management](./sn-asset.md)
   - Hardware asset management
     - All of the items above, plus
     - Manage hardware and consumable assets
+
+### Hardware Asset Management Implementation
+
+#### ServiceNow IT Asset Management Products
+
+1. **ITSM Asset Management Foundation Plugin**:
+   - Provides the baseline for managing IT assets (hardware, software, and contracts).
+   - Enables:
+     - Inventory control.
+     - Cost reduction for purchasing and managing assets.
+     - Full asset lifecycle management from planning to disposal.
+     - Compliance with standards and regulations.
+     - Improved IT service delivery to end-users.
+     - Establishing asset management standards and processes.
+     - Mobile Asset Receiving & My Assets
+2. **Hardware Asset Management (HAM)**:
+   - Expands upon ITSM Asset Management with advanced automation and lifecycle insights.
+   - Key Features:
+     - **Hardware Model Normalization**: Normalizes asset models with a content library, lifecycle data, and HAM resource categories.
+     - **Asset Lifecycle Automation**:
+       - Automated flows: Asset order, disposal, stock orders, asset refresh, RMA, and more.
+       - Tasks: Deploy, swap, retire assets.
+     - **Asset Inventory Audit (Mobile)**: Supports mobile audits, disposal scanning, and remote receiving.
+     - **Hardware Asset Manager Dashboard**: Centralized view for managing hardware assets.
+   - Automates full asset lifecycle from procurement to disposal with enhanced CMDB integration.
+   - Requires a separate license and activation by ServiceNow.
+3. **Software Asset Management (SAM) Professional**:
+   - Tracks and manages software licenses, compliance, and optimization.
+   - Key Capabilities:
+     - Reclaims unused software rights.
+     - Manages allocations and purchases for software entitlements.
+   - Requires a separate subscription
+   - [SAM notes](./sn-asset-sam.md)
+
+#### Differences Between HAM and ITSM Asset Management
+
+- HAM enhances ITSM Asset Management in four key areas:
+  1. **Hardware Model Normalization**.
+  2. **Asset Lifecycle Automation**.
+  3. **Asset Inventory Audit (Mobile)**.
+  4. **Hardware Asset Manager Dashboard**.
+- While ITSM Asset Management provides foundational capabilities, HAM focuses on automation, advanced workflows, and integration for hardware assets.
+
+#### HAM Benefits
+
+- **Comprehensive Lifecycle Management**:
+  - Covers pre-production planning to post-production retirement.
+  - Tracks financial, contractual, and inventory details.
+- **Integrated with CMDB**:
+  - Eliminates challenges like data integration and normalization.
+  - Offers a unified platform for IT and asset management.
+
+#### Required Plugins for Hardware Asset Management
+
+**Active by Default**:
+
+1. **ITSM Asset Management** (`com.snc.asset_management`)
+   - Part of the ITSM Asset Application.
+   - Active by default on ITSM and CSM instances upon activation.
+2. **Contract Management**
+3. **Depreciation**
+4. **Expense Line**
+5. **Fixed Asset**
+6. **My Assets**
+
+**Inactive by Default**:
+
+1. **Hardware Asset Management**
+   - Available via the ServiceNow Store.
+   - Includes **Hardware Model Normalization** and **Normalization Data Services Client** plugins.
+2. **Cost Management**
+3. **Data Certification**
+4. **Managed Documents**
+5. **Procurement**
+
+#### Optional Plugins
+
+Might require additional subscriptions:
+
+1. **ITSM Software Asset Management Foundation**
+2. **Software Asset Management (SAM) Professional**
+3. **Governance, Risk, and Compliance (GRC)**
+4. **Vendor Performance**
+5. **Field Service Management**
+6. **Performance Analytics**
+
+### Hardware Asset Management (HAM) Plugin Installation
+
+1. **Obtain License**:
+   - Acquire a HAM license from the **ServiceNow Store**.
+   - Ensure your instance is running **Paris or later**.
+2. **Install HAM**:
+   - Navigate to: **System Applications > All Available Applications > All**.
+   - Search for **Hardware Asset Management** (`sn_hamp`).
+3. **Role Requirement**:
+   - Assign the **ham_admin** role for installation and configuration.
+
+HAM updates are released on the **ServiceNow Store** independently of major product releases.
+
+#### Asset Management Modules
+
+1. **Default ITSM Asset Management Modules**:
+   - **Asset**:
+     - Overview, Portfolios, All Assets, Consumables, Hardware Assets, License Assets, Other Assets, Software.
+   - **Administration**:
+     - Manage and configure asset-related settings.
+   - **My Assets**:
+     - Self-service module for end users.
+2. **Additional HAM Modules (Activated with HAM Plugin)**:
+   - **Asset**:
+     - Hardware Asset Dashboard, Hardware Asset Workspace, Asset Tasks.
+   - **Hardware Model Normalization**:
+     - Overview.
+   - **Loaner Management**:
+     - All Loaner Asset Orders, Waitlisted Orders.
+   - **Disposal Orders**:
+     - Create Disposal Order, Disposal Orders.
+   - **Return Merchandise Authorization (RMA)**:
+     - All RMA Requests, RMA Line Items.
+   - **Asset Audits**
+
+#### Asset Management Process Relationships
+
+- **Request/Catalog Management**:
+  - Asset Output: Hardware and consumable models published in the Service Catalog.
+- **Content Library Curation**:
+  - Asset Output: Details from Discovery models and/or manufacturer lifecycle information that are not in the Central Software Library
+- **Contract Management**:
+  - Asset Input: Contract expiration dates, costs, terms, and conditions.
+- **Procurement Management**:
+  - Asset Input: Purchase order details from procurement systems.
+- **Change Management**:
+  - Asset Input: Hardware details for models or CIs supporting business services.
+  - Asset Output: Cost allocation and assignment details.
+- **Application Portfolio Management**:
+  - Asset Input: Hardware lifecycle and model information tied to applications.
+  - Asset Output: Hardware lifecycle data to support business applications.
+
+#### Personas, Roles, and Groups
+
+1. **Personas**:
+    - **Process Owner**: Defines and oversees process.
+    - **Asset Manager**: Handles operations, administration, and finances.
+    - **Asset Administrator**: Performs procurement and inventory activities.
+    - **System Administrator**: Maintains asset data and integrations.
+    - **Configuration Manager**: Manages CI classes and health guidelines.
+    - **Other Personas**: IT Finance Manager, IT Procurement Manager, IT Contract Manager, IT Vendor Manager.
+2. **Roles**:
+    - **asset**: Manages assets and records.
+    - **catalog_admin**: Manages the service catalog.
+    - **discovery_admin**: Configures and executes Discovery.
+    - **flow_operator**: Views flow execution details and logs.
+    - **ham_admin**: Manages HAM advanced features (requires HAM plugin).
+    - **inventory_admin**: Manages stockrooms, rules, and stock information.
+    - **itil**: Handles incident, problem, and change management tasks.
+    - **procurement_user**: Manages purchase orders and transfer orders.
