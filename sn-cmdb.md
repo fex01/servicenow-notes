@@ -52,8 +52,8 @@
     - Use ServiceNow Change Management to handle change requests – And use the Proposed Change function for updates of non-discoverable, manually-entered data.
     - Make sure that changes are reviewed and approved before they’re made
     - Use the Identification and Reconciliation Engine (IRE) to import new data in your CMDB –IRE
-    processes help maintain data integrity in the CMDB, preventing duplicate CIs by uniquely
-    identifying CIs and CI attributes by allowing only authoritative data sources to write to CMDB.
+      processes help maintain data integrity in the CMDB, preventing duplicate CIs by uniquely
+      identifying CIs and CI attributes by allowing only authoritative data sources to write to CMDB.
     - Configure permissions so that only authorized users can make changes to your CMDB
     - Communicate changes to stakeholders
 
@@ -151,6 +151,7 @@
   - 3. Design Data Model - s30ff
   - 4. Operationalize and Maintain the CMDB - s36
 - further slidedeck structure
+
   - 5. CMDB definitions and concepts - s37ff
   - 6. ServiceNow CMDB Basics
     - s44 Key Concepts
@@ -184,14 +185,13 @@
       - ITOM..., s6
     - 185 Next steps
 
-
 - Agenda
   - first draft:
     - 1 CMDB
       - 1.1 CMDB Einführung
       - 1.2 Strategie
-        - Ziele 
-        - CMDB Team 
+        - Ziele
+        - CMDB Team
         - Data Model
         - Operation & Management
       - 1.3 CMDB Konzepte

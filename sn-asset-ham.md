@@ -18,7 +18,68 @@ back to [Asset Management](./sn-asset.md)
 
 ### Labs
 
-- []
+#### L1:Prepare the Asset Management Environment (W)
+
+- [lab steps](https://nowlearning.servicenow.com/sys_attachment.do?sys_id=4f92791b974a0e54524eb3cf9153af67)
+
+##### L1: Objective
+
+1. Validate that ITSM Asset Management and Hardware Asset Management (HAM) functionality are installed and activated.
+2. Grant appropriate access to the asset manager for these applications.
+3. Download supporting files for future labs.
+
+##### L1-A: Validate Plugins
+
+1. Log in as the System Administrator
+2. Navigate to **System Definition > Plugins**. Switch to **Classic Application Manager** if prompted.
+3. Verify the following plugins are installed:
+   - Asset Management, Asset Management Workspace, Contract Management, Cost Management, Data Certification, Extended CMDB, Hardware Asset Management, Managed Documents, My Assets, Procurement.
+   - Install and activate any missing plugins (optionally include demo data).
+
+##### L1-B: Create a User Account
+
+1. Navigate to **User Administration > Users** and create a new user with the following details:
+   - User ID: hamm.dalorian
+   - First Name: Hamm
+   - Last Name: Dalorian
+   - Title: Asset Manager
+   - Email: `hamm.dalorian@example.com`
+   - Time Zone: US/Pacific (optional).
+2. Save the user record.
+
+##### L1-C: Add User to a New Group
+
+1. On Hamm’s user record, navigate to the **Groups** section and select **New**.
+2. Create and save a group named **Asset Managers**.
+3. Verify Hamm appears in the **Group Members** related list.
+
+##### L1-D: Add Roles to the Group
+
+1. Navigate to the **Roles** section of the **Asset Managers** group and select **Edit**.
+2. Add the following roles to the group:
+   - `asset`, `catalog_admin`, `discovery_admin`, `financial_mgmt_admin`, `flow_designer`, `ham_admin`, `inventory_admin`, `itil`, `procurement_user`.
+3. Save the changes.
+
+##### L1-E: Add User to Another Group
+
+1. On Hamm’s user record, under the **Groups** section, select **Edit**.
+2. Add **Field Services** to the group list.
+3. Verify both **Asset Managers** and **Field Services** groups are listed.
+
+##### L1-F: Verify Actions
+
+1. Impersonate Hamm Dalorian through the **User Menu**.
+2. Verify the following are available in the application navigator:
+   - Asset Management
+   - Hardware Asset Dashboard
+   - Hardware Model Normalization.
+3. End impersonation.
+
+##### L1-G: Download Supporting Files
+
+1. Navigate to **Self-Service > Knowledge** as the System Administrator.
+2. Open the **Class knowledge base** and download the SupportingFiles.zip.
+3. Save and unzip the file in an easily accessible location.
 
 ## Topics
 
@@ -80,10 +141,10 @@ back to [Asset Management](./sn-asset.md)
     - Integrations with the applications used to support defined process integrations (e.g., integration with purchasing system)
 - ITSM: configuration and delivery of IT services to users
 - Goals of IT asset management (ITAM)
-  - improve productivity: new hire process, asset requisition, share asset data, HW refresh
-  - financial reporting: accurate and automated depreciation, accurate tax calculation, charge-back costs, project accounting
-  - cost optimization: optimize contracts, standardize assets, employee separation, avoid penalities
-  - decision support: asset reporting, asset dashboard, ad-hoc queries, data integration
+  - **improve productivity**: new hire process, asset requisition, share asset data, HW refresh
+  - **financial reporting**: accurate and automated depreciation, accurate tax calculation, charge-back costs, project accounting
+  - **cost optimization**: optimize contracts, standardize assets, employee separation, avoid penalities
+  - **decision support**: asset reporting, asset dashboard, ad-hoc queries, data integration
 - IT HW Asset Lifecycle
   - 1. Request: LC begins with a plan or a request - someone needs an asset to achieve a goal
   - 2. Procure: fulfillment by existing stock or through procurement from a vendor
@@ -200,15 +261,17 @@ back to [Asset Management](./sn-asset.md)
 
 **Inactive by Default**:
 
-1. **Hardware Asset Management**
+1. **Hardware Asset Management** (sn_hamp)
    - Available via the ServiceNow Store.
    - Includes **Hardware Model Normalization** and **Normalization Data Services Client** plugins.
-2. **Cost Management**
+2. **Cost Management** (com.snc.cost_management)
 3. **Data Certification**
-4. **Managed Documents**
-5. **Procurement**
+   - plugin does not exist on Xanadu
+   - exists on Vancouver
+4. **Managed Documents** (com.snc.document_management)
+5. **Procurement** (com.snc.procurement)
 
-#### Optional Plugins
+**Optional Plugins**:
 
 Might require additional subscriptions:
 
@@ -231,6 +294,7 @@ Might require additional subscriptions:
    - Assign the **ham_admin** role for installation and configuration.
 
 HAM updates are released on the **ServiceNow Store** independently of major product releases.
+Check also [Lab 1](#l1-a-validate-plugins) for plugin validation.
 
 #### Asset Management Modules
 
@@ -274,18 +338,33 @@ HAM updates are released on the **ServiceNow Store** independently of major prod
 #### Personas, Roles, and Groups
 
 1. **Personas**:
-    - **Process Owner**: Defines and oversees process.
-    - **Asset Manager**: Handles operations, administration, and finances.
-    - **Asset Administrator**: Performs procurement and inventory activities.
-    - **System Administrator**: Maintains asset data and integrations.
-    - **Configuration Manager**: Manages CI classes and health guidelines.
-    - **Other Personas**: IT Finance Manager, IT Procurement Manager, IT Contract Manager, IT Vendor Manager.
+   - **Process Owner**: Defines and oversees process.
+   - **Asset Manager**: Handles operations, administration, and finances.
+     - role: ham_admin - includes inventory_admin, asset, procurement_user
+   - **Asset Administrator**: Performs procurement and inventory activities.
+   - **System Administrator**: Maintains asset data and integrations.
+   - **Configuration Manager**: Manages CI classes and health guidelines.
+   - **Other Personas**: IT Finance Manager, IT Procurement Manager, IT Contract Manager, IT Vendor Manager.
 2. **Roles**:
-    - **asset**: Manages assets and records.
-    - **catalog_admin**: Manages the service catalog.
-    - **discovery_admin**: Configures and executes Discovery.
-    - **flow_operator**: Views flow execution details and logs.
-    - **ham_admin**: Manages HAM advanced features (requires HAM plugin).
-    - **inventory_admin**: Manages stockrooms, rules, and stock information.
-    - **itil**: Handles incident, problem, and change management tasks.
-    - **procurement_user**: Manages purchase orders and transfer orders.
+   - **asset**: Manages assets and records.
+   - **catalog_admin**: Manages the service catalog.
+   - **discovery_admin**: Configures and executes Discovery.
+   - **flow_operator**: Views flow execution details and logs.
+   - **ham_admin**: Manages HAM advanced features (requires HAM plugin).
+   - **inventory_admin**: Manages stockrooms, rules, and stock information.
+   - **itil**: Handles incident, problem, and change management tasks.
+   - **procurement_user**: Manages purchase orders and transfer orders.
+
+### Trustworthy Data
+
+areas of interests:
+
+- data dependability
+- data consistency
+- data accuracy
+- data reliability
+- data validation
+- data credibility
+- data believability
+- data transferability
+- data usefulness

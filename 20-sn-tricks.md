@@ -88,10 +88,13 @@ Form > right-click Label > Show ‘Field Name’
 
 Subscription Management
 
-## Which roles contain a specific subrole?
+## Roles
 
-- `sys_user_role_contains.list`
-  - Search for subrole in column `Contains`
+- Which roles contain a specific subrole?
+  - `sys_user_role_contains.list`
+    - Search for subrole in column `Contains`
+- Which user has a specific role?
+  - `sys_user_role.list` > open _role_ record > Related List Users
 
 ## Manually Set a Password
 
