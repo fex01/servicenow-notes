@@ -32,7 +32,7 @@ Microsoft Hyper-V is a virtualization application included with Windows Server 2
 
 ## Configuration Requirements
 
-- **Credentials:** Windows credentials with Domain administrator rights are necessary.
+- **Credentials:** Windows credentials with **Domain administrator rights** are necessary.
 - **PowerShell:** Must be enabled on the MID Server used for discovering Hyper-V servers and instances.
 
 ## Discovery Tools
@@ -47,6 +47,7 @@ Microsoft Hyper-V is a virtualization application included with Windows Server 2
     - Hyper-V - Virtual Machines\*
     - Hyper-V - Virtual Networks
 - pattern: Hyper-V Server
+  - pattern as way forward for Windows 2016 and later installations.
 
 ## Data Collection
 
@@ -69,3 +70,6 @@ Discovery maps relationships between the host machine, virtual machines, network
 ## Cloning Virtual Machines
 
 Instructions are provided for cloning Hyper-V VMs, ensuring unique IDs for imported machines to avoid duplicates in Discovery.
+
+- _Move or restore the virtual machine_: clones image **without changing the ID** - delete original when used to avoid Discovery issues
+- _Copy the virtual machine_: creates a new ID for the copy, avoiding conflicts with the original
