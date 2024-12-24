@@ -72,7 +72,7 @@ back to [Asset Management](./sn-asset.md)
 2. Verify the following are available in the application navigator:
    - Asset Management
    - Hardware Asset Dashboard
-   - Hardware Model Normalization.
+   - Hardware Model Normalization
 3. End impersonation.
 
 ##### L1-G: Download Supporting Files
@@ -162,6 +162,66 @@ back to [Asset Management](./sn-asset.md)
 3. Save the record.
 4. Select **Auto-select assets** to automatically add available components to the bundle.
 5. Change the **State** to In Stock and save.
+
+#### L2.2: Hardware Model Normalization
+
+- [lab steps](https://nowlearning.servicenow.com/sys_attachment.do?sys_id=6ff6b5d397ca0e54524eb3cf9153af3a)
+
+##### L2.2: Objective
+
+1. Establish Content Service participation.
+2. Exclude a hardware model from Content Service participation.
+3. Validate hardware model Content Service download.
+4. Normalize an unnormalized hardware model.
+
+##### L2.2-A: Opt-in to Content Service
+
+1. Impersonate Hamm Dalorian.
+2. Navigate to **Asset > Hardware Model Normalization > Content Service Setup**.
+3. Select the **Opt-In Agreement** link, read the details, and select **Done**.
+4. Check **Yes, I have read and accept the Opt-In Agreement**.
+5. Select **Opt-In**.
+6. Expand each **HARDWARE ASSET DATA** section to review the details sent to ServiceNow.
+
+##### L2.2-B: Exclude a Hardware Model from Content Service
+
+1. Navigate to **Product Catalog > Product Models > Hardware Models**.
+2. Open the **Gamer Supreme** hardware model.
+3. Select the **Normalization** tab and check **Exclude from content service**.
+4. Select **Update**.
+
+##### L2.2-C: Opt-in to License Resource Categories
+
+1. Navigate to **Asset > Hardware Model Normalization > HAM Resource Categories**.
+2. Open the **Network Gear** resource category and review associated model categories.
+3. Select **Opt out**, confirm in the popup, and verify the **Opt in** checkbox is deselected.
+4. Return to the list of HAM Resource Categories and confirm the **Network Gear** category is marked as false in the **Opt in** column.
+5. Opt back into the **Network Gear** category, ensuring all categories are set to **true**.
+
+##### L2.2-D: Validate Hardware Model Content Service Download
+
+1. Navigate to **Asset > Hardware Model Normalization > Overview**.
+2. Review the **Hardware Model Content Service Download** section for:
+   - Days until the next content library download.
+   - Days since the last content library download.
+
+##### L2.2-E: Review Fully Normalized Hardware Model
+
+1. Navigate to **Product Catalog > Product Models > Hardware Models**.
+2. Select the **Personalize List** gear icon and add **Normalization status** to the displayed columns.
+3. Open the **Macbook Pro 15** hardware model with a normalization status of **Normalized**. (e.g., Model number MR962LL/A)
+4. Review the **General** tab for the display name and other normalized data.
+5. Open the **Compaq Evo Notebook PC** (n610c) model and review its **Hardware Model Lifecycles** tab for lifecycle data provided by the Content Service.
+
+##### L2.2-F: Normalize an Unnormalized Hardware Model
+
+1. Navigate to **Product Catalog > Product Models > Hardware Models** and select **New**.
+2. Enter the following details:
+   - **Manufacturer:** `Dell Inc.`
+   - **Name:** junk text
+3. Save the record and review the **Normalization** tab.
+4. Update the **Model number** to **PS6000X** and save again.
+5. Review the updated **Normalization** tab for changes.
 
 ## Topics
 
@@ -647,3 +707,118 @@ Check also [Lab 1](#l1-a-validate-plugins) for plugin validation.
     - Pallets must be empty to delete; all assets must be removed first.
     - pallet assets can not be part of an asset bundle
     - Required role: **asset**.
+
+### Hardware Model Normalization (W)
+
+- **Overview of Hardware Model Normalization**
+  - **Importance of HAM Installation**: Essential for utilizing Hardware Model Normalization features.
+  - **Definition and Purpose**: Focuses on standardizing hardware and consumable asset data, enhancing lifecycle management through the ServiceNow platform.
+  - **Key Features**:
+    - Standardizes product model and asset data across the organization.
+    - Generates clean, reliable CMDB data.
+    - Automates population of lifecycle data using ServiceNow Content Library.
+  - **Benefits**:
+    - Ensures accurate asset inventory.
+    - Improves IT service quality by providing necessary asset lifecycle data.
+    - Automates hardware asset management processes.
+  - **Potential Issues Addressed**:
+    - Inconsistent asset data from multiple sources.
+    - Error-prone manual data entry.
+    - Inconsistent data gathering and audit processes.
+    - Overlapping and duplicate records.
+- **Hardware Model Normalization Functionality**
+  - Normalized **Display name**: **manufacturer** + **product name** + **model number**
+  - **Automatic Updates**: Lifecycle data such as end of support and life dates are populated automatically.
+    - since Vancouver, this includes additional information like physical dimensions (e.g., height, width, length, and weight), energy ratings and power consumption, and manufacturer warranty information
+    - does not overwrite data manually added to the information section of an asset
+  - **Error Handling**: Normalizes inconsistencies found during asset intake or audits.
+  - aligns assets under common **Display name (manufacturer + product name + model number)**
+  - aligns models with the United Nations Standard Product and Services Code (**UNSPSC**)
+- **Hardware Model Normalization Tables**
+  - Device Type
+  - Hardware Lifecycle Definition
+  - Hardware Manufacturer
+  - Hardware Model Library
+  - Hardware Normalization Map
+  - Hardware Product.
+- **Hardware Asset Management Content Service**
+  - **Functionality**: Offers ongoing improvement of hardware and consumable model recognition.
+  - **Data Sharing**: Allows secure sharing of data with ServiceNow to enhance normalization processes.
+  - **Opting Out**: Users can opt-out anytime, which impacts the visibility and normalization of non-standard data.
+  - daily updates of custom data from your instance to ServiceNow (opt-in)
+  - weekly updates from ServiceNow to the Content Service
+    - scheduled job: _HAM - Apply latest content changes_
+  - it is possible to opt-in, but exclude specific hardware / consumable models
+  - data retrieved by ServiceNow stays anonymous and will be disposed after review
+  - default: opted-out
+- **On-premise Support for Hardware Content Library**
+  - **Manual Upload and Export**: Allows manual upload of hardware library data and export of normalization content via a zip file for on-premise instances.
+  - **Activation Requirements**:
+    - Must opt-in to HAM Content Service through the Content Service Setup page.
+    - Activate the on-premise feature by enabling the Manage Hardware Library module in System Definition > Modules.
+  - **Functional Options**:
+    - Import Hardware Library Content File.
+    - Opt-in for exporting hardware normalization content.
+- **HAM Class Licensing**
+  - **Customization**: Allows subscription customization based on resource categories.
+  - **Resource Categories**: Includes categories like End User Computers, Servers, Network Gear, Mobile Devices, and Telecom Network Inventory (TNI) (when TNI is purchased)
+  - **Opting Process**: manual opting out available to save costs.
+    - All > Asset > Hardware Model Normalization > HAM Resource categories
+  - required to use normalization features for respective categories
+- **Practical Application of Hardware Model Normalization**
+  - **Creating Models**: Initiate by creating hardware or consumable models in the Product Catalog.
+    - All > Product Catalog > Product Models >
+      - Hardware Models
+      - Consumable Models
+  - **Normalization Process**:
+    - Automatically runs upon model creation, whether added manually, discovered, or imported.
+    - Fields such as manufacturer, product, and model are locked after normalization to prevent edits.
+      - _Normalization Status_ is set to _Normalized_
+      - _Device type_ is set to standard grouping based on the UNSPSC
+      - _Display name_ is set to _Manufacturer_ + _Product Name_ + _Model Number_
+    - lifecycle information and other Content Service data is added when record is saved (auto-normalization)
+  - **Hardware Normalization Status Categories**
+    - **New**: Model has not undergone normalization.
+    - **Normalized**: Model is fully normalized with no editable fields necessary; aligns with data from the Hardware Asset Management Content Service.
+    - **Partially Normalized**: Model is normalized based on manufacturer and product fields; the model field remains editable for further updates.
+    - **Manufacturer Normalized**: Normalization is based solely on the manufacturer field; model and product fields remain editable. When data is added, normalization category is updated to _Manually Normalized_
+    - **Manually Normalized**: manually updated one or more of manufacturer, product name, and/or model number fields
+    - **Match Not Found**: No matching rule in the Hardware Library for the model's key fields; all fields remain editable until matched.
+  - daily scheduled job **HAM - Hardware Normalization**: re-check/re-asses anything that is not in a fully Normalized status
+  - **Normalization Reversion**: Enables resetting of model fields to their original values if needed.
+    - required `ham_admin` role
+- **Overview of Hardware Model Lifecycles**
+  - **Function**: Tracks critical lifecycle dates and risk levels for hardware, for both internal management and publisher timelines.
+  - **Integration**: Lifecycle data is auto-populated for fully normalized models via the Hardware Asset Management Content Service, with the option to manually add records.
+  - Key Lifecycle Phases
+    - **Pre-release**
+      - Internal: Preparation for deployment.
+      - Publisher: Announcement of release.
+    - **General Availability**
+      - Internal: Availability date within the organization.
+      - Publisher: Market release date.
+    - **End of Sale**
+      - Internal: End of internal availability.
+      - Publisher: Manufacturer stops sales and improvements.
+    - **End of Support**
+      - Internal: Supported only by internal teams.
+      - Publisher: Manufacturer provides only fixes.
+    - **End of Extended Support**
+      - Internal: No internal support.
+      - Publisher: No manufacturer support.
+    - **End of Life**
+- **Notes on Device Type in Hardware Model Normalization**
+  - **Traditional Challenges**: Historically, linking models to model categories in ServiceNow has been arbitrary and inconsistent.
+  - **Standardization with UNSPSC**: Device types (like computers, printers, monitors) are now standardized using the UNSPSC, a global classification system.
+  - **Benefits of UNSPSC Alignment**:
+    - Ensures consistent categorization of all products and services, from IT equipment to everyday items.
+    - Facilitates accurate reporting and management of assets based on globally recognized standards, rather than arbitrary internal categorizations.
+- **Common Service Data Model (CSDM) Integration**
+  - **Purpose**: Provides standard terms and definitions for tracking product model lifecycle stages and statuses.
+  - **Adoption**: Optional for HAM users, aligning product model status with CSDM values.
+- **Hardware Model Normalization Overview** dashboard
+  - **Usage**: Monitors normalization status and lifecycle data of hardware and consumable models.
+  - **Updates**: Dashboard updates reflect real-time changes and scheduled content downloads.
+- **Integration with Application Portfolio Management (APM)**
+  - **Purpose**: Supports organizational goals by linking hardware assets to business services.
+  - **Benefits**: Enables proactive planning and risk management by providing visibility into hardware lifecycle statuses.

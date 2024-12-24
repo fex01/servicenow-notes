@@ -313,7 +313,7 @@
       - Devices - Credential-less Discovery Network Device
       - Applications - Credential-less Discovery Application
       - HorizontalDiscoveryProbe launches Credential-less discovery patterns
-    - Cl Details
+    - CI Details
       - Nmap uses reverse-DNS to ID the host
       - If no hostname is configured, the IP address will be used
       - Serial number is not captured by Nmap
@@ -410,6 +410,11 @@
     - if on device ACLs are used, MID server IP must be added
     - SNMP v3 requires protocol, private key and user name to be defined
 - Discovery Behavior
+  - [docs: Discovery behaviors](https://www.servicenow.com/docs/bundle/xanadu-it-operations-management/page/product/discovery/concept/c_DiscoveryBehaviors.html)
+    - [Create a Discovery behavior](https://www.servicenow.com/docs/bundle/xanadu-it-operations-management/page/product/discovery/task/create-disco-behavior.html)
+    - [Set up a load balancing behavior](https://www.servicenow.com/docs/bundle/xanadu-it-operations-management/page/product/discovery/task/t_SetUpLoadBalDiscoBehavr.html)
+    - [Examples of Discovery behavior functionalities](https://www.servicenow.com/docs/bundle/xanadu-it-operations-management/page/product/discovery/reference/r_DefineTheFunctionalities.html)
+    - [Discovery behavior example: access an ACL protected SNMP device](https://www.servicenow.com/docs/bundle/xanadu-it-operations-management/page/product/discovery/task/t_AccessAnACLProtectedSNMPDevice.html)
   - which protocols are used during scanning
   - can be used to restrict a specific Discovery Schedule to discover only specific devices, for example only Windows (wmi probe)
   - create and use Behavior:
@@ -419,7 +424,9 @@
       - Save
       - Related Lists > Discovery Functionality > New
         - Phase: 1
+          - arbitrary phase to group behaviors - not aligned with Discovery Phases
         - Functionality definition: defines which probes are used, e.g. Windows only
+          - All > Discovery Definition > Functionality Definitions
         - MID servers
         - Submit
       - Update
