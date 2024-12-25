@@ -223,6 +223,63 @@ back to [Asset Management](./sn-asset.md)
 4. Update the **Model number** to **PS6000X** and save again.
 5. Review the updated **Normalization** tab for changes.
 
+#### L2.3: Asset and Configuration Item (CI) Relationships
+
+- [lab steps](https://nowlearning.servicenow.com/sys_attachment.do?sys_id=c655a12397468294524eb3cf9153af73)
+
+##### L2.3: Objective
+
+1. Create a configuration item (CI).
+2. Synchronize CI and asset.
+
+##### L2.3-A: Create a Configuration Item and Associated Asset
+
+1. Impersonate Hamm Dalorian.
+2. Navigate to **Configuration > Base Items > Computers**.
+3. Select **New** and complete the form:
+   - **Name:** Serenity
+   - **Asset tag:** DELL1234567
+   - **Manufacturer:** Dell Inc.
+   - **Serial number:** DELLM17X-001
+   - **Model ID:** Dell Inc. Alienware M17x
+   - **Assigned to:** Felipe Gould
+4. Save the record.
+
+To create the associated asset:
+5. End impersonation
+6. Navigate to **System Definition > Scheduled Jobs**.
+7. Locate the job **Asset - Create asset delayed sync** and select **Execute Now**.
+8. Re-impersonate Hamm Dalorian and return to **Configuration > Base Items > Computers**.
+9. Open the record for **Serenity** and verify the **Asset** field is populated.
+
+##### L2.3-B: Define Model Asset Tracking Strategy
+
+1. Navigate to **Product Catalog > Product Models > Hardware Models**.
+2. Open the record for **MacBook Pro 17”**.
+3. Set **Asset tracking strategy** to **Don’t create assets** and save.
+4. Navigate to **Configuration > Base Items > Computers** and create a new record:
+   - **Name:** Enterprise
+   - **Manufacturer:** Apple
+   - **Serial number:** APPLMBP17-001
+   - **Model ID:** Apple MacBook Pro 17"
+   - **Assigned to:** Fred Luddy
+5. Save the record and verify the **Asset** field is not populated due to the tracking strategy.
+
+##### L2.3-C: Enforce CI Verification
+
+1. Navigate to **Product Catalog > Product Models > Model Categories**.
+2. Open the record for **Computer** and enable **Enforce CI Verification**. Save the changes.
+3. Navigate to **Configuration > Base Items > Computers** and create a new record:
+   - **Name:** Destiny
+   - **Manufacturer:** Dell Inc.
+   - **Serial number:** DELLM17X-002
+   - **Model ID:** Dell Inc. Alienware M17X
+   - **Assigned to:** Felipe Gould
+4. Save the record and add **DELL2345678** to the **Asset tag** field, save the changes
+5. End impersonation and execute the **Asset – Create asset delayed sync** job.
+6. Re-impersonate Hamm Dalorian, open the record for **Destiny**, and select **Create Asset**.
+7. Verify the asset record is created by confirming the **Asset** field is populated or by searching for **DELL2345678** under **Asset > Portfolios > Hardware Assets**.
+
 ## Topics
 
 ### Introduction
@@ -822,3 +879,71 @@ Check also [Lab 1](#l1-a-validate-plugins) for plugin validation.
 - **Integration with Application Portfolio Management (APM)**
   - **Purpose**: Supports organizational goals by linking hardware assets to business services.
   - **Benefits**: Enables proactive planning and risk management by providing visibility into hardware lifecycle statuses.
+
+### Assets and Configuration Items
+
+- **Components of the Asset Lifecycle**
+  - IT Asset Management (HAM) centers on the financial lifecycle of physical IT components:
+    - Request, procure, receive, stock, and dispose
+  - If tracking financial information, contracts, or ownership, you need an asset record
+  - During the operational phase, an asset can also be a CI (configuration item) for support, monitoring, deployment, and changes
+- **Difference Between Asset and Configuration Management**
+  - Assets:
+    - Financial and contractual information
+    - Lifecycle details (request, procure, receive, stock, dispose)
+    - Ownership and cost relationships
+  - CIs:
+    - Operational details (deploy, support, monitor)
+    - Logical or physical resource relationships
+    - Task tracking (incidents, problems, changes)
+- **Purpose of Model Categories**
+  - A model record is needed any time there is an asset or CI
+  - Model categories link CI classes to asset classes
+    - Example: The Computer model category links the cmdb_ci_computer CI class to the alm_hardware asset class
+    - When a new CI is created (e.g., a computer), a corresponding hardware asset is also created (and removed in sync)
+  - CI classes have a one-to-one relationship with model categories
+  - Asset classes do not, so a model category must be specified when creating a new asset
+  - Model category configuration determines:
+    - Whether to create an asset from a CI
+    - Which asset class to use (hardware, consumable, license, facility)
+  - ![Asset <> Model <> CI relationships](./attachments/sn-asset-relationships.png)
+- **Asset and Configuration Item Process**
+  - Two main approaches to creating and linking assets and CIs:
+    1. Data sources (Discovery, SCCM, etc.) create CIs first; linked assets are then created if a model category exists
+    2. Procurement or other tools create assets first; linked CIs are then created if a model category exists
+  - Synchronization happens on key fields (e.g., State on asset ↔ Status on CI)
+    - Best practice: update the asset State to drive the CI Status
+  - Ensure unique identifiers (such as Asset tag) are used to merge or update existing records
+    - especially when both approaches are used in parallel, as CI names might be based on the model -> they would not be unique identifiers
+  - Sync mechanics:
+    - **Business Rules** (examples on `alm_asset` and `cmdb_ci` tables)
+      - **On alm_asset**:
+        - Create CI on insert
+        - Update CI fields on change
+      - **On cmdb_ci**:
+        - Create Asset on insert
+        - Update Asset fields on change
+        - Create asset on model change
+    - **Script Includes**
+      - **AssetandCI** or **AssetAndCISynchronizer**
+        - Handle the core logic (e.g., which fields to update and how to handle exceptions)
+    - **Asset > Administration Modules**
+      1. **Asset CI Field Mappings (`alm_asset_ci_field_mapping`)**
+         - Lists all synchronized fields and whether each mapping is active
+      2. **Asset CI Install Status Mappings (`alm_asset_ci_state_mapping`)**
+         - Maps asset states to CI install statuses
+      3. **Asset CI Hardware State Mappings (`alm_hardware_state_mapping`)**
+         - Maps hardware asset states to CI statuses
+- **Enforcing CI Verification**
+  - Some organizations do not want assets automatically created for certain CIs (e.g., contractor-owned devices)
+  - If Enforce CI Verification is enabled on a model category:
+    - The system will not create an asset automatically until the CI is verified
+    - Verification options:
+      - Create Asset: marks the CI as verified and creates the asset
+      - Merge CI: merges the new CI with an existing CI that already has an asset
+  - Configuration errors (incorrect sequencing of model/model category assignment) can also prevent automatic asset creation
+- **Asset Tracking Strategy**
+  - On individual model records, the Asset tracking strategy field can override model category settings:
+    - Leave to category: follow the model category’s default behavior
+    - Create consumable asset: treat items as consumables (e.g., low-end printers) instead of individually tracked assets
+    - Do not create assets: no asset record is created for these CIs (useful if your company never owns/purchases them)
