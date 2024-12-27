@@ -245,12 +245,7 @@ back to [Asset Management](./sn-asset.md)
    - **Assigned to:** Felipe Gould
 4. Save the record.
 
-To create the associated asset:
-5. End impersonation
-6. Navigate to **System Definition > Scheduled Jobs**.
-7. Locate the job **Asset - Create asset delayed sync** and select **Execute Now**.
-8. Re-impersonate Hamm Dalorian and return to **Configuration > Base Items > Computers**.
-9. Open the record for **Serenity** and verify the **Asset** field is populated.
+To create the associated asset: 5. End impersonation 6. Navigate to **System Definition > Scheduled Jobs**. 7. Locate the job **Asset - Create asset delayed sync** and select **Execute Now**. 8. Re-impersonate Hamm Dalorian and return to **Configuration > Base Items > Computers**. 9. Open the record for **Serenity** and verify the **Asset** field is populated.
 
 ##### L2.3-B: Define Model Asset Tracking Strategy
 
@@ -279,6 +274,193 @@ To create the associated asset:
 5. End impersonation and execute the **Asset – Create asset delayed sync** job.
 6. Re-impersonate Hamm Dalorian, open the record for **Destiny**, and select **Create Asset**.
 7. Verify the asset record is created by confirming the **Asset** field is populated or by searching for **DELL2345678** under **Asset > Portfolios > Hardware Assets**.
+
+#### L3.1: Manage Consumables
+
+- [lab steps](https://nowlearning.servicenow.com/sys_attachment.do?sys_id=079da127974a8294524eb3cf9153af51)
+
+##### L3.1: Objective
+
+1. Create a consumable record and associate it with a new consumable model.
+2. Consume a consumable asset.
+
+##### L3.1-A: Create a Consumable Product Model
+
+1. Impersonate Hamm Dalorian.
+2. Navigate to **Product Catalog > Product Models > Consumable Models**.
+3. Select **New** and complete the form:
+   - **Manufacturer:** Logitech
+   - **Name:** M510 wireless mouse
+   - **Short description:** Wireless computer mouse
+   - **Model categories:** Consumable
+   - **Model number:** M510
+   - **Cost:** $19.00
+4. Save the record.
+
+##### L3.1-B: Create a Consumable Asset Record
+
+1. Navigate to **Asset > Portfolios > Consumables**.
+2. Select **New** and complete the form:
+   - **Model category:** Consumable
+   - **Model:** Logitech M510 wireless mouse
+   - **Quantity:** 50
+   - **State:** In stock
+   - **Substate:** Available
+   - **Stockroom:** Southern California Warehouse
+3. Verify the cost is automatically calculated as $950.00 (50 units x $19 each).
+4. Save the record.
+
+##### L3.1-C: Consume a Consumable Asset
+
+1. On the created consumable asset record, select the **Consume** button.
+2. In the **User** field, select **Beth Anglin**.
+3. Select **OK** and verify the results:
+   - The quantity is updated to 49 (50 - 1 consumed = 49).
+   - The cost is updated to $931.00 ($950 - $19 for 1 consumed = $931).
+4. Save the record.
+
+##### L3.1: Lab Challenge: Validate Asset Assignment
+
+1. Impersonate Beth Anglin.
+2. Navigate to **Self-Service > My Assets**.
+3. Verify that one Logitech M510 wireless mouse has been assigned.
+
+#### L3.2: Manage Stock
+
+- [lab steps](https://nowlearning.servicenow.com/sys_attachment.do?sys_id=c6ed21e7974a8294524eb3cf9153af45)
+
+##### L3.2: Objective
+
+1. Transfer assets out of a stockroom.
+2. Transfer assets into a stockroom.
+
+##### L3.2-A: Create a Transfer Order
+
+1. Impersonate Hamm Dalorian.
+2. Navigate to **Inventory > Transfer Orders > Create Transfer Order**.
+3. Complete the form:
+   - **From stockroom:** Southern California Warehouse
+   - **To stockroom:** San Diego South Warehouse
+4. Save the transfer order.
+5. In the **Transfer Order Lines** related list, select **New** and complete the form:
+   - **Model:** Logitech M510 wireless mouse
+   - **Quantity requested:** 20
+6. Submit the transfer order line.
+7. Create two additional transfer order lines for one Apple MacBook Pro 15" laptop each, selecting assets with a state of **In stock** and a substate of **Available**.
+8. Validate that there are three lines:
+
+   - One line for 20 Logitech M510 wireless mice.
+   - Two lines for Apple MacBook Pro 15" laptops.
+
+9. Open the **Transfer Order Line** for the Logitech mice and review the **Transfer Order Line Tasks** related list.
+10. Select **Close Task** to complete fulfillment and begin the asset transfer process.
+11. Repeat the process for the other transfer order lines for the laptops, ensuring their stages progress to **In Transit**.
+
+##### L3.2-B: Receive a Transfer Order
+
+1. Impersonate Luke Wilson.
+2. Navigate to **Inventory > Transfer Orders > Transfer Orders** and open the created transfer order.
+3. Open the **Transfer Order Line** for the Logitech mice and review it.
+4. Open the **Open Transfer Order Line Task** and:
+   - Enter **Quantity received:** 10.
+   - Select **Close Task**.
+5. Repeat the process for the Apple MacBook Pro 15" laptops to mark them as received.
+6. Process the remaining 10 Logitech mice when they are delivered and mark them as received.
+
+##### L3.2: Verify Actions
+
+1. Navigate to **Inventory > Stock > Stockrooms**.
+2. Open **San Diego South Warehouse** and validate that 20 Logitech M510 wireless mice are in stock and available.
+
+##### Lab Challenge: Consume a Consumable
+
+1. Consume one Logitech M510 wireless mouse from the San Diego South Warehouse.
+2. Assign it to **Alejandro Mascall** and validate that the mouse appears in Alejandro’s assigned assets.
+
+#### L3.3: Import Assets
+
+- [lab steps](https://nowlearning.servicenow.com/sys_attachment.do?sys_id=312ee16b974a8294524eb3cf9153af41)
+
+##### L3.3: Objective
+
+1. Load hardware asset data.
+2. Transform hardware asset data into ServiceNow tables.
+3. Import hardware asset data via the advanced shipment notification (ASN) template.
+
+##### L3.3-A: Load Asset Data
+
+1. use the **System Administrator** account
+2. Navigate to **System Import Sets > Load Data**.
+3. Select **Create table**, and add a **Label:** Asset Import.
+4. Under **Source of the import**, select **File**, and upload `3.3-assets_for_import.xls`.
+5. Submit the import.
+
+##### L3.3-B: Create Transform Maps
+
+1. Define the **Hardware Model Import Map**:
+   - Next steps: Create transform map
+     - **Name**: Hardware Model Import Map
+     - **Target table:** Hardware Model [cmdb_hardware_product_model].
+     - Save the map.
+     - Use **Auto Map Matching Fields**
+     - Use **Mapping Assist** to configure mappings for:
+       - **Source field:** model_name → **Target field:** Name
+       - Save
+     - set **Coalesce** to true for: u_model_name, manufacturer
+     - Update
+2. Define the **Asset Import Map**:
+   - Next steps: Create transform map
+     - **Name**: Asset Import Map
+     - **Target table:** Hardware [alm_hardware].
+     - Use **Auto Map Matching Fields**
+     - set **Coalesce** to true for: u_asset_tag
+     - adapt date format for `u_warranty_expiration` by opening the record and clicking Suggestion behind the date format field
+       - format: `yyyy-MM-dd`
+     - create two new mappings:
+       - **Source field:** model_name → **Target field:** Model (**Choice action:** reject, **Reference value**: name).
+       - **Source field:** category → **Target field:** Model category (**Choice action:** reject).
+     - Save.
+
+##### L3.3-C: Transform Data
+
+1. Stay on the Asset Import Map record and select **Transform**.
+2. Move both maps to **Selected maps** and arrange them:
+   - Run **Hardware Model Import Map** first.
+   - Run **Asset Import Map** second.
+3. Execute the transform and verify the import:
+   - Navigate to **Asset > Portfolios > Hardware Assets**.
+   - Confirm `A71001` imported data matches the spreadsheet.
+
+##### L3.3-D: Update Asset Data
+
+1. Navigate to **System Import Sets > Load Data**.
+2. Select **Existing table:** Asset Import [u_asset_import].
+3. Upload `3.3-assets_for_update.xls` and submit.
+4. Transform the data using the maps in the correct order (Hardware Model Import Map, Asset Import Map)
+5. Verify updates to assets, such as **State**, **Substate**, and **Assigned to**.
+   - A71008, A71022
+
+##### L3.3-E: Import Advanced Shipment Notification (ASN) Data
+
+1. Add a new shipping carrier:
+   - Navigate to **sn_itam_common_shipping_carrier.list** and select **New**.
+   - **Name:** FedEx, **Email:** `fedex@example.com`, **Status:** Active.
+2. Navigate to **Procurement > Orders > Import Shipment Notifications**.
+3. Upload `3.3-sn_hamp_import_template.xlsx` and process the import.
+4. Verify the results in the **Import Set Runs** and **Import Set Rows** related lists.
+   - All > Procurement > Orders > Import Status
+   - **Import Set Rows**, one record shows comment `Shipping address is invalid;Ignored by s...`
+5. Correct any errors (e.g., invalid shipping address) and re-import as needed.
+
+##### L3.3: Verify Actions
+
+1. Navigate to **Asset > Portfolios > Hardware Assets**.
+2. Validate imported records, confirming their **State** as **In transit**.
+
+##### L3.3: Lab Challenge: Fix Errors in ASN Template
+
+1. Update the ASN template for Asset tag **AA0124** with a valid shipping address.
+2. Remove already imported rows and re-import the updated template.
 
 ## Topics
 
@@ -947,3 +1129,193 @@ Check also [Lab 1](#l1-a-validate-plugins) for plugin validation.
     - Leave to category: follow the model category’s default behavior
     - Create consumable asset: treat items as consumables (e.g., low-end printers) instead of individually tracked assets
     - Do not create assets: no asset record is created for these CIs (useful if your company never owns/purchases them)
+
+### HAM Practical Management - Tier 2 Capability Blueprint
+
+- approach
+  - **Policies** and **processes** to maintain hardware asset data
+  - Any **areas of risks**, as well as opportunities for improvement and savings
+  - **Automation** for maintaining trustworthy asset data
+- **Common Terms**
+  - **Consumable**: An asset that is consumed (used up rather than retired or returned) and ordered or managed in bulk.
+  - **Stockroom**: A location where inventory items are physically stored and tracked.
+  - **Transfer order**: A request to move assets between company stockrooms.
+  - **Import**: Loading data via spreadsheets, done manually or automatically.
+  - **Asset state**: The status of an asset throughout its lifecycle, from when it is received through final disposition.
+  - **Contract**: Details related to warranties, maintenance agreements, and leases.
+- **Practical Management Introduction**
+  - **Tier 2** (Practical Management) sets up asset management as a continuous process and prepares the organization for the next tier (where assets integrate into operational processes).
+  - Practical management typically starts once an organization realizes the problems that arise from untrustworthy data and the risks associated with it.
+  - This tier focuses on establishing a basic management control environment:
+    - Policies
+    - Roles
+    - Responsibilities
+  - The primary objective:
+    - Drive out “quick wins” and make those wins visible.
+- **Manage the Lifecycle**
+  - This tier intersects with the **Auditing** component of the asset lifecycle: ![Asset Lifecycle](./attachments/sn-asset-ham-practical-management.png)
+  - Focus areas:
+    - Managing automation
+    - Ensuring compliance
+    - Tracking key contract details
+  - Contracts are essential in practical management, but full contract management (e.g., financials, rate cards) is covered later in Strategic Conformance (Module 5).
+  - From a governance perspective, ensure that audits become routine rather than urgent:
+    - What information needs to be tracked?
+    - How to determine which assets are installed in the environment?
+    - Which assets are most important to focus on?
+    - If using Discovery, how to handle devices not discovered for a certain period?
+    - Which contracts are most important to manage?
+    - How much detail is needed for each contract?
+
+#### PM: Consumables
+
+- Consumable Asset Overview
+  - **Consumables** are items purchased in quantity and distributed on request.
+  - **Typical characteristics**:
+    - Consumed (not returned or retired)
+    - Managed in bulk (e.g., printer toner, mice, keyboards)
+    - Not discoverable
+    - Low value if lost or stolen
+  - **Deciding which consumables to manage**:
+    - Consider the item’s value
+    - Determine if they expire or cannot be feasibly reclaimed
+    - Assess how critical it is to have them always in stock
+    - Factor in how frequently they are requested
+  - **Simplified asset records**:
+    - Track in bulk (quantity and cost)
+    - Capture costs for financial insight (chargebacks, show backs)
+      - Chargebacks: Costs are billed to the consuming department’s budget.
+      - Showbacks: Costs are displayed for transparency but not formally billed.
+      - Why they matter: Both models provide visibility into IT spending, driving accountability and better cost management.
+    - Fewer attributes compared to standard IT assets
+- Managing Consumable Assets
+  - **Create Consumable Model**:
+    - All consumables use the “Consumable” model category
+    - No need to create a new model category
+  - **Track Consumables**:
+    - When receiving new consumables in a stockroom, if fields (model category, model, stockroom/location, assigned to, state, substate) match, quantities and costs merge
+    - Costs are averaged for the updated total quantity
+      - After merging 8 units at \$60 and 7 units at \$35, you end up with 15 units valued at \$95, resulting in an average cost of \$6.34 per unit.
+  - **Consume Consumables**:
+    - Prerequisites: Quantity > 0, asset in “In stock” state with “Available” substate
+    - Consumption reduces the “In stock” quantity by the amount consumed
+    - Record remains for reporting after consumption
+  - **Alternate consumption methods**:
+    - Through the Service Catalog fulfillment process
+  - **Procurement**:
+    - Once received, bulk consumable items update the quantity; individual items do not appear on receiving slip lines after merging
+
+#### PM: Stock Management
+
+- **Tracking Inventory Overview**
+  - Assets are assigned to stockrooms.
+  - **Stock rules** can notify or automatically transfer assets when the quantity in a stockroom falls below a threshold.
+  - Stockrooms are separate entities in the Asset Management application.
+- **Stockrooms**
+  - Stockrooms identify locations where inventory is stored and tracked.
+  - ServiceNow’s distributed stockroom model supports both simple and complex configurations. There are multiple types of stockrooms, such as:
+    - Central Warehouse
+    - Warehouse
+    - Pick Up/Drop Off (PUDO)
+    - Forward Shipping Location (FSL)
+    - On site (i.e., local stockroom)
+  - **All available stock** (consumable or non-consumable) is managed in stockrooms.
+  - Transfer orders track the movement of assets between stockrooms, including “in transit” status.
+  - **Stock rules** automate replenishment when quantities drop below certain levels.
+  - A designated stockroom manager per stockroom oversees stock validation and transfers.
+- **Transfer Orders**
+  - Transfer orders move assets between stockrooms, with each asset on a separate transfer order line.
+  - **Transfer order lines** allow multiple assets to be listed on a single transfer order.
+    - displayed in a related list
+  - **Transfer order line tasks**:
+    - Automatically created based on the model category of the asset.
+    - Move through stages (Requested, Shipment Preparation, In Transit, etc.).
+    - Closing one task creates the next task (e.g., closing Ready for Fulfillment opens Ready for Shipment).
+  - **Automatic Asset Updates**:
+    - As tasks advance, the asset’s state (e.g., from Available to Reserved) is updated.
+    - Mark line items as received to complete the transfer order.
+  - **Important Considerations**:
+    - Consumable assets can be transferred in bulk (quantity > 1); non-consumables are transferred individually (quantity = 1).
+    - Order lines validate sufficient stock before transfer.
+    - Canceling an order line or deleting a transfer order releases the assets (only possible before shipment).
+    - Pre-allocated assets must be transferred in full.
+    - A business rule prevents transferring the same asset concurrently.
+- **Bulk Transfer Updates**
+  - **Bulk Update** is part of the Hardware Asset Management (HAM) application and simplifies the transfer order process:
+    - Single-click updates to multiple transfer order lines (e.g., move them all from Shipment Preparation to In Transit).
+    - Stages supported: Requested, Shipment Preparation, Ship, Receive, Deliver.
+    - Requires the **inventory_user** role.
+  - **Bulk Update Procedure**:
+    1. Click **Bulk Update** from the transfer order and select which transfer order lines to update.
+    2. Choose the next **stage** to move the tasks to.
+    3. Move desired lines from the **Available** box to the **Selected** box.
+    4. Click **Update**. The tasks and sub-tasks are closed; the next tasks are created.
+    5. Repeat until all line tasks for the transfer order are completed.
+
+#### PM: Automated Asset Population
+
+- **Automated Asset Population**
+  - Manual vs. Data Import
+    - Manual entry for small numbers of assets is not practical
+    - Data import (e.g., via spreadsheets) is faster and more efficient
+  - Data Sources may include
+    - ServiceNow Discovery or Agent Client Collector
+    - Spreadsheets
+    - Deployment or inventory tools
+    - Directory services
+    - HR systems
+    - ERP systems
+    - Vendor Advanced Shipment Notifications (ASN)
+- **Import Data**
+  - System Import Sets
+    - Load data into an import set table
+    - Use a transform map to move data from the import set table to the target ServiceNow table (e.g., [alm_hardware])
+  - Typical Data Import Steps
+    - Load data (e.g., from a spreadsheet)
+    - Create transform map to define mappings
+    - Run transform to place data into the appropriate tables
+- **Transform Data**
+  - Transform Process moves data from the import set table to the permanent ServiceNow table
+  - Transform Maps
+    - Define how fields from imported data map to target table fields
+    - Allow for basic data manipulation (e.g., date format changes, matching manufacturer names)
+  - Mapping Options
+    - Auto map matching fields or use Mapping Assist
+    - More complex if you need to handle related tables (e.g., model/category references)
+    - Missing references may require creating or updating records first
+- **Create or Update Records During Import?**
+  - Coalesce
+    - Identify unique field(s) (e.g., asset tag) to update existing records instead of creating duplicates
+    - If no match, a new record is created
+  - Future Imports
+    - Reuse spreadsheet/CSV templates for consistent formatting
+    - Easy Import (admin role required) automatically creates a template and includes sys_ids for updates
+- **Technical Tips for Complex Imports**
+  - Challenges
+    - Splitting one source into multiple ServiceNow tables
+    - Missing critical fields
+    - Misaligned date formats
+    - Values not matching ServiceNow expectations
+    - Extra fields in source data that may need new fields in ServiceNow
+  - Guidelines
+    - Compare source to ServiceNow requirements before import
+    - Provide placeholders or correct formats (e.g., date conversions)
+    - Determine which data to ignore or modify during transform
+- **Advanced Shipment Notifications (ASN)**
+  - Part of HAM
+  - Enables creating “In transit” asset records before physical receipt
+  - Vendors fill out a standard template with shipment details
+  - You upload the template to create asset records in advance
+  - ASN Template
+    - Download from _All > Procurement > Orders > Import Shipment Notifications_
+    - Fields include PO number, vendor, model, serial, asset tag, quantity, shipping details
+    - Serialized assets must appear one row per asset (unique serial)
+  - Import Procedure
+    - Download template and provide to vendor
+    - Vendor completes template and returns it
+    - Upload to ServiceNow to create assets in “In transit” state
+      - _All > Procurement > Orders > Import Shipment Notifications_
+    - Check status at Procurement > Orders > Import Status
+  - Guidelines
+    - Always use the template version matching your HAM release
+    - Admin role is required for this feature
