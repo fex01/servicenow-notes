@@ -462,6 +462,261 @@ To create the associated asset: 5. End impersonation 6. Navigate to **System Def
 1. Update the ASN template for Asset tag **AA0124** with a valid shipping address.
 2. Remove already imported rows and re-import the updated template.
 
+#### L3.4: Retire Assets
+
+- [lab steps](https://nowlearning.servicenow.com/sys_attachment.do?sys_id=f07e25eb974a8294524eb3cf9153af08)
+
+##### L3.4: Objective
+
+1. Create a retirement change workflow.
+2. Retire assets both manually and using a workflow.
+
+##### L3.4-A: Apply Update Set
+
+1. Impersonate the **System Administrator**.
+2. Navigate to **System Update Sets > Retrieved Update Sets**.
+3. Under **Related Links**, select **Import Update Set from XML**.
+4. Upload `3.4-Asset Retirement Workflow.xml` and select **Upload**.
+5. Select **Asset Retirement Workflow** and then **Preview Update Set**.
+6. After the preview completes, select **Commit Update Set**.
+7. Close the completion message.
+
+##### L3.4-B: Review Retirement Workflow
+
+1. Navigate to **Workflow > Workflow Editor**.
+2. Search for and open the **Retire Asset** workflow.
+3. Validate the following acceptance criteria:
+   - A change request is created to track the retirement process.
+   - Sequential tasks are created for:
+     - Backing up user files.
+     - Wiping the asset's drive.
+     - Removing entitlements and installations.
+     - Returning leased assets to the vendor or sending purchased assets to a disposal vendor.
+   - The asset's **State** changes to **Retired** and **Substate** updates to **Vendor Credit** (leased) or **Disposed** (purchased).
+   - The change request is closed after all tasks are completed.
+4. Close the workflow tab.
+
+##### L3.4-C: Retire an Asset Manually
+
+1. Impersonate Hamm Dalorian.
+2. Navigate to **Asset > Portfolios > Hardware Assets**.
+3. Open the asset with Asset tag **P1000228**.
+4. Update the **State** to **Retired** and **Substate** to **Disposed**.
+5. Select **Update**.
+
+##### L3.4-D: Use Retirement Workflow
+
+1. Navigate to **Asset > Portfolios > Hardware Assets**.
+2. Open the asset with Asset tag **P1000145**.
+3. Under **Related Links**, select **Retire Asset** to initiate the workflow.
+4. Review the newly created **Change Request** and its associated tasks.
+5. Complete each task sequentially:
+   - Close the backup task with a close note: "User files backed up."
+   - Close the wipe task with a close note: "Hard drive wiped."
+   - Close the disposal task with a close note: "Sent to disposal vendor."
+   - Close the certificate task with a note: "Certificate of disposal attached."
+6. Review the **Change Request**:
+   - Confirm its **State** is **Closed** with **Close notes**: "Asset retired successfully."
+7. Return to the asset record and verify its **State** as **Retired** and **Substate** as **Disposed**.
+
+##### L3.4: Lab Challenge - Validate Workflow for Leased Assets
+
+1. Open an "In use" asset (e.g., P1000056).
+2. Set its **Acquisition method** to **Lease** and save.
+3. Retire the asset using the workflow.
+4. Confirm the asset is returned to the vendor:
+   - **State:** Retired.
+   - **Substate:** Vendor Credit.
+
+#### L3.5: Validate Asset Lifecycle Automation
+
+- [lab steps](https://nowlearning.servicenow.com/sys_attachment.do?sys_id=17ae692f974a8294524eb3cf9153af15)
+
+##### L3.5: Objective
+
+1. Dispose of assets using the HAM Hardware Asset Disposal flow.
+2. Update associated CI and asset records via the automated process flow.
+3. Copy the Hardware Stock Order Flow for modification.
+4. Resolve customer incidents and update associated CI/asset records automatically.
+
+##### L3.5-A: Validate HAM Flows Availability
+
+1. Impersonate Hamm Dalorian.
+2. Navigate to **Process Automation > Flow Designer**.
+3. Verify the following HAM flows exist:
+   - Hardware Asset Disposal Flow
+   - Hardware Asset Reclamation Flow
+   - Hardware Asset Reclamation Line Flow
+   - Hardware Asset Refresh Flow
+   - Hardware Asset Refresh Line Flow
+   - Hardware Stock Order Flow
+   - Standard Hardware Asset Request
+4. (Optional) Open a flow (e.g., Hardware Asset Disposal) to view its logic.
+5. Close the Flow Designer tab.
+
+##### L3.5-B: Create Disposal Order
+
+1. Navigate to **Inventory > Disposal Orders > Create Disposal Order**.
+2. Complete the form:
+   - **Stockroom:** Southern California Warehouse
+   - **Assigned to:** Rob Woodbyrne
+3. Save the order.
+4. Add assets:
+   - Select the **Planned Assets** tab and click **Edit**.
+   - Move three assets with **State:** In stock and **Substate:** Pending disposal to the Planned Assets list.
+   - Save.
+   - Save the order.
+5. Process tasks:
+   - Navigate to the **Hardware Disposal Tasks** tab.
+   - Open the first task, **Verify Assets**, and confirm that all planned assets are listed.
+   - Select all assets on the list and choose **Actions on selected rows > Verify** to confirm their presence.
+   - Verify that the **Stage** of the assets is updated to **Verified**.
+   - Select **Close Task** to complete the verification.
+   - Save the updated disposal order.
+6. Schedule vendor pickup for the assets:
+   - Enter **Vendor:** IngramMicro, **Scheduled date:** Tomorrow, **Vendor order ID:** IM-5597, **Pickup contact:** Luke Skye, and **Pickup details:** Loading dock is slippery in winter.
+   - Close the task.
+   - Save the updated disposal order.
+7. Mark assets as **Departed** once the vendor picks them up.
+8. Confirm vendor receipt:
+   - Open the **Vendor Confirmation** task.
+   - Review the list of Planned Assets and verify their **State:** Retired and **Substate:** Pending disposal.
+   - Confirm vendor receipt and close the task.
+9. Provide disposal documentation:
+   - Open the **Disposal Documentation** task.
+   - From the **Certificate of disposal** dropdown, select **Yes**.
+   - Attach the file `3.5-Certificate_of_Disposal.txt` using the **Manage Attachments** icon.
+   - Mark all assets as **Disposed**:
+     - Select all assets on the **Planned Assets** list.
+     - Choose **Actions on selected rows > Dispose**.
+   - Verify that the final **State:** Retired and **Substate:** Disposed is updated for all assets.
+   - Close the task and save the disposal order.
+
+##### L3.5-C: Copy Hardware Stock Order Flow
+
+1. As System Administrator, navigate to **Process Automation > Flow Designer**.
+2. Open the **Hardware Stock Order Flow** and select **Copy flow** from the **More actions menu**.
+3. Name the new flow **Hardware Stock Order Flow – CloudD**.
+4. Select **Edit flow** and explore adding actions, flow logic, or subflows.
+5. Close the Flow Designer tab.
+
+##### L3.5-D: Resolve Hardware Incident and View Auto-Updates
+
+1. Impersonate Hamm Dalorian, create a test incident:
+   - Navigate to **Incident > Create New**.
+   - Complete the form:
+     - **Caller:** Florine Willardson
+     - **Category:** Hardware
+     - **Configuration Item:** MacBook Air 13"
+       - use search to find the one assigned to Florine Willardson
+     - **Short description:** Broken screen – can’t work.
+   - Save the incident.
+   - Add the following fields to the **Affected CIs** tab:
+     - Asset Action
+     - Swapped CI
+     - Updated
+2. Resolve the incident:
+   - Update **Asset Action** to **Swap** and **Swapped CI** to a new CI (e.g., Apple - MacBook Pro 15" for Technical Staff).
+     - use search to find an unassigned CI
+   - Enter **Resolution code:** Solution provided and **Resolution notes:** Swapped for new laptop.
+   - Resolve the incident and validate updates to the associated CI/asset records.
+
+##### L3.5-E: Configure Asset Lifecycle Category
+
+1. Impersonate Hamm Dalorian, navigate to **Self-Service > Service Catalog**.
+2. Add the **Asset Lifecycle** category:
+   - Select **Add content** and locate the **Asset Lifecycle** section.
+   - Select the desired location for the category and close the form.
+3. Verify the **Asset Lifecycle** card is added
+
+##### L3.5: Lab Verification - Asset Refresh Order
+
+1. Impersonate Hamm Dalorian, navigate to **Self-Service > Service Catalog**.
+2. Open the **Asset Lifecycle** card and select **Hardware Asset Refresh Order**.
+   - Type of refresh: Single model
+   - Replacement model: Lenovo ThinkPad T20 264744U
+3. Modify the **Filter Criteria** to include non-eligible assets:
+   - Set **Eligible for refresh** to **false**.
+   - Add a filter for **Model:** Hewlett-Packard HP EliteBook 2540p.
+4. Select **Run Filter** and confirm assets are listed in the **Available** list.
+5. Move 10 assets to the **Selected** list.
+6. Select **Order Now** to submit the request.
+7. Navigate to the **Requests** tab and verify the **Requested Items**:
+   - Confirm the requested 10 assets are listed under the variables section.
+   - Ensure the replacement model is **Lenovo ThinkPad T20 264744U**.
+
+#### L4.1: Report on Hardware Assets
+
+- [lab steps](https://nowlearning.servicenow.com/sys_attachment.do?sys_id=ee85bda7974e8294524eb3cf9153af73)
+
+##### L4.1: Objective
+
+1. Identify the quantity of assets by model.
+2. Identify total spend by vendor.
+3. Identify computers still under warranty.
+4. Navigate the Hardware Asset Dashboard.
+
+##### L4.1-A: Create a Bar Chart of Assets by Model
+
+1. Impersonate Hamm Dalorian.
+2. Navigate to **Asset > Portfolios > Hardware Assets**.
+3. Select the **Personalize List** gear icon and update columns to include:
+   - **Asset tag**, **Model category**, **Model**, **Assigned to**, **Company**, **State**, **Substate**, **Cost**, and **Configuration item**.
+4. Select **OK** to save changes.
+5. In the **Model category** column, right-click on **Computer** in any record and select **Show Matching**.
+6. Right-click the **Model** column header and select **Bar Chart**.
+7. In the **Create a report** designer panel:
+   - Rename the report to **Computer Assets by Model**.
+   - Save the report.
+
+##### L4.1-B: Report on Total Spend by Vendor
+
+1. Navigate to **Reports > View / Run**.
+2. Select **Create a report**.
+3. Configure the report:
+   - **Report name:** Vendor Spend
+   - **Source type:** Table
+   - **Table:** Hardware [alm_hardware]
+   - **Type:** Pivot table
+4. Under **Configure** options:
+   - Row: **Vendor**
+   - Column: **Model category**
+   - Aggregation: **Sum > Cost**
+5. Save the report and hover over data to analyze spend by vendor.
+
+##### L4.1-C: Report on Computers Still Under Warranty
+
+1. Navigate to **Reports > Create New**.
+2. Configure the report:
+   - **Report name:** Computers Still Under Warranty
+   - **Source type:** Table
+   - **Table:** Hardware [alm_hardware]
+   - **Type:** Pivot table
+3. Under **Configure** options:
+   - Row: **Model category**
+   - Column: **Warranty expiration**
+   - Aggregation: **Sum > Quantity**
+4. Open the **Condition Builder** and filter:
+   - **Model category:** is **Computer**
+   - **Warranty expiration:** after **Today**
+5. Save the report.
+
+##### L4.1-D: Navigate Hardware Asset Dashboard
+
+1. Navigate to **Asset > Hardware Asset Dashboard**.
+2. Explore the **Asset Health** tab to review:
+   - **Incomplete assets** (e.g., missing purchase information).
+   - **Assets with most incidents**.
+   - **Assets due for refresh**.
+   - **Undiscovered assets** within the last month.
+3. Navigate to the **Model Management** tab and analyze:
+   - Hardware and consumable models nearing **End of Life**.
+   - Normalization status and lifecycle overview for models.
+4. Explore additional tabs:
+   - **Procurement** for sourcing requests.
+   - **Inventory** for stock orders, open audits, and new hardware findings.
+   - **End of Life** for disposed assets and lifecycle status.
+
 ## Topics
 
 ### Introduction
@@ -651,6 +906,7 @@ To create the associated asset: 5. End impersonation 6. Navigate to **System Def
    - exists on Vancouver
 4. **Managed Documents** (com.snc.document_management)
 5. **Procurement** (com.snc.procurement)
+6. **Asset Management Workspace** (com.sn_itam_workspace)
 
 **Optional Plugins**:
 
@@ -736,7 +992,7 @@ Check also [Lab 1](#l1-a-validate-plugins) for plugin validation.
    - **itil**: Handles incident, problem, and change management tasks.
    - **procurement_user**: Manages purchase orders and transfer orders.
 
-### Trustworthy Data
+### HAM Trustworthy Data - - Tier 1 Capability Blueprint
 
 - Importance of Trustworthy Data
   - Good data is essential for effective IT asset management (ITAM).
@@ -749,74 +1005,65 @@ Check also [Lab 1](#l1-a-validate-plugins) for plugin validation.
 - Significance
   - Trustworthy data is a critical foundation for successful asset management.
   - Enables accurate inventory management, a top management priority.
+- **Common Terms**
+  - **Discovery**: Identifies applications and devices on a network and updates the CMDB with the discovered data.
+    - [Discovery notes](./sn-discovery.md)
+  - **Normalization**: Reorganizes database data to eliminate inconsistencies and redundancies, ensuring related items are stored together.
+  - **Model**: Represents a type of asset (e.g., hardware or consumable) and includes common data attributes.
+  - **Model Category**: Groups similar asset types (e.g., Computers) to link configuration management with asset management.
+  - **Model Number**: Unique identifier for a model record, corresponding to the manufacturer's part number for an asset configuration.
+  - **Normalization Status**: Indicates the level of normalization based on Manufacturer, Model Name, and Model Number.
+  - **Manual Normalization**: Updating hardware or consumable model data manually.
+  - **IT Asset**: Includes hardware, software, consumables, and data that require financial tracking.
+  - **Configuration Item (CI)**: Operationally managed items that may or may not be assets.
+  - **CMDB**: A data repository that stores information describing Configuration Items (CIs).
+    - [CMDB notes](./sn-cmdb.md)
+- **Managing the Lifecycle**
+  - Focus of This Tier: Establish a reliable data foundation through physical inventory management.
+  - Key questions to address:
+    - **What do you have?**
+    - **Who has it?**
+    - **Where is it?**
+    - **When and how should it be retired?**
+  - Policy and Process Considerations
+    1. **Tracking Information**:
+       - Define what asset data needs to be tracked (e.g., location, ownership, lifecycle).
+    2. **Data Sources**:
+       - Identify data sources or tools to integrate for information collection.
+    3. **Handling Inventory Changes**:
+       - Plan for inventory updates over time and define processes for inventory changes
+    4. **Ensuring Data Quality**:
+       - Establish methods to validate and maintain data accuracy.
+    5. **User Education**:
+       - Educate users to adhere to data policies and maintain data integrity.
+    6. **Asset Refresh and Disposal**:
+       - Define asset refresh cycles and disposal policies.
+  - Reporting on Trustworthy Data: Develop a reporting strategy to track and demonstrate lifecycle management at this tier.
 
-#### TD: Common Terms
+#### TD: Asset Data
 
-- **Discovery**: Identifies applications and devices on a network and updates the CMDB with the discovered data.
-  - [Discovery notes](./sn-discovery.md)
-- **Normalization**: Reorganizes database data to eliminate inconsistencies and redundancies, ensuring related items are stored together.
-- **Model**: Represents a type of asset (e.g., hardware or consumable) and includes common data attributes.
-- **Model Category**: Groups similar asset types (e.g., Computers) to link configuration management with asset management.
-- **Model Number**: Unique identifier for a model record, corresponding to the manufacturer's part number for an asset configuration.
-- **Normalization Status**: Indicates the level of normalization based on Manufacturer, Model Name, and Model Number.
-- **Manual Normalization**: Updating hardware or consumable model data manually.
-- **IT Asset**: Includes hardware, software, consumables, and data that require financial tracking.
-- **Configuration Item (CI)**: Operationally managed items that may or may not be assets.
-- **CMDB**: A data repository that stores information describing Configuration Items (CIs).
-  - [CMDB notes](./sn-cmdb.md)
+- **Foundation for Effective Asset Management**
+  - **Tracking Requirements**:
+    - Users, locations, and manufacturers.
+    - Define the type of information and its intended use.
+  - **Cost Consideration**:
+    - Tracking data incurs costs (collection and maintenance). Assess the value of tracking specific data.
+- **Key Questions for Data Tracking**
+  1. **Operational or Financial?**
+     - Is the data operational, financial, or both?
+  2. **Specific or General?**
+     - Is the data unique to a specific asset or general to all assets of the same type?
+  3. **Storage Location**:
+     - Determine if the data belongs in:
+       - **Asset record**: Static, financial/ownership details.
+       - **Configuration item (CI) record**: Operational details.
+       - **Model record**: Shared information for asset and CI records.
+- **Basic Tracking Information**
+  1. **What is it?** (Model-related data).
+  2. **Who uses it?** (Asset and configuration management).
+  3. **Where is it?** (Asset and configuration management).
 
-#### TD: Managing the Lifecycle
-
-- Focus of This Tier: Establish a reliable data foundation through physical inventory management.
-- Key questions to address:
-  - **What do you have?**
-  - **Who has it?**
-  - **Where is it?**
-  - **When and how should it be retired?**
-- Policy and Process Considerations
-  1. **Tracking Information**:
-     - Define what asset data needs to be tracked (e.g., location, ownership, lifecycle).
-  2. **Data Sources**:
-     - Identify data sources or tools to integrate for information collection.
-  3. **Handling Inventory Changes**:
-     - Plan for inventory updates over time and define processes for inventory changes
-  4. **Ensuring Data Quality**:
-     - Establish methods to validate and maintain data accuracy.
-  5. **User Education**:
-     - Educate users to adhere to data policies and maintain data integrity.
-  6. **Asset Refresh and Disposal**:
-     - Define asset refresh cycles and disposal policies.
-- Reporting on Trustworthy Data: Develop a reporting strategy to track and demonstrate lifecycle management at this tier.
-
-### Asset Data
-
-#### Foundation for Effective Asset Management
-
-- **Tracking Requirements**:
-  - Users, locations, and manufacturers.
-  - Define the type of information and its intended use.
-- **Cost Consideration**:
-  - Tracking data incurs costs (collection and maintenance). Assess the value of tracking specific data.
-
-#### Key Questions for Data Tracking
-
-1. **Operational or Financial?**
-   - Is the data operational, financial, or both?
-2. **Specific or General?**
-   - Is the data unique to a specific asset or general to all assets of the same type?
-3. **Storage Location**:
-   - Determine if the data belongs in:
-     - **Asset record**: Static, financial/ownership details.
-     - **Configuration item (CI) record**: Operational details.
-     - **Model record**: Shared information for asset and CI records.
-
-#### Basic Tracking Information
-
-1. **What is it?** (Model-related data).
-2. **Who uses it?** (Asset and configuration management).
-3. **Where is it?** (Asset and configuration management).
-
-#### Data Categorization
+##### Data Categorization
 
 | **Asset Management (Static Data)** | **Model Record (Shared Data)** | **Configuration Management (Dynamic Data)** |
 | ---------------------------------- | ------------------------------ | ------------------------------------------- |
@@ -827,7 +1074,7 @@ Check also [Lab 1](#l1-a-validate-plugins) for plugin validation.
 | Contracts                          |                                | Installed software                          |
 |                                    |                                | File system                                 |
 
-#### Model Records
+##### TD: Model Records
 
 ![Asset and CI Relationships](./attachments/sn-asset-relationships.png)
 
@@ -853,7 +1100,7 @@ Check also [Lab 1](#l1-a-validate-plugins) for plugin validation.
     - **Model**: Defines the type and shared characteristics of the asset.
     - **Assets**: Individual records tied to a model.
 
-#### Asset Records
+##### TD: Asset Records
 
 - **Asset States**:
   - **On order**: Ordered but not received.
@@ -904,7 +1151,7 @@ Check also [Lab 1](#l1-a-validate-plugins) for plugin validation.
   - Typically created via discovery/procurement; manual creation aids understanding.
   - Display name for the Asset is automatically generated as a combination of the Asset tag and the Model.
 
-#### Bundled and Pallet Assets
+##### TD: Bundled and Pallet Assets
 
 - **Bundled Assets**:
   - **Overview**: Group multiple assets into a single entity for tracking, reserving, deploying, and retiring.
@@ -947,7 +1194,7 @@ Check also [Lab 1](#l1-a-validate-plugins) for plugin validation.
     - pallet assets can not be part of an asset bundle
     - Required role: **asset**.
 
-### Hardware Model Normalization (W)
+#### TD: Hardware Model Normalization
 
 - **Overview of Hardware Model Normalization**
   - **Importance of HAM Installation**: Essential for utilizing Hardware Model Normalization features.
@@ -1062,7 +1309,7 @@ Check also [Lab 1](#l1-a-validate-plugins) for plugin validation.
   - **Purpose**: Supports organizational goals by linking hardware assets to business services.
   - **Benefits**: Enables proactive planning and risk management by providing visibility into hardware lifecycle statuses.
 
-### Assets and Configuration Items
+#### TD: Assets and Configuration Items
 
 - **Components of the Asset Lifecycle**
   - IT Asset Management (HAM) centers on the financial lifecycle of physical IT components:
@@ -1319,3 +1566,207 @@ Check also [Lab 1](#l1-a-validate-plugins) for plugin validation.
   - Guidelines
     - Always use the template version matching your HAM release
     - Admin role is required for this feature
+
+#### PM: Asset Retirement
+
+- **Asset Retirement Overview**
+
+  - Asset retirement is more than just changing an asset’s state
+  - Common reasons for retirement
+    - Reducing maintenance costs, parts, and asset-related taxes
+    - Assets have reached end of useful life (fully capitalized, seldom used)
+    - Security and data exposure risks for non-networked assets
+  - Asset States and Substates
+    - States: On Order, In Stock, In Transit, In Use, Consumed, In Maintenance, Retired, Missing
+    - Substates for some states (e.g., Available, Reserved, Defective, Donated, Sold)
+      - ![Asset States and Substates](./attachments/sn-asset-states.png)
+    - When you opt-in to CSDM, these states may be replaced by Life Cycle Stage and Life Cycle Stage Status
+      - ![CSDM Life Cycle Stages: Hardware](./attachments/sn-csdm-lc-harware.png)
+  - Importance of Selecting a Substate
+    - Indicates what actually happened to the asset (e.g., Sold, Disposed)
+    - Helps meet internal/external regulations governing asset retirement
+  - Good Practices
+    - Use the Retired state at asset end of life
+    - Only delete asset records created by mistake
+    - Ensure the correct substate is set for auditing and compliance
+
+- **Asset Retirement Process**
+  - Retirement Involves More Than a State Change
+    - Multiple tasks are typically needed, such as wiping drives or removing software
+    - Policies and procedures define when and how to retire an asset
+  - Asset Policy and Disposal Procedure
+    - Asset policy dictates retirement conditions
+    - Disposal procedure details removing software, data, parts reuse, destruction, or vendor returns
+  - Things to Remember
+    - Retiring an asset sets related CI status to retired
+    - Selecting a substate is best practice (though not required out of the box)
+  - Use Workflow to Drive Consistency
+    - Workflows can automate multi-step processes (approvals, notifications, tasks)
+    - Activities might include backing up data, wiping drives, removing software entitlements
+    - Leased assets may require a different workflow (returning to vendor instead of disposal)
+    - Updating the underlying asset records automatically
+  - **Asset Retirement Workflow Template**
+    - **Back up/remove user files**
+      - Create a task for backing up or moving user files from the retiring asset to the new device
+      - Clarify who is responsible (IT or another team) for ensuring local files are preserved
+    - **Wipe drive**
+      - Create a task for wiping the retiring asset’s drive (and possibly reimaging, if it will be repurposed)
+      - Define who performs the wipe to ensure proper data sanitization
+    - **Remove device entitlements**
+      - Automate removing associated software entitlements and reclaim them as available
+      - Prevent these entitlements from counting against software usage or compliance reports
+    - **Remove software installations**
+      - Automate uninstalling software from the device prior to or during retirement
+      - Ensure any reclaimed licenses are documented
+    - **Determine if the asset is leased**
+      - If yes, create a task to return it to the vendor
+      - If no, create a task to send it to the disposal vendor for secure destruction or recycling
+    - **Update asset record**
+      - Automate updating the asset record to a retired state (with appropriate substate)
+      - Attach relevant disposal certificates from the vendor to meet compliance requirements
+      - Use reports to track monthly retirements, retirement status, and scheduled retirements
+
+#### PM: Asset Lifecycle Automation
+
+- **Asset Lifecycle Automation Overview**
+  - Requires installation of the Hardware Asset Management (HAM) application
+  - Automates updates to asset records throughout their lifecycle, from procurement to disposal
+  - Uses workflows and asset tasks to reduce manual record updates and improve data accuracy
+  - Flow Designer can be leveraged to configure standard practice with low-code automation
+  - Eliminates risk of data inaccuracy by reducing manual entry
+- **Asset Lifecycle Automation – Flows**
+  - These out-of-the-box flows automatically update assets and CIs as work progresses
+  - Focus on Plan through Deploy phases, ensuring assets remain accurate from purchase to disposal
+  - Examples of standard flows provided:
+    - Standard Hardware Asset Request (request, source, deploy)
+    - Loaner Asset Request (borrow hardware/consumables temporarily)
+    - Hardware Stock Order (bulk ordering for stockrooms)
+    - Hardware Asset Refresh (replace aged assets with new ones)
+    - Zero Touch Refresh (fulfill refresh requests via external vendor)
+    - Hardware Asset Reclamation (integrate with HR to reclaim assets when employees leave)
+    - Hardware Asset Disposal (dispose end-of-life assets)
+    - Asset Donation (donate assets to charity)
+    - Asset RMA (handle returns and replacements of faulty products)
+    - Lease Contract Expiration (buyout, extend, or return leased assets)
+    - Contract Renewal (renew expiring contracts)
+  - Flows are read-only by default; copy them before customizing
+  - **Accessing flows from the Service Catalog**
+    - Navigate to **Self-Service > Service Catalog**
+    - To display the “Asset Lifecycle” category, click the add icon (+) beside the search bar
+    - Choose **Asset Lifecycle** from the list and drag it onto the catalog home page
+    - Once added, flows like **Hardware Asset Refresh**, **Stock Order**, and **Loaner Asset Request** can be triggered from there
+  - **Triggering flows from the application navigator and elsewhere**
+    - Navigate to **Inventory > Stock > Submit Stock Order**, fill out the form, and **Order Now** to trigger the **Hardware Stock Order Flow**
+    - Navigate to **Inventory > Disposal Orders > Create Disposal Order**, submit the form to trigger the **Hardware Asset Disposal flow**
+    - Navigate to **Inventory > Asset Reclamation > Asset Reclamation Requests** and click **New** to trigger the **Hardware Asset Reclamation Flow**
+    - Lease Contract flows, Contract Renewal flows, and others may be triggered automatically or from the appropriate Contract/Lease records
+- **Asset Lifecycle Automation – Tasks**
+  - Provides automated accuracy during Deploy through Dispose phases
+  - Tasks are automatically enabled for Incident, Change, and Work Order (if Field Service Management is in use)
+  - Eliminates the need for manual asset or CI record updates on these tickets
+  - Based on the resolution (Asset action) selected, HAM updates relevant records:
+    - Retires or swaps assets/CIs
+    - Reclaims or reallocates software licenses
+    - Ends or starts maintenance contracts
+  - Asset actions include No Action, Update/Repair, Swap, or Retire
+    - Swap and Retire trigger behind-the-scenes record changes
+  - **Asset action process**:
+    - Open an Incident (or other ticket type) and navigate to the **Affected CIs** related list
+    - Select an **Asset action** (e.g., Swap, Retire) and enter the **Swapped CI** if applicable
+    - Upon resolving the ticket, HAM automatically updates:
+      - The affected CI (removed from service if retired, replaced if swapped)
+      - The corresponding asset record (e.g., sets to Retired or updates the location/assignment)
+      - Any associated software entitlements (reclaimed or transferred to the new CI)
+      - Maintenance contracts (ends on the old asset, starts on the new one)
+    - Requires **itil** or **admin** role for completing the process
+  - Reduces data inaccuracy risks by automating changes that would otherwise rely on agent effort
+
+### HAM Operational Integration - Tier 3 Capability Blueprint
+
+- **Operational Integration Introduction**
+  - IT asset management (ITAM) operating in a silo leads to duplication of effort, complexity, and extra costs
+  - Integrating HAM with existing operational processes yields:
+    - Process efficiency and time/cost savings
+    - Better visibility into asset data
+  - Focuses on:
+    - Reporting and dashboards to know asset status and lifecycle stage
+    - Streamlined requests and procurement
+    - Managing integrated data for consistency and accuracy
+  - Primary objective: Improved hardware asset management efficiency, spotlight on continual improvement
+- **Common Terms**
+  - **Report**: Display of data in easy-to-consume formats
+  - **Dashboard**: Central location to view multiple related reports
+  - **Service Catalog**: Self-service portal for requesting products and services
+  - **Product Catalog**: Set of information about models
+  - **Vendor Catalog**: List of products available from various vendors
+  - **Classes**: Default are Hardware, Software License, and Consumable
+  - **Data Accuracy**: Certified correctness of data
+- **Managing the Lifecycle**
+  - Emphasis on tying IT asset management into operational practices (requests via catalog, ties between assets and CIs)
+  - Considerations when planning asset policy and processes:
+    - Vendor catalog management responsibilities
+    - Which items are visible to end users in the catalog
+    - Procurement process approach
+    - Stock management for key items
+    - Tracking items as assets, CIs, or both
+    - Automation standards and critical data points for accuracy
+
+#### OI: Reporting, Dashboards, and Other Asset Tracking
+
+- **Asset Reports**
+  - Navigate to **Reports > View/Run** to create, modify, and view saved reports
+  - Easily create reports from a list by selecting the column menu (bar chart, pie chart, etc.)
+  - Report types include pie chart, bar chart, list, pivot table, and more
+  - Permissions
+    - Adjust sharing to limit who sees the report
+    - ACLs control underlying data access for the _reporting_ user
+    - List reports only show records the user is permitted to view
+- **Asset Dashboards and Home Pages**
+  - Dashboards combine multiple reports/widgets on a single screen, sharable with multiple users
+  - Homepages can be customized with relevant asset reports for your daily work
+  - **Asset > Overview** dashboard offers default overview reports
+  - **Self-Service > My Assets** shows each user’s assigned assets, entitled software, and refresh dates (requires My Assets plugin for older instances)
+  - **Hardware Asset Dashboard** (requires HAM)
+    - Centralizes key metrics for hardware and consumable assets, e.g., inventory, disposal status, end-of-life data
+    - Updated in real-time except for daily lifecycle jobs
+    - Access via **Asset > Hardware Asset Dashboard** (role: asset)
+    - Tabs include:
+      - **Asset Health**: Track defective, missing, aging, or undiscovered assets
+        - Incomplete Assets: Shows hardware and consumable models missing critical purchase data (e.g., PO number, PO lines, or receiving lines).
+          - Visibility to incomplete records helps ensure data completeness.
+        - Eligible for Refresh Assets: Lists assets flagged as nearing end-of-life or scheduled for retirement.
+          - Reduces risk by proactively identifying and prioritizing upgrades.
+        - Asset Incident Frequency: Displays assets associated with frequent incidents.
+          - Helps identify problematic hardware to address or retire.
+        - Active Assets - Not Discovered: Reports on assets that have not been discovered for over 30 days.
+          - Ensures deployment data accuracy by highlighting assets possibly overlooked by discovery.
+      - **Model Management**: Monitor model end-of-life and normalization status
+      - **Procurement**: View pending deliveries, orders by vendor, sourcing
+      - **Inventory**: Track open stock orders, stock rules, transfer orders, and audits
+        - show the value from maintaining inventory accuracy
+      - **End of Life**: Monitor assets nearing warranty end, disposal status, and methods
+- **Hardware Asset Workspace – Overview**
+  - Introduced in San Diego as an alternative interface to manage hardware assets (requires HAM, Asset Management Workspace plugin)
+  - Provides multiple tabs/icons for quick navigation:
+    - **Hardware asset overview** (landing page)
+    - **Asset analytics** (TCO, overall performance)
+    - **Inventory** (stockrooms, audits, disposal orders)
+    - **Asset estate** (fulfill requests, act on expiring assets)
+    - **Model management** (end-of-life models, normalization)
+    - **Procurement** (requests, POs, sourcing)
+    - **Contract management** (renewals, expirations)
+    - **Success portal** (evaluate HAM performance)
+    - **Asset operations** (stock rules, stock orders, warranty details)
+  - required plugins:
+    - ITSM Asset Management (com.snc.asset_management)
+    - Hardware Asset Management (sn_hamp)
+    - Asset Management Workspace (com.sn_itam_workspace)
+- **Asset Management Executive Dashboard – Overview**
+  - Provides a single view for critical KPIs across HAM, SAM, and Cloud Insights
+  - Displays metrics like total spend, fulfillment time, missing assets, expiring contracts, EOL models, etc.
+  - Requires HAM or SAM to be installed
+  - Access via **Asset Executive Workspace > Asset Management Executive Dashboard** (role: sn_itam_common.asset_exec)
+- **Other Asset Tracking Strategies & Integrations**
+  - Integrate RFID solutions (e.g., Zebra MotionWorks) to auto-track hardware asset location changes
+  - RFID tags ping assets’ real-time location; movements get captured automatically in HAM
+  - All RFID transactions are stored as activities for auditing
