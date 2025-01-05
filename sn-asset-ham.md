@@ -717,6 +717,103 @@ To create the associated asset: 5. End impersonation 6. Navigate to **System Def
    - **Inventory** for stock orders, open audits, and new hardware findings.
    - **End of Life** for disposed assets and lifecycle status.
 
+#### L4.2: Manage Request and Procurement
+
+- [lab steps](https://nowlearning.servicenow.com/sys_attachment.do?sys_id=7306fdeb974e8294524eb3cf9153af07)
+
+##### L4.2: Objective
+
+1. Publish a hardware model to the service catalog.
+2. Request a hardware model from the service catalog.
+3. Source and receive a hardware model from a vendor.
+
+##### L4.2-A: Publish to Hardware Catalog
+
+1. Impersonate Hamm Dalorian.
+2. Navigate to **Product Catalog > Product Models > Hardware Models**.
+3. Open **Scanner CL1000**.
+4. On the **Product Catalog** tab, enter the description: *Wireless scanner used in warehouses and distribution facilities to manage inventory*.
+5. Save the changes.
+6. Under **Related Links**, select **Publish to Hardware Catalog**.
+7. In the **Publish to Hardware Catalog** popup, set the **Category** to **Hardware** and select **OK**.
+8. Navigate to **Self-Service > Service Catalog**, select **Hardware**, and confirm **Scanner CL1000** is listed with accurate information.
+
+##### L4.2-B: Create Vendor Catalog Items
+
+1. Navigate to **Product Catalog > Catalog Definitions > Vendor Items**.
+2. Select **New** and complete the form:
+   - **Vendor:** `Cloudward Inc`
+   - **Product Model:** `Creative Labs Scanner CL1000`
+   - **Product ID:** `CDW-CL1000`
+   - **List Price:** `$100`
+   - **Vendor Price:** `$90`
+   - **Product Catalog Item:** `Scanner CL1000`
+3. Save the record.
+4. Add a second vendor:
+   - Navigate to **Product Catalog > Catalog Definitions > Hardware & Software Items**.
+   - Open **Scanner CL1000**.
+   - In the **Vendor Catalog Items** related list, select **New** and complete the form:
+     - **Vendor:** `Amazon`
+     - **Product Model:** `Creative Labs Scanner CL1000`
+     - **Product ID:** `AMZ-CL1000`
+     - **List Price:** `$110`
+     - **Vendor Price:** `$105`
+   - Submit the record and confirm both vendor catalog items are listed.
+
+##### L4.2-C: Request Items from the Service Catalog
+
+1. Impersonate Luke Wilson.
+2. Navigate to **Self-Service > Service Catalog**, select **Hardware**, and open **Scanner CL1000**.
+3. Set **Quantity** to 2 and select **Order Now**.
+4. Take note of the **REQ number** for tracking.
+
+##### L4.2-D: Source the Request
+
+1. Impersonate Hamm Dalorian and navigate to **Procurement > Requests > Requests**.
+2. Open Luke Wilson's request.
+3. In the **Catalog Tasks** related list, open the task record and select **Source Request**.
+4. Review the available stock:
+   - Transfer one scanner from **Southern California Warehouse** to **San Diego South Warehouse**:
+     - Complete the **Transfer Order** form with the required stockroom details and submit.
+   - Purchase the second scanner:
+     - Select **Vendor:** Cloudward Inc ($90.00).
+     - Submit the purchase order.
+5. Confirm both a purchase order and a transfer order were created and are associated with the request.
+
+##### L4.2-E: Order the Item
+
+1. Impersonate Beth Anglin.
+2. Navigate to **Procurement > Orders > Purchase Orders**.
+3. Open the purchase order for the second scanner and select **Order**.
+
+##### L4.2-F: Create the Asset Before Delivery
+
+1. Impersonate Hamm Dalorian and return to **Procurement > Requests > Requests**.
+2. Open Luke Wilson's request and access the purchase order.
+3. Under **Related Links**, select **Create hardware assets prior to delivery**.
+4. In the **Assets** related list, enter an **Asset Tag** (e.g., HHD12345) and save the record.
+
+##### L4.2-G: Receive the Request
+
+1. On the purchase order, select **Receive**.
+2. If needed, capture **Asset Tag** and **Serial Number** information upon receipt.
+3. Submit the receipt and confirm:
+   - The purchase order status is now **Received**.
+   - The asset state is **In stock**, with a substate of **Available** and a cost of $90.
+
+##### L4.2-H: Lab Verification Steps
+
+1. Confirm the following actions were completed:
+   - **Scanner CL1000** is published to the service catalog and accurately listed.
+   - Vendor catalog items for **Cloudward Inc.** and **Amazon** are created.
+   - A request for 2 scanners is successfully placed by Luke Wilson.
+   - The request is sourced using a combination of stock transfer and vendor purchase.
+2. Verify the asset state for the received scanner:
+   - **State:** In stock.
+   - **Substate:** Available.
+   - **Cost:** Matches the vendor price ($90).
+3. Confirm all associated orders (purchase and transfer) are completed and listed under the request record.
+
 ## Topics
 
 ### Introduction
@@ -1770,3 +1867,66 @@ Check also [Lab 1](#l1-a-validate-plugins) for plugin validation.
   - Integrate RFID solutions (e.g., Zebra MotionWorks) to auto-track hardware asset location changes
   - RFID tags ping assets’ real-time location; movements get captured automatically in HAM
   - All RFID transactions are stored as activities for auditing
+
+#### OI: Requests and Procurement
+
+- **Requests and Procurement**
+  - Automating request and procurement processes:
+    - Improves process efficiency, visibility, and data consistency
+    - Reduces duplication of effort, time, and cost
+  - Examples of automation:
+    - Product, vendor, and service catalogs simplify asset requests and sourcing
+    - Stock rules and automated stock flows streamline stock management
+    - Asset mobile applications help with new hire onboarding and inventory management
+  - **ITAM and Service Catalog**
+    - Tying asset management into the service catalog makes it easier to maintain standards
+    - Standards reduce complexity and cost (similar to having a uniform fleet in aviation)
+    - Defined standards improve service costing, employee profiles, and overall consistency
+- **Catalogs**
+  - **Service Catalog**: A single location for end users to request products/services  
+    - When integrated with asset management, you can create assets automatically, source from existing stock, and standardize asset requests
+  - **Product Catalog**: A listing of hardware/software items (models) available in the Service Catalog  
+    - Same models used for assets, CIs, vendor catalog items, etc.
+  - **Vendor Catalog**: Items available from specific vendors  
+    - Maintains product listing and pricing for each vendor
+  - **Catalog Relationships**:  
+    - Models are the connection point between assets, CIs, and catalog items
+    - **Publishing Options**:  
+      - From a model (updates driven by the model data)
+      - From a vendor item (details managed by the vendor record)
+- **Procurement**
+  - Ask: “Does the item need to be procured?”
+  - **Basic Procurement Flow**:
+    - ![Basic Procurement Flow](./attachments/sn-asset-procurement-flow.png)
+    - User request → Manager approval
+      - Prerequisites:
+        - Define standards
+        - Service costing
+        - Employee profiles
+    - Source from stock (transfer order) or purchase (purchase order)
+    - Purchased assets can be pre-created in ServiceNow based on the purchase order
+    - Receiving slips track incoming items and generate asset records if needed
+- **Requests**
+  - **Request Structure**:
+    - Request (top-level record)
+    - Requested items (the individual items requested)
+    - Approvals (manager or others)
+    - Purchase orders (if items must be purchased from a vendor)
+    - Transfer orders (if items can be sourced from existing stock)
+    - Catalog tasks (assigned to fulfill/prepare requested items)
+  - **Source a Request**:
+    - Send assets from a stockroom (transfer order) or create a purchase order to buy from a vendor
+    - **Consume Local Stock** (HAM feature):
+      - If the requested item is in a local stockroom, consume it directly, avoiding a transfer or purchase order
+      - Reduces fulfillment time by leveraging local inventory
+- **Purchase Orders**
+  - Purchase orders group ordered items as PO lines
+  - Integration with existing purchasing systems is possible (task or automation triggers existing system when you click Order in ServiceNow)
+  - **Receiving Purchase Orders**:
+    - Asset tags/serial numbers can be updated during receiving
+    - If assets are pre-created, updates to tag/serial are preserved
+    - Assets can be automatically created upon receiving if the model is specified
+  - **Consolidate Purchase Orders**: schedule purchases
+    - Combine multiple requests/items into a single PO
+    - Decreases the number of vendor transactions
+    - Potentially qualifies for better pricing
