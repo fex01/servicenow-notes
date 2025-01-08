@@ -27,6 +27,78 @@
 
 ![Discovery Process](./attachments/sn-discovery-process.png)
 
+## Credential Requirements
+
+- Windows
+  - one of the following [source](https://www.servicenow.com/docs/bundle/xanadu-platform-security/page/product/credentials/reference/r_WindowsCredentialsForm.html):
+    - domain user with local administrator access on the target Windows hosts
+    - local account that has administrator privileges and User Access Control (UAC) disabled on the same host
+  - No logon privileges are needed. Account does NOT need to be interactive
+  - [gMSA](#group-managed-service-accounts-gmsas) accounts leave password management to the DCs and are an option for Windows Credential
+  - admin share (`admin$`) access is required
+    - see [Windows probes and permissions](https://www.servicenow.com/docs/bundle/xanadu-it-operations-management/page/product/discovery/reference/r_DiscoWinProbesAndPermissions.html)
+    - can be broken when Kerberos is used (disallows file-share access via IP instead of host name)
+    - Workaround: use WinRM instead of WIM for Windows Discovery
+    - [source]( https://support.servicenow.com/kb?id=kb_article_view&sysparm_article=KB0753041)
+  - Domain Controller: require account with Domain Admin permissions, not just local Admin permissions
+  - [Hyper-V](./sn-discovery-hyper-v.md/#configuration-requirements): requires account with Domain Admin permissions, not just local Admin permissions
+- SSH:
+  - Unix/Linux
+  - support for SSH password and Private Key
+  - at least sudo read permissions
+- [SNMP](https://www.servicenow.com/docs/bundle/xanadu-platform-security/page/product/credentials/concept/c_SNMPCredentials.html): 
+  - router, switch, printer
+  - SNMP v2 and v3
+    - v2: can be read only (community string)
+      - default: `public`
+    - SNMP v3 requires protocol, private key and user name to be defined
+  - if on device ACIs are used, MID server IP must be added
+- VMware vCenter: discover vCenter running on Windows
+  - VMware credential type allows Discovery to explore VMware's vCenter running on a Windows machine to discover ESX machines, virtual machines, and resource pools
+  - The VMware Discovery and automation API (vCenter API) now provides the globally unique serial number for computer Cls
+  - CIM credentials are not needed to allow access to each VMware host
+  - Windows credentials are not necessary for Center Discovery, when valid VMware credentials are used
+- CIM: Storage server based on Common Information Model (CIM)
+  - CIM and Host credentials for either Windows or UNIX are required
+  - CIM credential used to probe SIM Server for SMI-S information to discover Storage server and fabric
+  - Host credential used to discover Host server
+
+### Group Managed Service Accounts (gMSAs)
+
+- [docs: gMSA configuration for Discovery](https://www.servicenow.com/docs/bundle/xanadu-it-operations-management/page/product/discovery/concept/gmsa-configuration-for-discovery.html)
+- [docs: Install a MID Server on Windows](https://www.servicenow.com/docs/bundle/xanadu-servicenow-platform/page/product/mid-server/concept/mid-server-install-prereqs.html)
+  - Only the accounts with log on as service policy are displayed in the drop-down. Group Managed Service Accounts (gMSA) that inherit the log on as service policy from their groups are not displayed in the drop-down. However, you can install the MID Server service using those accounts by manually entering the service account name in the editable drop-down
+- [community: Discovery: How to use a Group Managed Service Account (GMSA) as the service account for Discovery?](https://www.servicenow.com/community/itom-articles/discovery-how-to-use-a-group-managed-service-account-gmsa-as-the/ta-p/2318945)
+- [KB: create a gMSA Credential](https://support.servicenow.com/kb?id=kb_article_view&sysparm_article=KB0750818)
+- [MS: Group Managed Service Accounts Overview](https://learn.microsoft.com/en-us/windows-server/identity/ad-ds/manage/group-managed-service-accounts/group-managed-service-accounts/group-managed-service-accounts-overview)
+- gMSA and ADME Known Error
+  - [community: Getting ADME to work with MID Server service account credentials, like gMSA?](https://www.servicenow.com/community/itom-forum/getting-adme-to-work-with-mid-server-service-account-credentials/m-p/3025047)
+  - [KB: ADME does not support "Service Account" windows credentials](https://support.servicenow.com/kb?id=kb_article_view&sysparm_article=KB1642127)
+
+### WinRM instead of WIM
+
+- [Use Windows Remote Management for classification](https://www.servicenow.com/docs/bundle/xanadu-it-operations-management/page/product/mid-server/task/t_EnableDeviceClassWinRemoteMgmt.html)
+  - Prerequisites
+    - **Install and configure** a Windows MID Server on the local network.
+    - **Enable the WinRM service** on all Windows hosts you want to discover.
+    - Required roles: `discovery_admin`, `agent_admin`, or `admin`.
+  - Procedure
+    - **Set up the WinRM Protocol**:
+      - Navigate to **Discovery > MID Servers** in ServiceNow.
+      - Select the desired MID Server for discovering Windows hosts.
+      - Under **Configuration Parameters**, click **New** to add a new parameter.
+      - Set the **Parameter name** to `mid.windows.management_protocol` and the value to `WinRM`.
+      - Save the configuration.
+    - **Optional Configurations**:
+      - Add additional WinRM-specific parameters if necessary:
+        - **`mid.powershell_api.winrm.remote_port`**: Default is `5985`.
+        - **`mid.powershell_api.session_pool.target.max_size`**: Max sessions per target (default `2`).
+        - **`mid.powershell_api.session_pool.max_size`**: Max sessions in the pool (default `25`).
+        - **`mid.powershell_api.idle_session_timeout`**: Idle session timeout in seconds (default `60`).
+      - Note: Some parameters require restarting the MID Server to take effect.
+    - **Run Discovery**:
+      - Create and run a **Discovery schedule** to identify Windows devices on the network.
+
 ## Courses
 
 ### Discovery Extras
@@ -198,9 +270,11 @@
       - Configuration Items (default)
       - IP Addresses (credential-less)
         - create device history records, but does not update the CMDB
-      - Networks
+      - [Networks](https://www.servicenow.com/docs/bundle/xanadu-it-operations-management/page/product/discovery/concept/c_NetworkDiscovery.html)
         - identify routed IP networks via ARP
         - populate the IP Network table [cmdb_ci_ip_network]
+        - use Discovery Range Set > Private IP Addresses for default private IP ranges
+        - use `Network Discovery auto-starting routers` to set start router
       - Service (Service Mapping Discovery)
       - Serverless
         - skip scanning & classification
@@ -259,8 +333,8 @@
       - Behaviors
       - Clusters and Capabilities
       - Credentials
-      - Cl Classification
-      - Cl Identifiers
+      - CI Classification
+      - CI Identifiers
     - Permissions
       - Community Strings
       - Access to privilege commands (sudo)
@@ -302,8 +376,8 @@
     - Delays the discovery process
   - Credential-less Discovery
     - Used as an interim method for Discovery
-    - Allows for partial Cl information gathering via NMAP
-    - Supports the creation and modification of host and application Cls before credentials are created
+    - Allows for partial CI information gathering via NMAP
+    - Supports the creation and modification of host and application CIs before credentials are created
     - Data gathering is limited to Windows and Linux
     - configuration
       - needs to be enabled
@@ -383,7 +457,7 @@
     - error message “No credentials found for types [SSH Password, SSH Private Key]”
     - SSH Credentials need to be provided with at least sudo read permissions
   - Discovery > Home > Errors
-    - Lists errors by category for all Cl discoveries
+    - Lists errors by category for all CI discoveries
     - Select a category tile to display specific error codes that occur
     - Recommended actions are listed for the selected error
 - Credential Types
@@ -407,14 +481,14 @@
   - SNMP Credentials
     - can be read only (community string)
     - router, switch, printer
-    - if on device ACLs are used, MID server IP must be added
+    - if on device ACIs are used, MID server IP must be added
     - SNMP v3 requires protocol, private key and user name to be defined
 - Discovery Behavior
   - [docs: Discovery behaviors](https://www.servicenow.com/docs/bundle/xanadu-it-operations-management/page/product/discovery/concept/c_DiscoveryBehaviors.html)
     - [Create a Discovery behavior](https://www.servicenow.com/docs/bundle/xanadu-it-operations-management/page/product/discovery/task/create-disco-behavior.html)
     - [Set up a load balancing behavior](https://www.servicenow.com/docs/bundle/xanadu-it-operations-management/page/product/discovery/task/t_SetUpLoadBalDiscoBehavr.html)
     - [Examples of Discovery behavior functionalities](https://www.servicenow.com/docs/bundle/xanadu-it-operations-management/page/product/discovery/reference/r_DefineTheFunctionalities.html)
-    - [Discovery behavior example: access an ACL protected SNMP device](https://www.servicenow.com/docs/bundle/xanadu-it-operations-management/page/product/discovery/task/t_AccessAnACLProtectedSNMPDevice.html)
+    - [Discovery behavior example: access an ACI protected SNMP device](https://www.servicenow.com/docs/bundle/xanadu-it-operations-management/page/product/discovery/task/t_AccessAnACLProtectedSNMPDevice.html)
   - which protocols are used during scanning
   - can be used to restrict a specific Discovery Schedule to discover only specific devices, for example only Windows (wmi probe)
   - create and use Behavior:
@@ -511,7 +585,7 @@
 - Identification Phase
   - CI Identifiers
     - Identify a specific device (have I seen you before?)
-    - use the Cls attributes for identification:
+    - use the CIs attributes for identification:
       - Unique attributes: can be from the same table or from derived tables
       - Required attributes: cannot be empty
     - uses Identification Trigger Probes from the CI Classifier
@@ -525,7 +599,7 @@
     - From the Discovery Log tab, select the Pattern Log link
       - Horizontal Discovery Log displays hardware rules tried
     - Identifier entries are tried in order until a complete match is found
-    - If no match is found, a new Cl is created
+    - If no match is found, a new CI is created
     - Identifier Rules are used in order of Priority
     - Hardware Rule
       - Parent Classes and Child Classes
@@ -534,23 +608,23 @@
   - Overview
     - retains complete history about discovery sources and proposed values
     - track how the CMDB is populated down to CI attribute level
-    - revert Cl updates from a specific discovery source
+    - revert CI updates from a specific discovery source
     - recompute attribute values using updated reconciliation rules
   - Activating
     - Activate the plugin: ITOM Discovery License (com.snc.itom.vis.license)
     - Add the system property: glide.identification_engine.multisource_enabled and set to true
   - CMDB Multisource Data Table
     - data being integrated to the CMDB via the IRE is stored in the CMDB MultiSource Data [cmdb_multisource_data] table
-    - Each record in the Multisource Data table tracks all Cl attributes from each discovery source.
+    - Each record in the Multisource Data table tracks all CI attributes from each discovery source.
     - Some common attributes are stored in column fields while all of them are stored in a JSON blob
   - Visibility to Multisource CMDB Data
-    - Within Cl Class Manager from the Reconciliation Rules tab select Preview Data
-    - From the Cl record itself, under Related Links, select CMDB 360 Data Preview
-    - From the Cl record itself, add the related list called CMDB 360 Data to preview what data sources are responsible for the Cl data
+    - Within CI Class Manager from the Reconciliation Rules tab select Preview Data
+    - From the CI record itself, under Related Links, select CMDB 360 Data Preview
+    - From the CI record itself, add the related list called CMDB 360 Data to preview what data sources are responsible for the CI data
 - Exploration Phase
   - Probes and Patterns
     - Explore the device, update CMDB (what else can you tell me about yourself?)
-    - Probes and Patterns launched are dictated by the Cl Classification
+    - Probes and Patterns launched are dictated by the CI Classification
     - collect details like RAM, CPU, software information
 - Troubleshooting
   - Port Scan Phase (Connectivity)
@@ -585,7 +659,7 @@
     - “depends on”: App to App Relationship
   - TCP Connections
     - [Server CI record] > Related List > TCP Connections
-    - Discovery finds application to host dependencies based on the running processes of a computer Cl that have a process classier configured
+    - Discovery finds application to host dependencies based on the running processes of a computer CI that have a process classier configured
     - Discovery finds application to application dependencies based on applications that have process classifiers and have TCP communications between them
 - Process Classification
   - All > Discovery Definition > CI Classification > Processes
@@ -600,7 +674,7 @@
     - All > Discovery Definition > CI Classification > Process Handlers
     - avoid duplication of CIs by filtering out parameters with inconsistent values after process restart
       - for example by identifying processes by their unchanged installation path
-    - Process Handlers only need to be used if parameters have inconsistent values that cause duplicate applications. This is an optional configuration, Cl Identification is preferred.
+    - Process Handlers only need to be used if parameters have inconsistent values that cause duplicate applications. This is an optional configuration, CI Identification is preferred.
   - Create Process Classifier
     - discover server CI
     - open server CI > Related Lists > Running Processes > open process record
@@ -609,7 +683,7 @@
       - select unique identifier as condition
       - maybe set also exclusion criteria like “Parameter does not contain X”
       - additional scripting is possible
-- Cl Identifiers for Applications
+- CI Identifiers for Applications
   - Application CI Identifiers can fall back to parent table identifiers when Allow fallback to parent's rules is set to true
 - CI Class Manager: Centrally view, create, or edit basic class definitions, and class settings for:
   - Identification
@@ -623,7 +697,7 @@
 #### DF: Asset Discovery and Agent Client Collector
 
 - [Asset Management](./sn-asset.md)
-- Assets and Cls - how are they related?
+- Assets and CIs - how are they related?
   - what is an asset?
     - tracked via Asset Management application
     - financial, contractual, location and ownership details
@@ -631,9 +705,9 @@
     - created during the procurement process, imported from other sources, or manually inputted
     - or auto-created during Discovery when CIs are populated
   - Model Category
-    - associate Cl classes with Asset classes
+    - associate CI classes with Asset classes
     - **Model Category and Model must be defined before creating an Asset record**
-    - Determine if the ServiceNow platform will create an Asset and/or Cl - and in which tables
+    - Determine if the ServiceNow platform will create an Asset and/or CI - and in which tables
   - Model
     - template for specific versions or various configurations of an Asset
     - is the common link between Asset (Model) und CI (Model ID)
@@ -651,23 +725,23 @@
     - CI Class: Computer [cmdb_ci_computer]
       - CI: MaxMustermann-Mac
   - create an Asset
-    - The Model Category and Model determine if an Asset and Cl record will be created and which table they will populate
+    - The Model Category and Model determine if an Asset and CI record will be created and which table they will populate
     - Example:
       - Model - Dell Inc. Alienware M17x is associated to Model Category Computer
-      - Model Category Computer creates Asset class Hardware and Cl class Computer records
+      - Model Category Computer creates Asset class Hardware and CI class Computer records
   - create an CI
-    - When creating a Cl record, it's important to populate the Model ID field
+    - When creating a CI record, it's important to populate the Model ID field
     - Model ID is associated to a Model category
-    - Only one Model category can be associated to a Cl class
+    - Only one Model category can be associated to a CI class
     - Example:
-      - If a Cl record is imported into the Computer table, the Model ID will be associated to a specific Model category Computer
+      - If a CI record is imported into the Computer table, the Model ID will be associated to a specific Model category Computer
       - Model Category Computer also creates an Asset class Hardware record
-  - Enforce Cl Class Verification
+  - Enforce CI Class Verification
     - Model categories can override the automatic creation of an Asset using Enforce CI Verification option
     - will affect all Models associated with the Model Category
     - Newly created CIs requires verification through a Ul action to:
-      - Create Asset - Creates an Asset associated with the newly created Cl record
-      - Merge CI - Merge duplicates of a Cl if the Asset for the Cl was created through a different process and a Cl record already exists
+      - Create Asset - Creates an Asset associated with the newly created CI record
+      - Merge CI - Merge duplicates of a CI if the Asset for the CI was created through a different process and a CI record already exists
 
 ##### DF: Agent Client Collector for Visibility (ACC-V)
 
@@ -707,7 +781,7 @@
   - Powershell is not being used in any of the ACC-V modules
 - Process: applies Checks and Policies to schedule and collect host data which is triggered during the following cases:
   - Periodic scheduling: A policy-based approach where Discovery is triggered on a periodic basis
-  - On Cl delete: When the computer or server Cl record is deleted
+  - On CI delete: When the computer or server CI record is deleted
   - MID Server cycle: When the MID Server goes down and comes back up
   - Target host cycle: When the target host goes down and comes back up
   - Network break: When there is a break in the network link to the target
@@ -724,7 +798,7 @@
   - All > Agent Client Collector > Configuration > Check Definitions
     - checks are stored, created and updated on the instance
   - executes the osquery command on agents
-  - osquery commands are used to gather specific attribute details from a Cl such as serial number, file systems, running processes, etc
+  - osquery commands are used to gather specific attribute details from a CI such as serial number, file systems, running processes, etc
   - four Check Definitions are used by four ACC-V Policies
 - Policies
   - four policies for ACC-V
@@ -732,7 +806,7 @@
     - Software Installed Policy
     - SAM discovery
     - SAM background policy
-  - define which Cl type to monitor
+  - define which CI type to monitor
   - defines interval-based scheduling
   - default interval is 86400 seconds, which is every 24
 - Discovery Source: ACC-Visibility
@@ -757,12 +831,12 @@
       - Horizontal Pattern probe also contain a sensor used for updating the CMDB
   - what is a pattern?
     - Series of operations that tell Discovery:
-      - Which Cl to find on your network
+      - Which CI to find on your network
       - What credentials to use
       - What tables to populate in the CMDB
     - Patterns perform the same function as a probe:
       - Identifies a target Cl
-      - Explores a Cl for details, such as RAM, CPU, OS version, etc
+      - Explores a CI for details, such as RAM, CPU, OS version, etc
     - Differences between Pattern and Probes
       - Patterns run during Identification and Exploration phases, probes run during all phases
       - patterns are much faster than probes in collecting device details
@@ -771,11 +845,11 @@
       - Used only by Discovery for creating lists of devices
     - Application: Identified by a running process on a host, such as HIS, Apache, MSSQL
       - Used by top-down (Service Mapping) and Horizontal discovery
-      - Must have a corresponding configuration item type and a Cl classification
+      - Must have a corresponding configuration item type and a CI classification
     - Shared Library
     - Cloud Resource: discover resources in AWS and Azure datacenters
   - Pattern Sections
-    - Identification: Used to Identify a Cl through a series of steps and is part of the baseline pattern record
+    - Identification: Used to Identify a CI through a series of steps and is part of the baseline pattern record
     - Extension: Used to extend the Identification section, without changing the baseline pattern and is saved as a shared library
   - Example
     - CI Classification is Windows Server 2016
@@ -839,8 +913,8 @@
     - Delimiters and Positions are used to define what specific information will be captured from the Output
   - Merge Table
     - Operation to merge content from two source tables into a target table
-    - Great final step if variable names match Cl attributes
-    - Target Table should match Cl Type for final step
+    - Great final step if variable names match CI attributes
+    - Target Table should match CI Type for final step
   - Transform Table
     - Add one or more computed columns to an existing table and place the results in a target table
     - Use this operation to unify information from different sources
@@ -899,7 +973,7 @@
     - Used only by Discovery for creating lists of devices
   - Application: Identified by a running process on a host, such as HIS, Apache, MSSQL
     - Used by top-down (Service Mapping) and Horizontal discovery
-    - Must have a corresponding configuration item type and a Cl classification
+    - Must have a corresponding configuration item type and a CI classification
   - Shared Library
   - Cloud Resource: discover resources in AWS and Azure datacenters
 - Debug Type
@@ -921,7 +995,7 @@
   - Pattern Designer > Discovery Pattern Logs, add column Process ID, find pattern
 - Host CI Install Status=absent -> no application debugging
 - Horizontal Patterns must be triggered via Process Classification
-  - Cl Classification > Processes
+  - CI Classification > Processes
   - Process Classification is what triggers the Application patterns
   - Use the HorizontalDiscoveryProbe-Horizontal Patt trigger probe to associate the Application Pattern
 - use the log
@@ -929,7 +1003,7 @@
   - or Discovery Status > Discovery Log
 - using patterns with Process Classifiers
   - process classifiers will mostly deliver the application name - can be combined with patterns to extract additional details
-  - Process classification in Discovery tracks services, such as database servers, running on computer Cls in your ServiceNow instance
+  - Process classification in Discovery tracks services, such as database servers, running on computer CIs in your ServiceNow instance
   - Patterns can utilize Process Classifiers to help identify applications based on running processes
   - Enforce Process Classification must be checked for a pattern to utilize the Process Classifiers
   - adapt an existing pattern
@@ -960,8 +1034,8 @@
 - [CMDB Health](./sn-cmdb-health.md)
 - Requirements Gathering - example questions
   - Do you want to be notified of a device that is no longer discoverable?
-  - Do you want the Cl owners to be notified of the changes?
-  - Do my Cls match corporate policy around?
+  - Do you want the CI owners to be notified of the changes?
+  - Do my CIs match corporate policy around?
   - Do you want to automatically update the status of a Cl?
   - Do you want to delete aging Cls?
   - Do you want to configure a single view of everything you are managing?
@@ -972,7 +1046,7 @@
     - example: A Business Rule sets Install Status to Pending Install when a record is inserted/updated into the Hardware [cmdb_ci_hardware] table, or an extended table, by a user with the mid_server role.
   - Scheduled Jobs
     - All > System Definition > Scheduled Jobs
-    - example: Using the Most recent discovery date as a condition, a Scheduled Job ran on a repeating interval updates Install Status to Absent for Cls not rediscovered in 30 days.
+    - example: Using the Most recent discovery date as a condition, a Scheduled Job ran on a repeating interval updates Install Status to Absent for CIs not rediscovered in 30 days.
     - first check OOB support like Data Manager policies
   - Data Policies
     - All > System Policy > Rules > Data Policies
@@ -980,7 +1054,7 @@
   - Notifications
     - All > System Notifications > Email
     - All > System Notifications > Push
-    - example: A Notification informs the Managed by user when the Cl Install Status is updated to Unknown.
+    - example: A Notification informs the Managed by user when the CI Install Status is updated to Unknown.
     - check also CMDB Remediation tasks
 - Architecture
   - [cmdb] Base Configuration Item table
@@ -988,18 +1062,18 @@
   - [cmdb_rel_ci] CI Relationship
   - [cmdb_rel_attributes] CI Relationship Attributes
 - CI Lifecycle Challenges
-  - Cl Created:
-    - How do we manage a process around new Cls being discovered?
+  - CI Created:
+    - How do we manage a process around new CIs being discovered?
     - e.g. Business Rule on insert/update sets Install Status to Pending Install and Data Policy sets Managed by field to mandatory
-  - Application dependent to Cl not rediscovered after 14 days
+  - Application dependent to CI not rediscovered after 14 days
     - How do we manage a process around applications that are no longer discoverable and still display as application-to-host dependencies on the Dependency View map?
     - e.g. Scheduled Job deletes application not seen within 14 days to maintain accurate relationships on the Dependency View Map
-  - Cl not rediscovered after 30 days
-    - How do we manage a process around Cls that are no longer being discovered?
+  - CI not rediscovered after 30 days
+    - How do we manage a process around CIs that are no longer being discovered?
     - e.g. Scheduled Job updates Install Status to Absent, notification sent to Discovery admin, report generated weekly of Absent devices
 - Fields for CI Management
-  - Most recent discovery: Can be used to determine aging Cl criteria
-  - Discovery source: Can be used to build logic in Business Rules for only Cls discovered by Discovery
+  - Most recent discovery: Can be used to determine aging CI criteria
+  - Discovery source: Can be used to build logic in Business Rules for only CIs discovered by Discovery
   - Managed by: Can be used to determine who manages the Cl
   - Install Status: Can be used to flag a Cl, notify administrators, or report based on specific criteria
 - Working with ServiceNow Support
@@ -1018,7 +1092,7 @@
     - CIM for SMI-S information to discover Storage
   - Target IP Ranges, Subnets or Lists
   - Web Proxy Information (if required)
-  - Firewall/ACLs configured for MID Sever
+  - Firewall/ACIs configured for MID Sever
     - Internet (WAN) outbound only access on port 443
     - Intranet (LAN) inbound (wished for)
       - Any/Any for windows desktop firewalls
@@ -1077,7 +1151,7 @@
     - Example: WMI Probe triggers Windows - Classify probe
     - Windows - Classify probe queries a series of WMI fields on the target device
     - Payload results are processed by Windows - Classify Sensor script
-    - Payload results compared to the Cl Classification lists
+    - Payload results compared to the CI Classification lists
   - Computer/Server devices are classified by the operating system
   - Network devices classified based on routing/ switching/printing
   - relevant records - example Windows
@@ -1086,7 +1160,7 @@
     - Sensor: Windows - Classify
       - All > Discovery Definition > Sensors
     - Classifications List
-      - All > Discovery Definition > Cl Classification > Windows
+      - All > Discovery Definition > CI Classification > Windows
       - [specific record]
         - Related Lists > Classification Criteria
         - Related Lists > Triggers probes
@@ -1104,13 +1178,13 @@
       - View the system log using Node Log File Browser
 - Identification - Review
   - Third phase of Discovery
-  - Devices, such as computers, use a Hardware Rule under Identifiers to reconcile Cl entries
+  - Devices, such as computers, use a Hardware Rule under Identifiers to reconcile CI entries
   - Identifier entries are assigned to tables, such as Hardware [cmdb_ci_hardware], along with Criterion attributes (fields) to determine the uniqueness of a device
   - Criterion attributes are assigned a priority to determine which value will be used to uniquely identify a device
-  - If a device is not found in a table with the criterion field values, the device will be considered a unique record and will be inserted as a new Cl record
+  - If a device is not found in a table with the criterion field values, the device will be considered a unique record and will be inserted as a new CI record
   - If there are duplicate records, Discovery will only update the record that was created first and flag the newer records as duplicates. A de-duplication task will be created
   - Identifiers
-    - All > Discovery Definition > Cl Identification > Identifiers
+    - All > Discovery Definition > CI Identification > Identifiers
     - for example Hardware Rule
       - It is important to ensure a device has a value in the same fields that correspond to the identifier entries defined by Discovery
       - Typically, serial number is an important field used to reconcile a device
@@ -1120,7 +1194,7 @@
     - Set Type = string
     - Set the Value = true
     - View Identification rules used under Discovery > Status > Discovery Log tab
-    - Under Discovery Properties, activate Cl identification debugging to include Cl identification information in the discovery log for each IP
+    - Under Discovery Properties, activate CI identification debugging to include CI identification information in the discovery log for each IP
 - Exploration - Review
   - Fourth phase of Discovery
     - Exploration probes are triggered by the associated classifier
@@ -1146,7 +1220,7 @@
       - From the Discovery Pattern Logs, select View log to view the Service Discovery Log details
       - From the Service Discovery Log, select View log to view the Horizontal Discovery log details
     - Discovery Pattern Logs lists which patterns were run, the IP address of the device, and the Status of Success or Failure
-    - Pattern logs will show the success or failure of each pattern step and if a Cl was created/ updated during the Discovery pattern process
+    - Pattern logs will show the success or failure of each pattern step and if a CI was created/ updated during the Discovery pattern process
     - Pattern Designer logs can be viewed from the Service Discovery log window or from the Discovery Status > Discovery Log tab
 
 ### Populate the CMDB

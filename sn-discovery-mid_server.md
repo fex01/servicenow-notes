@@ -177,6 +177,73 @@ Configuration
   - mid.instance.password: instance mid server user password hash
   - name: mid server name
 
+### Docker
+
+- [docs: Containerized MID Server](https://www.servicenow.com/docs/bundle/xanadu-servicenow-platform/page/product/mid-server/concept/containerized-mid.html)
+
+#### 1. Build a MID Server Docker Image (Linux)
+
+- **Prerequisites and Requirements**
+  - **Docker Engine & CLI 20.10.4 or later**
+- Keep libraries updated to the newest versions available (or those with security patches).
+
+- **Procedure**
+
+  1. **Download Recipe & Verify**
+     - Go to the **MID Server download page** (All > MID Servers > Downloads) and download the Docker recipe (ZIP).
+     - Verify its digital signature (see documentation for details).
+  2. **Unzip the Recipe**
+  3. create MID Server User on Instance
+  4. Fill `.env` file with at least the following content:
+
+     ```txt
+     DOCKER_TAG=...
+     MID_INSTANCE_URL=https://<instance>.service-now.com/
+     MID_INSTANCE_USERNAME=...
+     MID_INSTANCE_PASSWORD=...
+     MID_SERVER_NAME=...
+     ```
+
+     - This file can also contain other environment variables for the Docker build process.
+
+  5. **Build the Docker Image**
+
+     ```bash
+     cd path/to/Dockerfile
+     export $(grep DOCKER_TAG .env)
+     docker build --platform=linux/amd64./ --tag "$DOCKER_TAG"
+     ```
+
+  6. **List Docker Images** (optional)
+
+     ```bash
+     docker image ls
+     ```
+
+#### 2. Launch Containerized MID Server (Docker)
+
+1. **Prerequisites**
+   - **Docker Engine & CLI 20.10.4+**
+
+2. **Start the Container**
+
+   ```bash
+   docker run -d -p 8800:8800 --name "$MID_SERVER_NAME" --env-file ./.env "$DOCKER_TAG"
+   ```
+
+   - remarks:
+    - `--network host` seems to reliably kill the mid server start
+    - `-p 8800:8800` expose port for ACC Listener
+
+#### 7. Additional Notes & Best Practices
+
+- **Auto-upgrade**: For containerized MID Servers, it is recommended to **disable auto-upgrade** and rebuild the Docker image for new releases.
+- **Scaling & Orchestration**: Containerization and orchestration (Kubernetes/Swarm) allow for automatic scaling, load-balancing, and self-healing.
+- **Security**: Always use Docker/Kubernetes secrets for sensitive data.
+- **Cleaning & Maintenance**: Use `docker rmi` or similar commands to keep your environment free of unused images.
+
+With these steps, you can build, launch, and manage Containerized MID Servers on Linux using Docker, Docker Swarm, or Kubernetes, ensuring a secure and flexible approach to MID Server deployment.
+
 ## Troubleshooting
 
 ### MID Server FileNameComplianceInSync Error
