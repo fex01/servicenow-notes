@@ -27,6 +27,10 @@
 
 ![Discovery Process](./attachments/sn-discovery-process.png)
 
+## Additional Information / to sort
+
+- [KB1116898 Windows Discovery Overview](https://support.servicenow.com/kb?id=kb_article_view&sysparm_article=KB1116898)
+
 ## Credential Requirements
 
 - Windows

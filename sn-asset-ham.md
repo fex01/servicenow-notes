@@ -732,7 +732,7 @@ To create the associated asset: 5. End impersonation 6. Navigate to **System Def
 1. Impersonate Hamm Dalorian.
 2. Navigate to **Product Catalog > Product Models > Hardware Models**.
 3. Open **Scanner CL1000**.
-4. On the **Product Catalog** tab, enter the description: *Wireless scanner used in warehouses and distribution facilities to manage inventory*.
+4. On the **Product Catalog** tab, enter the description: _Wireless scanner used in warehouses and distribution facilities to manage inventory_.
 5. Save the changes.
 6. Under **Related Links**, select **Publish to Hardware Catalog**.
 7. In the **Publish to Hardware Catalog** popup, set the **Category** to **Hardware** and select **OK**.
@@ -813,6 +813,194 @@ To create the associated asset: 5. End impersonation 6. Navigate to **System Def
    - **Substate:** Available.
    - **Cost:** Matches the vendor price ($90).
 3. Confirm all associated orders (purchase and transfer) are completed and listed under the request record.
+
+#### L4.3: Automate Stock Management
+
+- [lab steps](https://nowlearning.servicenow.com/sys_attachment.do?sys_id=b146fd6f974e8294524eb3cf9153affa)
+
+##### L4.3: Objective
+
+1. Replenish internal stock from a central warehouse.
+2. Replenish central warehouse stock from a vendor.
+3. Verify replenishment rules.
+4. Replenish stock using HAM bulk stock order.
+
+##### L4.3-A: Replenish Stock from a Stockroom
+
+1. Impersonate Hamm Dalorian.
+2. Navigate to **Inventory > Stock > Stock Rules** and click **New**.
+3. Complete the form:
+   - **Model**: `Acer Notebook Battery`
+   - **Stockroom**: `San Diego South Warehouse`
+   - **Threshold**: `3`
+   - **Restocking option**: `Stockroom`
+   - **Order size**: `5`
+   - **Parent stockroom**: `Southern California Warehouse`
+4. Click **Submit**.
+
+##### L4.3-B: Replenish Stock from a Vendor
+
+1. Navigate to **Inventory > Stock > Stock Rules** and click **New**.
+2. Complete the form:
+   - **Model**: `Acer Notebook Battery`
+   - **Stockroom**: `Southern California Warehouse`
+   - **Threshold**: `10`
+   - **Restocking option**: `Vendor`
+   - **Order size**: `20`
+3. Click **Submit**.
+4. Verify the stockroom manager:
+   - Navigate to **Inventory > Stockrooms**.
+   - Open the Southern California Warehouse stockroom.
+   - Update the **Manager** to `Rob Woodbyrne`.
+   - Click **Update**.
+
+##### L4.3-C: Verify Stock Rules Operate as Expected
+
+1. **Consume stock to trigger replenishment**:
+   - Navigate to **Inventory > Stockrooms** and open the `San Diego South Warehouse`.
+   - Under the **Consumables** tab, open the `Acer Notebook Battery` record.
+   - Consume one battery to drop the quantity below the threshold of `3`.
+   - Navigate back to the `Southern California Warehouse` stockroom.
+   - Under the **Consumables** tab, consume batteries to drop the quantity below the threshold of `10`.
+2. **Run the stock rule job manually**:
+   - Impersonate System Administrator and navigate to **System Scheduler > Scheduled Jobs > Scheduled Jobs**.
+   - Open `Stock Rule Runner` and set the **Next action** date to yesterday.
+   - Click the checkmark to save and then select **Update**.
+3. **Validate stock rules**:
+   - Impersonate Rob Woodbyrne and navigate to **Inventory > Transfer Orders > Transfer Orders**.
+   - Open the transfer order for `Acer Notebook Batteries` to confirm it was triggered by the first stock rule.
+   - Navigate to **Procurement > Requests > Requests** and locate the request triggered by the second stock rule for vendor replenishment.
+4. **Review the workflow**:
+   - Open the request triggered by the vendor replenishment stock rule.
+   - Under **Related Links**, select **Show Workflow**.
+   - Verify the workflow opened in a new tab, noting that the request is over `$1000` and has moved to the second-line approval step.
+   - Close the workflow tab.
+5. **Approve the request**:
+   - Impersonate Eric Schroeder.
+   - Navigate to **Procurement > Requests > Requests** and open the pending request from Rob Woodbyrne.
+   - Set the **Approval status** to `Approved`.
+   - Click **Update** to finalize the approval.
+
+##### L4.3-D: Replenish Stock Using HAM Bulk Stock Order
+
+1. Impersonate Rob Woodbyrne.
+2. Navigate to **Inventory > Stock > Submit Stock Order** and complete the form:
+   - **Model**: `Acer Notebook Battery`
+   - **Quantity**: `10`
+   - **Stockroom**: `Southern California Warehouse`
+   - Click **Order Now**.
+3. Navigate to **Procurement > Requests > Requests** and review the submitted request.
+4. Under **Related Links**, select **Show Workflow** to review the auto-generated workflow.
+
+##### L4.3-E: Replenish Stock from Service Catalog
+
+1. Navigate to **Self-Service > Service Catalog**.
+2. Select **Asset Lifecycle** and choose **Hardware Inventory Stock Order**.
+3. Complete the form:
+   - **Model**: `Acer Notebook Battery`
+   - **Quantity**: `5`
+   - **Stockroom**: `Southern California Warehouse`
+4. Click **Order Now**.
+5. Navigate to **Procurement > Requests > Requests** and confirm the submission.
+
+##### L4.3: Remarks
+
+- Related Link "Show Workflow" was not available during the lab. Maybe no longer available in newer instances?
+
+#### L4.4: Certify Data
+
+- [lab steps](https://nowlearning.servicenow.com/sys_attachment.do?sys_id=4686f563978e8294524eb3cf9153af7d)
+
+##### L4.4: Objective
+
+1. Configure a data certification user.
+2. Configure stockroom managers.
+3. Schedule monthly stockroom inventory.
+
+##### L4.4-A: Prepare to Use Certification
+
+1. Impersonate System Administrator.
+2. Navigate to **User Administration > Users** and click **New**.
+3. Complete the form:
+   - **User ID**: `data.manager`
+   - **First name**: `Data`
+   - **Last name**: `Manager`
+4. Save the record.
+5. Under the **Groups** tab, click **New** and set:
+   - **Name**: `Data Managers`
+6. Save the group.
+7. Under the **Roles** tab, click **Edit** and add:
+   - `certification_admin`
+8. Save the changes.
+
+##### L4.4-B: Configure Stockroom Managers
+
+1. Impersonate Hamm Dalorian.
+2. Navigate to **Inventory > Stock > Stockrooms**.
+3. Update the **Manager** for each stockroom:
+   - **San Diego Border – Pickup/Dropoff**: `Allyson Gillispie`
+   - **San Diego North – Pickup/Dropoff**: `Bertie Luby`
+   - **San Diego North Central – Pickup/Dropoff**: `Candice Bruckman`
+   - **San Diego South – Pickup/Dropoff**: `Dorthy Alexy`
+   - **San Diego South Central – Pickup/Dropoff**: `Enrique Oroark`
+   - **San Diego South Warehouse**: `Felipe Gould`
+   - **Santa Monica Warehouse**: `Aileen Mottern`
+   - **Southern California Warehouse**: `Rob Woodbyrne`
+
+##### L4.4-C: Create Data Certification Filter
+
+1. Impersonate Data Manager.
+2. Navigate to **Data Certification > Schedules > Certification Filters** and click **New**.
+3. Complete the form:
+   - **Name**: `In stock assets`
+   - **Description**: `Assets listed as In stock for monthly inventory`
+   - **Table**: `Asset [alm_asset]`
+   - **Filter condition**:
+     - `State | is | In stock`
+     - AND `Stockroom | is not empty`
+4. Click the **Update count refresh** button to update the matching record count.
+   - Double-Arrows above _Add Filter Condition_
+5. Submit the filter.
+
+##### L4.4-D: Define Certification Schedule
+
+1. Navigate to **Data Certification > Schedules > Create New**.
+2. Complete the form:
+   - **Name**: `Monthly Stockroom Inventory`
+   - **Filter**: `In stock assets`
+   - **Display fields**:
+     - `Model.Display name`
+     - `Model category`
+     - `Substate`
+   - **Certification fields**:
+     - `Asset tag`
+     - `Quantity`
+   - **Assignment type**: `User Field`
+   - **Assign to**: `Stockroom Manager`
+   - **Days to complete**: `3`
+   - **Task description**: `Monthly Stockroom Inventory`
+3. Save the record.
+4. Complete additional fields:
+   - **Run**: `Monthly`
+   - **Day (run_dayofmonth)**: `1`
+   - **Instructions**: `Validate that the actual stock in the stockroom matches what is listed in ServiceNow. Certify items that match and fail certification for those that do not.`
+5. Save the changes.
+6. Under **Related Links**, select **Preview Certification Tasks** and review the results.
+7. Click **Execute Now**.
+8. Navigate to **Data Certification > Schedules > Instances** and verify a new instance was created.
+
+##### L4.4-E: Verify a Certification Task
+
+1. Impersonate Rob Woodbyrne.
+2. Navigate to **Service Desk > My Work** and open the task for `Monthly Stockroom Inventory`.
+3. Sort the **Assets** list by **Display name** in ascending order.
+4. Identify discrepancies:
+   - Select the asset `3Com Cat 5 Cable (10ft)` and enter `Only 95` in the **Optional comment for checked elements** field.
+   - Click **Fail certification for checked elements** (red exclamation mark).
+5. Certify all correct elements:
+   - Select all remaining elements and click **Certify checked elements** (green check mark).
+   - Wait for the **Percentage complete** to update or manually save the form.
+6. Repeat as necessary to certify all remaining records.
 
 ## Topics
 
@@ -1883,15 +2071,15 @@ Check also [Lab 1](#l1-a-validate-plugins) for plugin validation.
     - Standards reduce complexity and cost (similar to having a uniform fleet in aviation)
     - Defined standards improve service costing, employee profiles, and overall consistency
 - **Catalogs**
-  - **Service Catalog**: A single location for end users to request products/services  
+  - **Service Catalog**: A single location for end users to request products/services
     - When integrated with asset management, you can create assets automatically, source from existing stock, and standardize asset requests
-  - **Product Catalog**: A listing of hardware/software items (models) available in the Service Catalog  
+  - **Product Catalog**: A listing of hardware/software items (models) available in the Service Catalog
     - Same models used for assets, CIs, vendor catalog items, etc.
-  - **Vendor Catalog**: Items available from specific vendors  
+  - **Vendor Catalog**: Items available from specific vendors
     - Maintains product listing and pricing for each vendor
-  - **Catalog Relationships**:  
+  - **Catalog Relationships**:
     - Models are the connection point between assets, CIs, and catalog items
-    - **Publishing Options**:  
+    - **Publishing Options**:
       - From a model (updates driven by the model data)
       - From a vendor item (details managed by the vendor record)
 - **Procurement**
@@ -1930,3 +2118,190 @@ Check also [Lab 1](#l1-a-validate-plugins) for plugin validation.
     - Combine multiple requests/items into a single PO
     - Decreases the number of vendor transactions
     - Potentially qualifies for better pricing
+
+#### OI: Automated Stock Management
+
+- **Thresholds**
+  - Keeping a minimum level of inventory helps avoid productivity slowdowns
+  - Stock rules define when to replenish critical items like laptops or toner
+  - By automating stock level management, you ensure items are on hand when needed
+- **Stock Rules**
+  - Identify when a stockroom’s quantity for a specific model goes below a threshold
+  - Actions:
+    - Create a task for the stockroom manager (e.g., to generate a purchase order)
+    - Create a transfer order to replenish stock from another stockroom
+  - The **Stock Rule Runner** scheduled job (runs daily) initiates restocking actions
+    - Prevents duplicate orders when a restock is already in progress
+    - Requires Procurement to be active for automatic purchase order creation
+- **Asset Lifecycle Automation – Standard Flows, Bulk Stock Order**
+  - Part of the HAM application: provides OOB ready-to-use flows
+  - **Bulk Stock Order** flow can be triggered in two ways:
+    1. **Automatic**: When a stock threshold is breached (kicked off by the Stock Rule Runner)
+       - caveat: will not trigger if a prior stock order is still in progress
+    2. **Ad-hoc**: Manually from the Service Catalog (Asset Lifecycle category) or Flow Designer
+       - for example to create an ad-hoc secondary order
+  - Example scenario: If a stock rule indicates 10 MacBook Pros must be on hand, dropping to 9 can automatically initiate a PO or transfer order to replenish
+- **Enhanced Inventory Management (Vancouver)**
+  - **Service Locations**:
+    - Link multiple service locations to a stockroom or multiple stockrooms to a service location
+    - link between stockrooms and rank the linked stockrooms for preferred sourcing
+    - Consume and reclaim assets locally if the location has inventory
+    - If a stockroom runs low, additional sourcing can be done from assigned sourcing locations
+    - Can also associate remote sites or user locations (with no local stockroom) to these service locations for automated fulfillment
+  - **Distribution Channels**:
+    - Rank preferred stockrooms for replenishing assets
+    - Improve logistics by linking stockrooms geographically
+  - These features help eliminate supply chain inefficiencies by automatically sourcing from the best location
+  - Configured in the **Hardware Asset Workspace**
+
+#### OI: Mobile Asset Management
+
+- **NOW Mobile app** (for all employees):
+  - View assigned hardware and consumables
+  - Log incidents without contacting the service desk
+  - Confirm physical receipt of delivered assets by scanning barcodes
+- **Agent Mobile app – for ITAM agents**
+  - **Create & Lookup Assets**:
+    - Scan barcodes to create or find asset details (assignee, location, etc.)
+    - Role: asset
+  - **Receive Assets**:
+    - View open POs, receive items via barcode scanning
+    - Asset records update automatically (PO lines, stockroom location)
+    - Roles: procurement_admin or procurement_user
+  - **Scan, Verify, and Depart Assets**:
+    - Disposal scanning (Quebec+) to retire assets via barcode
+    - Role: asset
+  - **Perform Asset Audits**:
+    - Scan assets in a stockroom or location to reconcile inventory
+    - Role: asset
+- **Agent Mobile app: Inventory Audit**
+  - **Mobile Asset Inventory Audit**:
+    - Use the Agent app to capture on-site assets via barcode scanning
+    - Compare scanned results with ServiceNow records to identify discrepancies
+    - Create scheduled or on-demand audits (stockrooms, data centers, etc.)
+    - Role: asset
+  - **Procedure**:
+    1. **Create Audit**: From the Now Platform or within the app (select stockroom/location)
+       - Instance: All > Asset Audits > Asset Audits and click New
+       - Mobile: navigate to Asset and tap either Stockroom audits or Location audits, New
+    2. **Scan Assets**: Multi-scan capability; review and submit scans; duplicates removed automatically
+    3. **Review Audit**: View results (found, missing, new) in the Now Platform
+    - Once completed, no further modifications allowed
+    - All > Asset Audits > Asset Audits > select the audit record
+  - **Reviewing Audit Results**:
+    - **Pie Chart** shows assets by status:
+      - **Scanned and expected**: Assets found at this location as predicted (green slice).
+      - **Scanned and not expected**: Assets physically there but not recorded at this location; record is auto-updated.
+      - **Expected and not found**: Assets that should be there but were not scanned.
+      - **New**: Assets not previously in the database; the audit creates these records automatically.
+    - **Related Lists**:
+      - **Expected Assets**: Populated once scanning begins; shows items assigned to that location/stockroom.
+      - **Scanned Assets**: Shows all scanned items; updates with each new batch of scans.
+    - Each asset record stores its last audited information, providing historical insight into location and status.
+  - **Technical Tips**:
+    - Works online/offline
+    - Multiple agents can scan for the same audit
+    - Scans can be uploaded in batches
+    - After closing, the audit is locked
+- **Agent Mobile app: Disposal Scanning**
+  - **Overview**:
+    - Use the Agent app to verify asset disposal via barcode scanning
+    - Increases accuracy for disposal tasks by matching planned vs. scanned assets
+    - Role: inventory_user
+  - **Procedure**:
+    1. Create or open a **Disposal Order** in Now Platform : All > Disposal Orders > Disposal Orders
+    2. In the mobile app, go to **Asset disposal** (verify or depart tab)
+    3. **Scan assets** for disposal or departure confirmation
+    4. Compare scanned results to the disposal order record
+
+#### OI: Extend Asset and Configuration Management
+
+- **Overview**
+  - Asset management is **not** configuration management
+  - Default asset classes: **Hardware** (alm_hardware), **Consumable** (alm_consumable), **Software Entitlements** (alm_license), and **Facility** (alm_facility)
+  - If these do not meet your needs, you can create a new asset class (e.g., for datacenter infrastructure like HVAC and generators)
+  - Before creating new classes:
+    - Check if existing classes suffice
+    - Excessive classes can add unnecessary complexity
+    - for CMDB configuration see notes on [CMDB](./sn-cmdb.md)
+- **Asset Classes**
+  - ServiceNow stores classes as database tables
+  - Creating a **new asset class** means extending the **base asset table (alm_asset)**
+    - By best practice, user-created table names follow the pattern `u_alm_<name>`
+  - After creating the table:
+    - Create an application/module
+    - Update new and existing **model categories** to recognize the new class
+- **Configuration Item (CI) Classes**
+  - The platform provides many default CI classes (e.g., cmdb_ci_computer, cmdb_ci_printer)
+  - Create a new CI class only if necessary, by extending the **appropriate CI table** (e.g., cmdb_ci_hardware)
+    - User-created CI tables follow the pattern `u_cmdb_ci_<name>`
+  - Once created:
+    - Define **identification and reconciliation rules** for the new CI class
+- **Product Model Classes**
+  - Common examples:
+    - **Application Model (cmdb_application_product_model)**
+    - **Consumable Model (cmdb_consumable_product_model)**
+    - **Contract Model (cmdb_contract_product_model)**
+    - **Facility Model (cmdb_facility_product_model)**
+    - **Hardware Model (cmdb_hardware_product_model)**
+    - **Software Model (cmdb_software_product_model)**
+  - Each product model class provides unique capabilities
+  - Create a new one if existing classes do not satisfy your needs
+- **Process to Extend**
+  - **Identify existing capabilities** before creating new fields or tables
+  - Best practice: “Don’t extend or build unless you must”
+  - **Steps to follow**:
+    1. Determine if the item is only a CI, only an asset, or both
+    2. Extend existing classes only if needed
+    3. Keep non-asset CIs out of asset management (e.g., ports, IP addresses, patches, VMs)
+    4. Keep asset and CMDB in sync (state, location)
+    5. Ensure supportable assets are also CIs (so incidents, changes, etc. can reference them)
+    6. Create an asset record for anything requiring **financial or contractual tracking** (e.g., warranty repairs, maintenance contracts)
+- **Asset vs. CI Recommended Practice Review**
+  - Often, servers, desktops, network hardware, and storage devices are both assets and CIs
+  - Some items might be **just an asset** or **just a CI**, depending on organizational policies
+  - **Key Best Practices**:
+    - Exclude non-asset CIs from asset management
+    - Keep states (Operation vs. Asset Status) and locations in sync
+    - Ensure any supportable asset is also a CI (to leverage incidents, maintenance, warranties)
+    - Asset data should support operational needs (repair under warranty, maintenance contracts)
+
+#### OI: Data Accuracy
+
+- **Data Certification**
+  - Some data requires manual validation to ensure accuracy
+  - **Certification Role**: Each person performing certifications needs the certification role; they do not need other process roles
+  - **What Data Certification Can Do**:
+    - Schedule or run on-demand data validation
+    - Ensure certain fields have correct data or any data at all
+    - Assign certification tasks automatically
+    - Validate specific fields on specific tables
+  - **Data Certification Process**:
+    1. **Create Certification Filter**: Define which records need to be certified
+       - All > Data Certification > Schedules > Certification Filters
+       - Test the filter carefully to target only desired records
+    2. **Create Certification Schedule**: Identify how often to run certification, assign tasks, specify fields to display and certify
+       - All > Data Certification > Schedules > Create New
+       - Details include:
+         - Frequency, due dates, assignment, instructions
+         - Filter (which records)
+         - Display and Certification fields (the actual fields to validate)
+       - Provide a clear **Task description** and **Instructions** for assigned users
+       - **Preview** certification tasks to confirm they match expectations before finalizing
+    3. **Run Certification**
+       - Generates tasks (grouped into an “Instance”) for users with the certification role.
+       - They review each record, mark it as certified (or not), and add work notes as needed.
+  - **Tracking Progress**:
+    - **Navigation**: **All > Data Certification > Schedules > Instances**
+    - Review real-time status of certifications in the Instance record.
+    - Each task links back to this Instance for easy reporting.
+- **Ensure Accurate Data Best Practices**
+  - **Leverage existing data** and processes (e.g., requests, discovery)
+  - **Perform checks during deployment** to update asset records
+  - **Barcode common attributes** for easy scanning
+  - **Use request records** for accurate user/location info
+  - **Incorporate data checks** into install processes
+  - **Configure discovery** to read files or registry for location/user details
+  - **Pull user info** from the OS (most frequent user over past 30 days)
+  - **Define change processes** to keep data updated
+  - **Use data certification** to validate fields that automation can’t confirm
