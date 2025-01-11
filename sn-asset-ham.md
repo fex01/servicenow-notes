@@ -10,11 +10,34 @@ back to [Asset Management](./sn-asset.md)
 
 ### Courses
 
-- [ ] [Hardware Asset Management (HAM) Fundamentals On Demand (Washington)](https://nowlearning.servicenow.com/lxp/en/it-asset-management/hardware-asset-management-ham-fundamentals-on-demand?id=learning_course_prev&course_id=944ea00847908654db63fb25126d4320)
+- [x] [Hardware Asset Management (HAM) Fundamentals On Demand (Washington)](https://nowlearning.servicenow.com/lxp/en/it-asset-management/hardware-asset-management-ham-fundamentals-on-demand?id=learning_course_prev&course_id=944ea00847908654db63fb25126d4320)
+- [ ] Hardware Asset Simulator
+- [ ] Hardware Asset Workspace Overview
+- [ ] Mobile Hardware Asset Management Fundamentals
 
 ### Links
 
--
+- Non-ServiceNow ITAM Resources:
+  - **International Organization for Standardization (ISO)**
+    - Largest developer of voluntary international standards
+    - Basic info is free; detailed standards are fee-based
+    - [Website](https://www.iso.org/home.html)
+  - **Asset Management ISO Standards**
+    - Covers ISO 55000 for Asset Management
+    - Owned/maintained by The Woodhouse Partnership Ltd
+    - Offers comprehensive details on the developing standard
+    - [Website](http://www.assetmanagementstandards.com/)
+  - **ITAM Review**
+    - News, reviews, and resources for ITAM, SAM, and licensing professionals
+    - [Website](https://www.itassetmanagement.net/)
+  - **The International Association of Information Technology Asset Managers (IAITAM)**
+    - Premier organization for IT Asset Managers
+    - Membership-based resources and multiple asset management certifications
+    - [Website](http://iaitam.org/)
+  - **IT Service Management ISO Standards**
+    - Based on ISO/IEC 20000 (for IT Service Management)
+    - Incorporates IT asset management practices
+    - [Website](https://www.bsigroup.com/en-GB/iso-20000-it-service-management/)
 
 ### Labs
 
@@ -1002,6 +1025,265 @@ To create the associated asset: 5. End impersonation 6. Navigate to **System Def
    - Wait for the **Percentage complete** to update or manually save the form.
 6. Repeat as necessary to certify all remaining records.
 
+#### L5.1: Manage Contracts
+
+- [lab steps](https://nowlearning.servicenow.com/sys_attachment.do?sys_id=a1db3da39742c294524eb3cf9153aff1)
+
+##### L5.1: Objective
+
+1. Create a hardware lease contract.
+2. Associate hardware assets with the lease contract.
+3. Manage the hardware lease contract lifecycle.
+
+##### L5.1-A: Enter a New Contract
+
+1. Impersonate Hamm Dalorian.
+2. Navigate to **Contract > Contracts > Leases** and click **New**.
+3. Complete the form:
+   - **Vendor**: `Lenovo`
+   - **Contract number**: `LNVO-1001`
+   - **Start date**: `<the first day of this year>`
+   - **End date**: `<the last day of this year>`
+   - **Description**: `Lease for Lenovo end user computers`
+   - **Contract administrator**: `Hamm Dalorian`
+   - **Approver**: `Beth Anglin`
+4. Save the record.
+5. Under the **Financial** section, set:
+   - **Payment amount**: `$500.00`
+6. Update the record.
+
+##### L5.1-B: Add Terms and Conditions
+
+1. Navigate to **Contract > Contracts > Terms & Conditions** and click **New**.
+2. Create the first record:
+   - **Name**: `Lenovo Use of Equipment`
+   - **Description**: `USE OF EQUIPMENT: Lessee shall only use the Equipment in a careful and proper manner and will comply with all laws, rules, ordinances, statutes, and orders regarding the use, maintenance, and storage of the Equipment.`
+3. Submit the record.
+4. Create the second record:
+   - **Name**: `Lenovo Lease Maintenance`
+   - **Description**: `MAINTENANCE, DAMAGE, AND LOSS: Lessee will, at Lessee's sole expense, keep and maintain the Equipment clean and in good working order and repair during the Lease Term. If lost or damaged, Lessee shall pay replacement costs.`
+5. Submit the record.
+6. Return to **Contract > Contracts > Leases** and open the Lenovo contract.
+7. Under the **Terms and Conditions** tab:
+   - Insert `Lenovo Use of Equipment` with an order of `100`.
+   - Insert `Lenovo Lease Maintenance` with an order of `200`.
+8. Save the record.
+9. Under **Related Links**, select **Build Terms and Conditions**.
+
+##### L5.1-C: Add Covered Assets
+
+1. In the **Assets Covered** related list, click **Edit**.
+2. In the **Collection** field, search for `*Lenovo ThinkStation S20`.
+3. Select all displayed assets and move them to the **Assets Covered** list.
+4. Save the record.
+5. Verify that the **Date added** field for each asset is updated to today.
+
+##### L5.1-D: Approve and Adjust Contract
+
+1. In the contract record, select **Submit For Review**.
+2. Impersonate Beth Anglin.
+3. Navigate to **Contract > My Approvals**, sort by **Created** (descending), and open the Lenovo contract.
+4. Review the contract details and select **Approve**.
+5. Verify the contract is updated to:
+   - **State**: `Approved`
+   - **Substate**: `None`
+6. Re-impersonate Hamm Dalorian and open the Lenovo contract.
+7. Select **Adjust** and update:
+   - **Payment amount**: `$600.00`
+8. Submit the adjustments and update the record.
+
+##### L5.1-E: Extend Contract
+
+1. Impersonate Beth Anglin.
+2. Navigate to **Contract > Contracts > Leases** and open the Lenovo contract.
+3. Select **Adjust** and update:
+   - **End date**: `<30 June next year>`
+4. Submit the adjustments.
+5. Navigate to **Contract > My Approvals**, open the Lenovo contract, and verify:
+   - **State**: `Active`
+   - The adjustment is applied without additional approval.
+
+#### L5.2: Manage Contract Financials
+
+- [lab steps](https://nowlearning.servicenow.com/sys_attachment.do?sys_id=f50c71679742c294524eb3cf9153af87)
+
+##### L5.2: Objective
+
+1. Create contract rate cards.
+2. Process contract costs.
+
+##### L5.2-A: Add Contract Rate Cards
+
+1. Impersonate Hamm Dalorian.
+2. Navigate to **Contract > Contracts > Leases** and open the Lenovo lease contract created earlier.
+3. Under the **Contract Rate Cards** related list, select **New** and complete the form:
+   - **Name**: `Payment for Support Systems`
+   - **Short description**: `Monthly payment for support systems.`
+   - **Base cost** (Financial tab): `$100.00`
+   - **Distribute cost** (Financial tab): `Allocate and distribute cost per asset`
+4. Save the record.
+5. Under the **Assets Covered** related list, select **New** and:
+   - Use the magnifying glass to search for the asset `P1000235`.
+   - Set the **Date added** to the first day of the current year.
+   - Click **Submit**.
+6. Repeat step 5 for the asset `P1000236`.
+7. On the **Contract Rate Card** form, click the reference icon next to the **Contract** field and select **Open Record** to return to the contract.
+8. View the **Financial** tab to verify the **Total cost**.
+
+###### Challenge: Create Another Rate Card
+
+1. Create another rate card under the **Contract Rate Cards** related list:
+   - **Name**: `Payment for Development Systems`
+   - **Short description**: `Monthly lease payment for development systems.`
+   - **Base cost**: `$500.00`
+   - **Distribute cost**: `Allocate and distribute cost per asset`
+2. Add three more assets to this rate card, following steps 5 and 6, with the **Date added** set to the first day of the current year.
+3. View the **Financial** tab to verify the updated **Total cost** reflects both rate cards.
+
+##### L5.2-B: Process Costs
+
+1. Impersonate the System Administrator.
+2. Navigate to **System Scheduler > Scheduled Jobs > Scheduled Jobs**.
+   - **not** under System Definitions > Scheduled Jobs
+3. Open **Process FM Costs** and update the **Next action** date to day before yesterday
+4. Click **Update** to save the changes and return to the list of scheduled jobs.
+5. Wait for the job to complete. The **State** will be updated to `Ready` when processing is finished.
+6. Verify:
+   1. Impersonate Hamm Dalorian.
+   2. Navigate to **Contract > Contracts > Leases** and open the Lenovo lease contract.
+   3. In the **Assets Covered** related list, open the asset `P1000235 – Lenovo ThinkStation S20`.
+   4. View the **Expense Lines** tab to validate that at least one entry reflects the lease contract.
+
+#### L5.3: Calculate Depreciation
+
+- [lab steps](https://nowlearning.servicenow.com/sys_attachment.do?sys_id=244c3da79742c294524eb3cf9153af89)
+
+##### L5.3: Objective
+
+1. Calculate depreciation for hardware assets.
+2. Create custom depreciation schedules.
+3. Group assets as fixed assets and sum their residual values.
+
+##### L5.3-A: Run Depreciation
+
+1. Impersonate Hamm Dalorian.
+2. Navigate to **Asset > Portfolios > Hardware Assets**.
+3. Open the record for the asset with **Asset tag**: `AA0005`.
+4. Navigate to the **Depreciation** tab and complete the form:
+   - **Depreciation**: `SL 3 Years`
+   - **Depreciation effective date**: `<the first day of this year> 00:00:00`
+   - **Salvage value**: `$100.00`
+5. Save the record using the **Save** option under **Additional Actions**.
+6. Under **Related Links**, select **Calculate Depreciation**.
+7. Review the calculated values:
+   - **Residual date**, **Residual value**, and **Depreciated amount**.
+   - Note: Values vary depending on the day depreciation is run.
+8. Repeat steps 4–7 for the asset with **Asset tag**: `AA0007` using:
+   - **Depreciation**: `SL 1 Year`
+   - **Depreciation effective date**: `<the first day of this year> 00:00:00`
+   - **Salvage value**: `$100.00`
+9. Compare results to observe the faster depreciation rate for the 1-year schedule.
+
+##### L5.3-B: Create Custom Depreciation Schedules
+
+1. Navigate to **Cost > Depreciation**.
+2. Open the depreciation schedule **Straight Line | SL 3 Years**.
+3. Modify the schedule:
+   - **Name**: `SL 2 Years`
+   - **Script**: Replace the number `3` with `2`.
+   - Add a semicolon (`;`) at the end of the script for completeness.
+4. Use the **Insert** option under **Additional Actions** to save the new schedule.
+5. Open the depreciation schedule **Declining Balance | DDB 4 Years**.
+6. Modify the schedule:
+   - **Name**: `DDB 6 Years`
+   - **Script**: Replace the number `4` with `6`.
+   - Add a semicolon (`;`) at the end of the script for completeness.
+7. Use the **Insert** option to save the new schedule.
+
+##### L5.3-C: Create a Fixed Asset
+
+1. Navigate to **Cost > Fixed Assets** and click **New**.
+2. Complete the form:
+   - **Fixed Asset**: `Asus G Series Purchase`
+3. Save the record using the **Save** option.
+4. Under the **Covers Assets** related list, click **Edit**.
+5. Filter assets:
+   - **Model**: `Asus G Series`
+6. Select **Run Filter** and move all matching assets to the **Selected** list.
+7. Save the changes.
+8. Under **Related Links**, select **Sum Residual Value** to calculate the total residual value for the grouped assets.
+
+#### L5.4: Identify Total Cost of Ownership
+
+- [lab steps](https://nowlearning.servicenow.com/sys_attachment.do?sys_id=a87cb92b9742c294524eb3cf9153af83)
+
+##### L5.4: Objective
+
+1. Create and apply a task rate card.
+2. Identify the total cost of ownership of an asset.
+
+##### L5.4-A: Activate Task Rate Card
+
+1. Impersonate Hamm Dalorian.
+2. Navigate to **Cost > Costs > Task Rate Cards**.
+3. Locate the **Incident non-P1** rate card.
+4. Double-click the whitespace next to `false` in the **Active** column and set it to `true`.
+5. Click the checkmark to save.
+
+##### L5.4-B: Apply the Task Rate Card
+
+1. Impersonate Eric Schroeder.
+2. Navigate to **Incident > Create New** and complete the form:
+   - **Caller**: `Joe Employee`
+   - **Configuration item**: `*JEMPLOYEE-IBM`
+   - **Short description**: `Cannot connect to network`
+3. Save the incident.
+4. Resolve and close the incident:
+   - Under the **Resolution information** tab:
+     - **Resolution code**: `Solution provided`
+     - **Resolution notes**: `Network cable was disconnected`
+   - Under the **Affected CIs** tab:
+     - Personalize the list to include the **Asset action** field.
+     - Set **Asset action** to `No action`.
+   - Select **Resolve**.
+   - Navigate to **Incident > Resolved**, locate the incident, and select **Close Incident**.
+
+##### L5.4-C: Generate Expense Lines
+
+1. Impersonate System Administrator.
+2. Navigate to **System Definition > Scheduled Jobs**.
+3. Locate and open the **Process Expense Allocation** job.
+4. Select **Execute Now**.
+
+##### L5.4-D: View New Expense Lines
+
+1. Impersonate Hamm Dalorian.
+2. Navigate to **Configuration > Base Items > Computers**.
+3. Open the record for `*JEMPLOYEE-IBM`.
+4. Click the reference icon next to the **Asset name** and select **Open Record**.
+5. Navigate to the **Expense Lines** tab to review:
+   - Two expense lines:
+     - One for the asset's original purchase.
+     - One for the incident cost.
+
+##### L5.4-E: Report on Total Cost of Ownership
+
+1. Navigate to **Reports > Create New** and complete the form:
+   - **Report name**: `Average Hardware Total Cost of Ownership by Model`
+   - **Source type**: `Table`
+   - **Table**: `Expense Line [fm_expense_line]`
+2. Select **Next**.
+3. Choose **Bar graph** under the **Bars** section, and select **Next**.
+4. Configure the report:
+   - **Group by**: `Asset ● Model`
+   - **Aggregation**: `Average`
+5. Save the report.
+6. Open the condition builder and set:
+   - **Asset**: `is not empty`
+   - **AND Asset.Class**: `is Hardware`
+7. Save the conditions and close the condition builder.
+8. Review the resulting graph.
+
 ## Topics
 
 ### Introduction
@@ -1067,16 +1349,16 @@ To create the associated asset: 5. End impersonation 6. Navigate to **System Def
   - **cost optimization**: optimize contracts, standardize assets, employee separation, avoid penalities
   - **decision support**: asset reporting, asset dashboard, ad-hoc queries, data integration
 - IT HW Asset Lifecycle
-  - 1. Request: LC begins with a plan or a request - someone needs an asset to achieve a goal
-  - 2. Procure: fulfillment by existing stock or through procurement from a vendor
-  - 3. Receive: process
-  - 4. Stock: process
+  - 1 Request: LC begins with a plan or a request - someone needs an asset to achieve a goal
+  - 2 Procure: fulfillment by existing stock or through procurement from a vendor
+  - 3 Receive: process
+  - 4 Stock: process
   - operational phase:
-    - 5. Deploy
-    - 6. Monitor
-    - 7. Support
-    - 8. MAC: Move, add, and change
-  - 9. Dispose
+    - 5 Deploy
+    - 6 Monitor
+    - 7 Support
+    - 8 MAC: Move, add, and change
+  - 9 Dispose
 - Manage the Lifecycle
   - IT Financial Management
     - Fulfillment
@@ -2305,3 +2587,150 @@ Check also [Lab 1](#l1-a-validate-plugins) for plugin validation.
   - **Pull user info** from the OS (most frequent user over past 30 days)
   - **Define change processes** to keep data updated
   - **Use data certification** to validate fields that automation can’t confirm
+
+### HAM Strategic Conformance - Tier 4 Capability Blueprint
+
+- **Strategic Conformance (Tier 4) – Key Points**
+  - Final tier of the hardware asset management (HAM) capability blueprint
+  - Focuses on **financial integration** and strategic planning (e.g., Business Service Management, Financial Management)
+  - Primary goal: **Financial tracking** of assets throughout their lifecycle (purchase, operational costs, and potential chargebacks)
+- **Common Financial Terms**
+  - **Contract financials**: Expenses tracked at the contract level
+  - **Rate card**: Expenses tracked at the expense line level
+  - **Original cost**: Purchase-related costs (e.g., purchase price, taxes, delivery, storage)
+  - **Operational expense**: Costs while the asset is in use (e.g., maintenance agreements, support labor, parts)
+  - **Depreciation expense**: An accounting concept allocating a portion of an asset’s cost over time
+  - **Total cost of ownership (TCO)**: Original cost + operational expense
+- **Lifecycle Management – Strategic Considerations**
+  - Emphasis on **financial aspects** to achieve maturity and stability in hardware asset management
+  - Possible **chargebacks/showbacks** for IT services or assets
+  - **Reporting on asset finances** (e.g., depreciation for tax purposes)
+  - Incorporate cost data into **organizational planning** and **financial management** processes
+- **Asset Financials – Core Components**
+  - **Original Cost**:
+    - Purchase price or lease cost
+    - Taxes, delivery, installation, warranty, and storage expenses (before deployment)
+  - **Operational Expense**:
+    - Ongoing costs (maintenance, support resources, replacement parts)
+  - **Depreciation**:
+    - Allocation of the asset’s original cost over its useful life
+    - An accounting entry, not a direct cash transaction
+
+#### SC: Contract Management
+
+- **Overview**
+  - A contract is a binding agreement tracked by the ServiceNow **Contract Management** application (active by default).
+  - Typical data stored:
+    - Contract number, start/end dates, and renewal info
+    - Terms and conditions (T&Cs), attachments, documents
+    - Financial terms (e.g., cost breakdowns)
+  - Managing contracts lets you:
+    - Track warranties, maintenance agreements, lease details
+    - Know when contracts expire (and take action if needed)
+    - Align covered assets with their respective contract(s)
+    - Reduce risk by ensuring contract coverage and timely renewals
+- **Contract Types**
+  - Examples of valid contract types:
+    - Insurance
+    - Lease
+    - License Bundle
+    - Maintenance
+    - Non-Disclosure
+    - Purchasing Agreements
+    - Purchase Order
+    - Service
+    - Software License
+    - Subscription
+    - Warranty
+- **Notifications**
+  - ServiceNow sends automatic **expiration notifications** at 90, 60, and 30 days before expiration and on the expiration date.
+  - Ensures contract administrators can renew, renegotiate, or end contracts in a timely manner.
+- **Lifecycle and States**
+  - **Contract States**:
+    - **Draft**: Information is added; user can edit fields freely
+    - **Active**: Approved, within valid dates; most fields become read-only
+    - **Expired**: End date has passed
+    - **Cancelled**: Contract is discontinued
+- **Terms and Conditions (T&Cs)**
+  - You can create multiple T&Cs records and associate them with the contract
+  - T&Cs changes over time are tracked in **Contract history**
+    - Shows modifications to contract start/end dates and T&Cs
+  - Related documents can be attached for reference
+  - **Contract Approval History**
+    - Tracks details of contract approvals
+    - **Enable**: System Administrator must activate **Log user approval activity**  
+      (**All > Workflow > Administration > Properties**)
+    - Stores approval details in the **Contract history** for audit and reference
+- **Adjusting a Contract**
+  - **Renew**: Moves to a new contract record (active upon approval); old contract references remain
+  - **Extend (Adjust)**: Keeps the contract record; updates the end date (and cost/terms if needed)
+  - **Adjust (Extend)** vs. **Renew**:
+    - Adjusting extends the existing contract’s end date (possibly changes cost)
+    - Renewing creates a new contract record referencing the old one (often has new terms or conditions)
+    - Conditions for both:
+      - State is Active or Expired
+      - Substate is None or Rejected
+  - **Cancel**: Sets state to **Cancelled**, halts any future activities, and inactivates related condition checkers and rate cards
+    - Condition: State is Active
+  - **Automated Flow**:
+    - A standard **Contract Renewal** flow is available (navigate to **All > Contracts > Contract Renewal**)
+    - Copies assets, T&Cs, rate cards from the old contract to the new one
+    - Maintains a history of the original contract data
+    - roles required: _asset_ or _contract_manager_
+- **Tracking Covered Assets**
+  - Important for leases, warranties, or maintenance contracts
+  - **Add covered assets** via the “Assets Covered” related list on the contract record
+  - Dates on the assets adjust to match changes to the contract’s end date
+  - For large asset sets, consider using an **Import Set** to associate assets in bulk
+
+#### SC: Contract Financials
+
+- **Contract Financials – Core Concept**
+  - Each contract has associated costs that can be tracked either at a **contract level** (on the Financial tab) or **individual expenses** using **rate cards**.
+  - Critical information for contract financials:
+    - Responsible cost center (e.g., IT cost center or another)
+    - Applicable taxes and rates (or tax exemption)
+    - Rate card association (if needed for expense line tracking)
+    - Payment terms (e.g., Net 30)
+    - Payment schedule and amounts
+- **Contract Rate Cards**
+  - **Purpose**: Break down contract expenses and apply them to different assets or users via **expense lines**.
+  - **Overrides** the contract’s Financial section for a more detailed expense breakdown.
+  - Multiple rate cards can be associated with the same contract.
+  - **Adding covered assets**: Similar to adding covered assets on a contract, but do it under the **rate card’s Assets Covered** list, specifying the coverage dates.
+  - **Cost Management plugin** must be activated to use rate cards.
+    - included when installing HAM
+- **Contract Expense Lines**
+  - **What they are**:
+    - Detailed, recurring expense records generated by rate cards or by the contract’s cost structure.
+    - They appear on both the contract and any associated asset records if the asset is attached to a rate card.
+  - **Generation**:
+    - The **Process FM Costs** scheduled job runs nightly (by default) to apply rate cards and produce expense lines.
+    - Adjust the schedule via **System Scheduler > Scheduled Jobs > Scheduled Jobs**, modifying **Process FM Costs**.
+    - Set the Next action date to a past time to run it immediately.
+
+#### SC: IT Cost Management
+
+- **Depreciation & Residual Value**
+  - **Depreciation**: The decrease in asset value over time (wear and tear, tech obsolescence), used as a tax deduction in some countries.
+  - **Residual Value**: The asset’s current estimated worth after depreciation is subtracted from its original cost.
+  - Only **hardware assets** depreciate; software is **amortized**.
+  - ServiceNow computes depreciation nightly once you set:
+    - Depreciation schedule (e.g., Straight line or Double-declining balance)
+    - Depreciation effective date (defaulted to the asset’s In Use date)
+  - **Straight line (SL)**: Depreciates the same amount each period.
+  - **Double-declining balance (DDB)**: Uses twice the **straight line percentage** each year, applied to the **current residual value**.
+    - Example: If the straight line rate is ~33% per year over 3 years, DDB uses ~66% each year but calculates it against whatever the asset’s residual value is at the start of that year.
+- **Fixed Assets**
+  - Typically larger or long-term investments (land, buildings, vehicles, machinery, computers, etc.).
+  - Many IT assets can be considered **fixed assets** for favorable tax treatment.
+  - In ServiceNow, multiple smaller IT assets can be grouped under a single fixed asset number; each asset tracks its own depreciation schedule.
+  - Depreciation calculations (and residual value updates) run nightly or on demand for accurate finance data.
+- **Total Cost of Ownership (TCO)**
+  - Combines **original cost** (purchase, delivery, storage) with **operational expense** (maintenance, repairs, resource labor, disposal).
+  - TCO often exceeds the initial purchase cost (e.g., hardware purchase is ~30% of total).
+  - **TCO Dashboard** (in Hardware Asset Workspace):
+    - Lets asset managers capture and report on all costs (procurement, repairs, maintenance, disposal).
+    - Rate cards for tasks/time tracking help attribute labor costs.
+    - Benchmark costs against similar assets or models.
+    - Used for strategic planning and decision-making.
