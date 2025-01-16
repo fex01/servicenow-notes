@@ -43,14 +43,14 @@
     - see [Windows probes and permissions](https://www.servicenow.com/docs/bundle/xanadu-it-operations-management/page/product/discovery/reference/r_DiscoWinProbesAndPermissions.html)
     - can be broken when Kerberos is used (disallows file-share access via IP instead of host name)
     - Workaround: use WinRM instead of WIM for Windows Discovery
-    - [source]( https://support.servicenow.com/kb?id=kb_article_view&sysparm_article=KB0753041)
+    - [source](https://support.servicenow.com/kb?id=kb_article_view&sysparm_article=KB0753041)
   - Domain Controller: require account with Domain Admin permissions, not just local Admin permissions
   - [Hyper-V](./sn-discovery-hyper-v.md/#configuration-requirements): requires account with Domain Admin permissions, not just local Admin permissions
 - SSH:
   - Unix/Linux
   - support for SSH password and Private Key
   - at least sudo read permissions
-- [SNMP](https://www.servicenow.com/docs/bundle/xanadu-platform-security/page/product/credentials/concept/c_SNMPCredentials.html): 
+- [SNMP](https://www.servicenow.com/docs/bundle/xanadu-platform-security/page/product/credentials/concept/c_SNMPCredentials.html):
   - router, switch, printer
   - SNMP v2 and v3
     - v2: can be read only (community string)
@@ -102,6 +102,35 @@
       - Note: Some parameters require restarting the MID Server to take effect.
     - **Run Discovery**:
       - Create and run a **Discovery schedule** to identify Windows devices on the network.
+
+## Delta Content
+
+### Xanadu
+
+- **ITOM Content Service**
+  - Uses AI-based classifiers to identify and deliver new CIs each week, ensuring rapid updates in the CMDB.
+  - Classifies running processes and SNMP System OIDs, allowing you to discover more products at scale.
+  - Identifies and excludes irrelevant processes from being promoted to CIs.
+  - Offers wide visibility, managed through the Discovery Admin Workspace.
+- **Configuring `cmdb_ci_linux_server` Creation for Kubernetes Nodes**
+  - By default, the Cloud Native Operations (CNO) Informer creates a `cmdb_ci_linux_server` CI for each Kubernetes node.
+  - To disable this:
+    - **Helm Chart**: `--set createServerCi=false`
+    - **k8s_informer.yaml**: `CREATE_SERVER_CI=false`
+- **Discovery Admin Workspace (1.2.5)**
+  - **Purpose**: A central location to discover applications, manage AI-suggested fingerprints, create or modify CIs, and monitor Discovery tasks.
+  - **Key Features**:
+    - **AI-Suggested Application Fingerprints**:
+      - Suggests applications based on detected processes.
+      - Enables viewing and modifying pattern names, CMDB classes, process samples, and related servers.
+      - Allows adding or removing suggestions before the next Discovery run.
+    - **Visualization & Diagnostics**:
+      - Provides data insights to track discovery progress and troubleshoot issues.
+    - **Access & Roles**:
+      - `admin` and `discovery_admin` roles have workspace access.
+    - **ECC Queue Load**:
+      - Displays the number of discovery tasks in the ECC queue.
+      - Helps detect potential discovery disruptions when queue spikes occur.
 
 ## Courses
 

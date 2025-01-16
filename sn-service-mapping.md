@@ -680,6 +680,50 @@ Back to [SNow ITOM](./sn-itom.md)
           - Related Links > Recalculate Service
           - _View Map_
 
+## Delta Content
+
+### Xanadu
+
+- **Upgrading to Xanadu**
+  - Install **Service Mapping Plus version 1.13.0** from the ServiceNow® Store for improved Service Mapping.
+  - Install the **App Service Extension** app to further enhance application service mapping (especially for Service Mapping Plus customers).
+  - **Discovery and Service Mapping Patterns** are available in the ServiceNow Store (see "Activation information" in the release notes).
+- **ITOM Visibility Enhancements**
+  - **Discovery Admin Workspace**:
+    - Unified location to configure Discovery, track progress, manage errors, and leverage diagnostic tools.
+    - Home: View discovery trends, tasks, and access relevant ITOM Visibility apps.
+    - Schedules: Gain insights into discovery performance.
+    - Diagnostics: Troubleshoot discovery errors.
+    - Insights: Access reports to optimize discovery operations.
+  - **Data Enrichment**:
+    - Expand discovered data in the CMDB using ITOM Content Service.
+    - Create application services using CMDB-based mapping.
+  - **Kubernetes Integration**:
+    - Upgrade and configure Informer pods from the ServiceNow instance (no direct Kubernetes admin dependency).
+    - Use OAuth2.0 authorization for enhanced security.
+  - **MID Server Enhancements**:
+    - Run other applications without storing credentials on the instance (Microsoft Azure Key Vault).
+    - Log file compression available (disabled by default).
+  - **CMDB-Based Mapping**:
+    - Use Automated Service Suggestions and existing CMDB data (no MID Server needed) to create new application services.
+  - **Cloud Native Operations (CNO) for Visibility**:
+    - From version 3.6.3, upgrade the CNO Informer directly from the instance.
+    - Control Informer execution parameters from the instance.
+    - Store instance credentials in Microsoft Azure Vault (when using AKS).
+- **Key Changes in This Release**
+  - **Shazzam Probe Enhancements**:
+    - Collect expanded data from devices.
+    - View extended Shazzam data in Discovery Admin Workspace (Insights tab).
+  - **Service Mapping Roles**:
+    - `service_mapping_admin` replaces `sm_admin`.
+    - `service_mapping_user` replaces `sm_user`.
+    - Updated roles improve visibility into ML-powered candidate suggestions.
+  - **New/Updated Discovery & Service Mapping Patterns**:
+    - Discover Dell EMC Data Domain storage and Dell EMC PowerMax storage.
+    - New pattern extensions: Pure Storage FlashArray, Azure SQL license information.
+  - **Integration with Agent Client Collector**:
+    - Top-down Service Mapping supports Automated Service Suggestions using Agent Client Collector.
+
 ## Courses
 
 ### Service Mapping Advanced
