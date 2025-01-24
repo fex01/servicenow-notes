@@ -25,6 +25,26 @@
 
 ## Topics
 
+### Assigned To Discovery
+
+- resources
+  - [docs: Populating Assigned To attribute in Computer CI for ACC-V](https://www.servicenow.com/docs/bundle/xanadu-it-operations-management/page/product/agent-client-collector/task/fetching-logged-in-user-information-for-acc-v.html)
+- automatically populate Assigned to for Windows endpoint devices and macOS devices by setting the following system properties
+  - `sn_acc_vis_content.set_assigned_to`
+  - `sn_acc_vis_content.assigned_to_user_order`
+- requires:
+  - local credentials with "Log on As Local System User" instead of default ServiceNow service user
+    - executed commands on Windows:
+      - `wmic COMPUTERSYSTEM GET USERNAME`
+      - `From osquery: SELECT l.user FROM logged_in_users l JOIN users u ON l.sid = u.uuid WHERE u.type != 'special'`
+    - executed commands on macOS: `SELECT distinct(l.user) FROM logged_in_users l JOIN users u ON l.user = u.username`
+- identified user name is matched against sys_user table
+  - matched user names can be pre-filtered with sys property `sn_acc_vis_content.assigned_to_user_order`
+- priority:
+  - by default, if Assigned To is not empty, it will not be overwritten
+  - sys property `sn_acc_vis_content.set_assigned_to` can be set to `true` to overwrite the Assigned To field
+    - define reconciliation rules to set priorities
+
 ### DF: Agent Client Collector for Visibility (ACC-V)
 
 - installation

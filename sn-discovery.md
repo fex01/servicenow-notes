@@ -107,6 +107,7 @@
 
 ### Xanadu
 
+- [Delta Exam Study Guide](https://nowlearning.servicenow.com/lxp/en/credentials/certified-system-administrator-delta-exam-study-guide-vancouver?id=kb_article_view&sysparm_article=KB0012130)
 - **ITOM Content Service**
   - Uses AI-based classifiers to identify and deliver new CIs each week, ensuring rapid updates in the CMDB.
   - Classifies running processes and SNMP System OIDs, allowing you to discover more products at scale.

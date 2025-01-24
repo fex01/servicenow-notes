@@ -684,6 +684,8 @@ Back to [SNow ITOM](./sn-itom.md)
 
 ### Xanadu
 
+
+- [Delta Exam Study Guide](https://nowlearning.servicenow.com/lxp/en/credentials/certified-system-administrator-delta-exam-study-guide-vancouver?id=kb_article_view&sysparm_article=KB0012139)
 - **Upgrading to Xanadu**
   - Install **Service Mapping Plus version 1.13.0** from the ServiceNow® Store for improved Service Mapping.
   - Install the **App Service Extension** app to further enhance application service mapping (especially for Service Mapping Plus customers).

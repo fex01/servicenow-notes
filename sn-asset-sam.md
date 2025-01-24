@@ -29,6 +29,42 @@ back to [Asset Management](./sn-asset.md)
 
 - []
 
+## Delta Content
+
+### Xanadu
+
+- [Delta Exam Study Guide](https://nowlearning.servicenow.com/lxp/en/credentials/certified-system-administrator-delta-exam-study-guide-vancouver?id=kb_article_view&sysparm_article=KB0012141)
+- **Success Portal in Software Asset Workspace**  
+  - Track SAM progress with success goals, success activities, health checks, Value builder tasks, and maturity items.  
+  - Set up success goals to analyze license value and calculate savings.  
+  - Create success activities tied to goals for ongoing progress tracking.  
+  - Use health checks to review license, permission, and configuration statuses.  
+  - Review Value builder tasks to address software upgrades, publisher packs, and integrations.  
+  - Improve SAM maturity through Crawl, Walk, and Run stages; link maturity items to goals and tasks.  
+  - Notifications are sent for assigned goals/activities or when a goal is Pending Review.  
+  - Domain separation is supported when Performance Analytics – Domain Support is active.
+- **SaaS Detection Report**  
+  - Identifies and manages SaaS applications accessed through a browser and linked to Digital End-User Experience (DEX).  
+  - Helps address shadow IT usage by revealing user access and usage duration.  
+  - Requires SAM – SaaS License Management (v13.1.0+) and DEX (v2.1.0+).
+- **Adobe Cloud Integration**  
+  - Tracks subscriptions and compliance for Creative Cloud, Experience Cloud, and Document Cloud.  
+  - Only supports Adobe Creative Cloud for Enterprise plans.  
+  - Integrations use either JWT or OAuth Server to Server credentials.
+- **Publish a Specific Set of Software Products**  
+  - Focus on reporting licensable products relevant to your current SAM implementation phase.  
+  - Start small, then expand scope as needed.  
+  - Ensure the `com.snc.samp.manage.published.products` property is enabled.
+- **Software Asset Management for Red Hat Enterprise Linux (RHEL)**  
+  - Requires the Software Asset Management Professional for IBM plugin (`com.sn_samp_ibm`) and CMDB CI Class Models from the Store.  
+  - RHEL discovery relies on Discovery and Service Mapping Patterns from the Store.  
+  - Supports socket-pair and core-based licensing for RHEL.  
+  - Create entitlements manually or import via spreadsheet.
+- **Bring Your Own License (BYOL) to Public Cloud**  
+  - Leverage existing Microsoft (SQL Server, Windows Server) or Oracle (Database, WebLogic) on AWS, Azure, GCP.  
+  - Pay only for infrastructure costs.  
+  - Includes Oracle Database Standard/Enterprise and Oracle WebLogic Server editions.
+
 ## Topics
 
 ### SAM Architecture
