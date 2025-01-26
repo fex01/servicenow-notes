@@ -17,6 +17,10 @@ back to [Asset Management](./sn-asset.md)
 
 ### Links
 
+- helper links:
+  - [community: Generating and Printing Barcodes for Single and Bulk Assets](https://www.servicenow.com/community/cmdb-forum/generating-and-printing-barcodes-for-single-and-bulk-assets/m-p/3131824/thread-id/13825)
+    - [blog: Barcode or QR codes generation in ServiceNow](https://servicenowwithrunjay.com/barcode-or-qr-codes-generation-in-servicenow/#:~:text=Printing%20barcodes%20or%20QR%20codes,generate%20Barcode%20or%20QR%20code.)
+  - [KB1216637 Auto-generating Asset Tags](https://support.servicenow.com/kb?id=kb_article_view&sysparm_article=KB1216637)
 - Non-ServiceNow ITAM Resources:
   - **International Organization for Standardization (ISO)**
     - Largest developer of voluntary international standards
