@@ -11,7 +11,7 @@ back to [Asset Management](./sn-asset.md)
 ### Courses
 
 - [x] [Hardware Asset Management (HAM) Fundamentals On Demand (Washington)](https://nowlearning.servicenow.com/lxp/en/it-asset-management/hardware-asset-management-ham-fundamentals-on-demand?id=learning_course_prev&course_id=944ea00847908654db63fb25126d4320)
-- [ ] Hardware Asset Simulator
+- [x] Hardware Asset Simulator
 - [ ] Hardware Asset Workspace Overview
 - [ ] Mobile Hardware Asset Management Fundamentals
 
@@ -1550,12 +1550,15 @@ Check also [Lab 1](#l1-a-validate-plugins) for plugin validation.
    - **Configuration Manager**: Manages CI classes and health guidelines.
    - **Other Personas**: IT Finance Manager, IT Procurement Manager, IT Contract Manager, IT Vendor Manager.
 2. **Roles**:
+   - **ham_admin**: Manages HAM advanced features (requires HAM plugin).
+     - includes: inventory_admin, catalog_manager, report_user, sn_hamp.ham_user, asset, procurement_admin
+   - **sn_hamp.ham_user**
+     - includes: asset
    - **asset**: Manages assets and records.
+     - includes: category_manager, contract_manager, financial_mgmt_user, inventory_user, procurement_user
    - **catalog_admin**: Manages the service catalog.
    - **discovery_admin**: Configures and executes Discovery.
    - **flow_operator**: Views flow execution details and logs.
-   - **ham_admin**: Manages HAM advanced features (requires HAM plugin).
-   - **inventory_admin**: Manages stockrooms, rules, and stock information.
    - **itil**: Handles incident, problem, and change management tasks.
    - **procurement_user**: Manages purchase orders and transfer orders.
 
