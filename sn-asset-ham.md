@@ -1552,7 +1552,7 @@ Check also [Lab 1](#l1-a-validate-plugins) for plugin validation.
 2. **Roles**:
    - **ham_admin**: Manages HAM advanced features (requires HAM plugin).
      - includes: inventory_admin, catalog_manager, report_user, sn_hamp.ham_user, asset, procurement_admin
-   - **sn_hamp.ham_user**
+   - **sn_hamp.ham_user** Manages hardware assets.
      - includes: asset
    - **asset**: Manages assets and records.
      - includes: category_manager, contract_manager, financial_mgmt_user, inventory_user, procurement_user
