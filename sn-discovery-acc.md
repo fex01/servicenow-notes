@@ -39,7 +39,8 @@
       - `From osquery: SELECT l.user FROM logged_in_users l JOIN users u ON l.sid = u.uuid WHERE u.type != 'special'`
     - executed commands on macOS: `SELECT distinct(l.user) FROM logged_in_users l JOIN users u ON l.user = u.username`
 - identified user name is matched against sys_user table
-  - matched user names can be pre-filtered with sys property `sn_acc_vis_content.assigned_to_user_order`
+  - identified user names can be prioritized with sys property `sn_acc_vis_content.assigned_to_user_order`
+    - default: `computer_system_username,logged_in_users`
 - priority:
   - by default, if Assigned To is not empty, it will not be overwritten
   - sys property `sn_acc_vis_content.set_assigned_to` can be set to `true` to overwrite the Assigned To field
