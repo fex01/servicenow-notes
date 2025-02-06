@@ -43,1251 +43,6 @@ back to [Asset Management](./sn-asset.md)
     - Incorporates IT asset management practices
     - [Website](https://www.bsigroup.com/en-GB/iso-20000-it-service-management/)
 
-### Labs
-
-#### L1:Prepare the Asset Management Environment (W)
-
-- [lab steps](https://nowlearning.servicenow.com/sys_attachment.do?sys_id=4f92791b974a0e54524eb3cf9153af67)
-
-##### L1: Objective
-
-1. Validate that ITSM Asset Management and Hardware Asset Management (HAM) functionality are installed and activated.
-2. Grant appropriate access to the asset manager for these applications.
-3. Download supporting files for future labs.
-
-##### L1-A: Validate Plugins
-
-1. Log in as the System Administrator
-2. Navigate to **System Definition > Plugins**. Switch to **Classic Application Manager** if prompted.
-3. Verify the following plugins are installed:
-   - Asset Management, Asset Management Workspace, Contract Management, Cost Management, Data Certification, Extended CMDB, Hardware Asset Management, Managed Documents, My Assets, Procurement.
-   - Install and activate any missing plugins (optionally include demo data).
-
-##### L1-B: Create a User Account
-
-1. Navigate to **User Administration > Users** and create a new user with the following details:
-   - User ID: hamm.dalorian
-   - First Name: Hamm
-   - Last Name: Dalorian
-   - Title: Asset Manager
-   - Email: `hamm.dalorian@example.com`
-   - Time Zone: US/Pacific (optional).
-2. Save the user record.
-
-##### L1-C: Add User to a New Group
-
-1. On Hamm’s user record, navigate to the **Groups** section and select **New**.
-2. Create and save a group named **Asset Managers**.
-3. Verify Hamm appears in the **Group Members** related list.
-
-##### L1-D: Add Roles to the Group
-
-1. Navigate to the **Roles** section of the **Asset Managers** group and select **Edit**.
-2. Add the following roles to the group:
-   - `asset`, `catalog_admin`, `discovery_admin`, `financial_mgmt_admin`, `flow_designer`, `ham_admin`, `inventory_admin`, `itil`, `procurement_user`.
-3. Save the changes.
-
-##### L1-E: Add User to Another Group
-
-1. On Hamm’s user record, under the **Groups** section, select **Edit**.
-2. Add **Field Services** to the group list.
-3. Verify both **Asset Managers** and **Field Services** groups are listed.
-
-##### L1-F: Verify Actions
-
-1. Impersonate Hamm Dalorian through the **User Menu**.
-2. Verify the following are available in the application navigator:
-   - Asset Management
-   - Hardware Asset Dashboard
-   - Hardware Model Normalization
-3. End impersonation.
-
-##### L1-G: Download Supporting Files
-
-1. Navigate to **Self-Service > Knowledge** as the System Administrator.
-2. Open the **Class knowledge base** and download the SupportingFiles.zip.
-3. Save and unzip the file in an easily accessible location.
-
-#### L2: Manage hardware assets
-
-- [lab steps](https://nowlearning.servicenow.com/sys_attachment.do?sys_id=91157d5b978a0e54524eb3cf9153af20)
-
-##### L2: Objective
-
-1. Create a hardware asset manually.
-2. Create a new model category and hardware model.
-3. Create a new bundled model and asset bundle.
-
-##### L2-A: Add Asset
-
-1. Impersonate Hamm Dalorian.
-2. Navigate to **Asset > Portfolios > All Assets**. Add this to your Favorites by selecting the star icon if desired.
-3. Select **New**, and when prompted, select **Hardware**.
-4. In the form:
-   - **Model category:** Computer
-   - **Model:** Dell Inc. Alienware M17x
-   - **Asset tag:** DELL0123456
-   - **Assigned to:** Beth Anglin
-   - **Serial number:** DELLM17X-000
-5. Save the asset record.
-
-##### L2-B: Create a New Model Category
-
-1. Navigate to **Product Catalog > Product Models > Model Categories**.
-2. Select **New**, and complete the form:
-   - **Name:** Handheld Device
-   - **Asset class:** Hardware [alm_hardware]
-3. Submit the record.
-
-##### L2-C: Create a New Hardware Model
-
-1. Navigate to **Product Catalog > Product Models > Hardware Models**.
-2. Select **New**, and complete the form:
-   - **Manufacturer:** Creative Labs
-   - **Name:** Scanner CL1000
-   - **Short description:** Warehouse inventory scanner
-   - **Model categories:** Handheld Device
-   - **Model number:** CL1000
-   - **Cost:** $100.00
-3. Save the record.
-4. Create a hardware asset using the new model:
-   - **Model category:** Handheld Device
-   - **Model:** Creative Labs Scanner CL1000
-   - **Asset tag:** CLS123456
-   - **State:** In stock
-   - **Stockroom:** Southern California Warehouse
-   - **Serial number:** CLSCN1000-001
-5. Submit the record.
-
-##### L2-D: Create a New Bundled Model
-
-1. Navigate to **Product Catalog > Product Models > Bundled Models**.
-2. Select **New**, and check flag **Bundle assets**.
-   - flag sets state to `Build` and model category to `Bundle`
-3. Complete the form:
-   - **Name:** Support Agent Bundle
-   - **Short description:** Standard support agent bundle
-   - **Model number:** SUPAGTBUNDLE
-4. Save the record.
-5. Add components to the bundle:
-   - Navigate to the **Model Components** tab and add the following components:
-     - **Computer:** Hewlett-Packard HP Compaq dc7700p Ultra-slim Desktop
-       - set **Is main component** to true
-     - **Monitor:** Samsung SyncMaster 27" 3D LED LCD Monitor
-     - **Consumable:** Logitech Logitech Desktop Keyboard
-     - **Consumable:** Logitech Logitech Desktop Optical Wireless Mouse
-     - **Printer:** Canon imageCLASS Laser Printer
-6. Change the **Status** to In Production and save the bundled model.
-
-##### L2-E: Create an Asset Bundle
-
-1. Navigate to **Asset > Portfolios > Bundled Assets**.
-2. Select **New**, and complete the form:
-   - **Model:** Support Agent Bundle
-   - **Asset tag:** BUN0006
-   - **Stockroom:** Southern California Warehouse
-3. Save the record.
-4. Select **Auto-select assets** to automatically add available components to the bundle.
-5. Change the **State** to In Stock and save.
-
-#### L2.2: Hardware Model Normalization
-
-- [lab steps](https://nowlearning.servicenow.com/sys_attachment.do?sys_id=6ff6b5d397ca0e54524eb3cf9153af3a)
-
-##### L2.2: Objective
-
-1. Establish Content Service participation.
-2. Exclude a hardware model from Content Service participation.
-3. Validate hardware model Content Service download.
-4. Normalize an unnormalized hardware model.
-
-##### L2.2-A: Opt-in to Content Service
-
-1. Impersonate Hamm Dalorian.
-2. Navigate to **Asset > Hardware Model Normalization > Content Service Setup**.
-3. Select the **Opt-In Agreement** link, read the details, and select **Done**.
-4. Check **Yes, I have read and accept the Opt-In Agreement**.
-5. Select **Opt-In**.
-6. Expand each **HARDWARE ASSET DATA** section to review the details sent to ServiceNow.
-
-##### L2.2-B: Exclude a Hardware Model from Content Service
-
-1. Navigate to **Product Catalog > Product Models > Hardware Models**.
-2. Open the **Gamer Supreme** hardware model.
-3. Select the **Normalization** tab and check **Exclude from content service**.
-4. Select **Update**.
-
-##### L2.2-C: Opt-in to License Resource Categories
-
-1. Navigate to **Asset > Hardware Model Normalization > HAM Resource Categories**.
-2. Open the **Network Gear** resource category and review associated model categories.
-3. Select **Opt out**, confirm in the popup, and verify the **Opt in** checkbox is deselected.
-4. Return to the list of HAM Resource Categories and confirm the **Network Gear** category is marked as false in the **Opt in** column.
-5. Opt back into the **Network Gear** category, ensuring all categories are set to **true**.
-
-##### L2.2-D: Validate Hardware Model Content Service Download
-
-1. Navigate to **Asset > Hardware Model Normalization > Overview**.
-2. Review the **Hardware Model Content Service Download** section for:
-   - Days until the next content library download.
-   - Days since the last content library download.
-
-##### L2.2-E: Review Fully Normalized Hardware Model
-
-1. Navigate to **Product Catalog > Product Models > Hardware Models**.
-2. Select the **Personalize List** gear icon and add **Normalization status** to the displayed columns.
-3. Open the **Macbook Pro 15** hardware model with a normalization status of **Normalized**. (e.g., Model number MR962LL/A)
-4. Review the **General** tab for the display name and other normalized data.
-5. Open the **Compaq Evo Notebook PC** (n610c) model and review its **Hardware Model Lifecycles** tab for lifecycle data provided by the Content Service.
-
-##### L2.2-F: Normalize an Unnormalized Hardware Model
-
-1. Navigate to **Product Catalog > Product Models > Hardware Models** and select **New**.
-2. Enter the following details:
-   - **Manufacturer:** `Dell Inc.`
-   - **Name:** junk text
-3. Save the record and review the **Normalization** tab.
-4. Update the **Model number** to **PS6000X** and save again.
-5. Review the updated **Normalization** tab for changes.
-
-#### L2.3: Asset and Configuration Item (CI) Relationships
-
-- [lab steps](https://nowlearning.servicenow.com/sys_attachment.do?sys_id=c655a12397468294524eb3cf9153af73)
-
-##### L2.3: Objective
-
-1. Create a configuration item (CI).
-2. Synchronize CI and asset.
-
-##### L2.3-A: Create a Configuration Item and Associated Asset
-
-1. Impersonate Hamm Dalorian.
-2. Navigate to **Configuration > Base Items > Computers**.
-3. Select **New** and complete the form:
-   - **Name:** Serenity
-   - **Asset tag:** DELL1234567
-   - **Manufacturer:** Dell Inc.
-   - **Serial number:** DELLM17X-001
-   - **Model ID:** Dell Inc. Alienware M17x
-   - **Assigned to:** Felipe Gould
-4. Save the record.
-
-To create the associated asset: 5. End impersonation 6. Navigate to **System Definition > Scheduled Jobs**. 7. Locate the job **Asset - Create asset delayed sync** and select **Execute Now**. 8. Re-impersonate Hamm Dalorian and return to **Configuration > Base Items > Computers**. 9. Open the record for **Serenity** and verify the **Asset** field is populated.
-
-##### L2.3-B: Define Model Asset Tracking Strategy
-
-1. Navigate to **Product Catalog > Product Models > Hardware Models**.
-2. Open the record for **MacBook Pro 17”**.
-3. Set **Asset tracking strategy** to **Don’t create assets** and save.
-4. Navigate to **Configuration > Base Items > Computers** and create a new record:
-   - **Name:** Enterprise
-   - **Manufacturer:** Apple
-   - **Serial number:** APPLMBP17-001
-   - **Model ID:** Apple MacBook Pro 17"
-   - **Assigned to:** Fred Luddy
-5. Save the record and verify the **Asset** field is not populated due to the tracking strategy.
-
-##### L2.3-C: Enforce CI Verification
-
-1. Navigate to **Product Catalog > Product Models > Model Categories**.
-2. Open the record for **Computer** and enable **Enforce CI Verification**. Save the changes.
-3. Navigate to **Configuration > Base Items > Computers** and create a new record:
-   - **Name:** Destiny
-   - **Manufacturer:** Dell Inc.
-   - **Serial number:** DELLM17X-002
-   - **Model ID:** Dell Inc. Alienware M17X
-   - **Assigned to:** Felipe Gould
-4. Save the record and add **DELL2345678** to the **Asset tag** field, save the changes
-5. End impersonation and execute the **Asset – Create asset delayed sync** job.
-6. Re-impersonate Hamm Dalorian, open the record for **Destiny**, and select **Create Asset**.
-7. Verify the asset record is created by confirming the **Asset** field is populated or by searching for **DELL2345678** under **Asset > Portfolios > Hardware Assets**.
-
-#### L3.1: Manage Consumables
-
-- [lab steps](https://nowlearning.servicenow.com/sys_attachment.do?sys_id=079da127974a8294524eb3cf9153af51)
-
-##### L3.1: Objective
-
-1. Create a consumable record and associate it with a new consumable model.
-2. Consume a consumable asset.
-
-##### L3.1-A: Create a Consumable Product Model
-
-1. Impersonate Hamm Dalorian.
-2. Navigate to **Product Catalog > Product Models > Consumable Models**.
-3. Select **New** and complete the form:
-   - **Manufacturer:** Logitech
-   - **Name:** M510 wireless mouse
-   - **Short description:** Wireless computer mouse
-   - **Model categories:** Consumable
-   - **Model number:** M510
-   - **Cost:** $19.00
-4. Save the record.
-
-##### L3.1-B: Create a Consumable Asset Record
-
-1. Navigate to **Asset > Portfolios > Consumables**.
-2. Select **New** and complete the form:
-   - **Model category:** Consumable
-   - **Model:** Logitech M510 wireless mouse
-   - **Quantity:** 50
-   - **State:** In stock
-   - **Substate:** Available
-   - **Stockroom:** Southern California Warehouse
-3. Verify the cost is automatically calculated as $950.00 (50 units x $19 each).
-4. Save the record.
-
-##### L3.1-C: Consume a Consumable Asset
-
-1. On the created consumable asset record, select the **Consume** button.
-2. In the **User** field, select **Beth Anglin**.
-3. Select **OK** and verify the results:
-   - The quantity is updated to 49 (50 - 1 consumed = 49).
-   - The cost is updated to $931.00 ($950 - $19 for 1 consumed = $931).
-4. Save the record.
-
-##### L3.1: Lab Challenge: Validate Asset Assignment
-
-1. Impersonate Beth Anglin.
-2. Navigate to **Self-Service > My Assets**.
-3. Verify that one Logitech M510 wireless mouse has been assigned.
-
-#### L3.2: Manage Stock
-
-- [lab steps](https://nowlearning.servicenow.com/sys_attachment.do?sys_id=c6ed21e7974a8294524eb3cf9153af45)
-
-##### L3.2: Objective
-
-1. Transfer assets out of a stockroom.
-2. Transfer assets into a stockroom.
-
-##### L3.2-A: Create a Transfer Order
-
-1. Impersonate Hamm Dalorian.
-2. Navigate to **Inventory > Transfer Orders > Create Transfer Order**.
-3. Complete the form:
-   - **From stockroom:** Southern California Warehouse
-   - **To stockroom:** San Diego South Warehouse
-4. Save the transfer order.
-5. In the **Transfer Order Lines** related list, select **New** and complete the form:
-   - **Model:** Logitech M510 wireless mouse
-   - **Quantity requested:** 20
-6. Submit the transfer order line.
-7. Create two additional transfer order lines for one Apple MacBook Pro 15" laptop each, selecting assets with a state of **In stock** and a substate of **Available**.
-8. Validate that there are three lines:
-
-   - One line for 20 Logitech M510 wireless mice.
-   - Two lines for Apple MacBook Pro 15" laptops.
-
-9. Open the **Transfer Order Line** for the Logitech mice and review the **Transfer Order Line Tasks** related list.
-10. Select **Close Task** to complete fulfillment and begin the asset transfer process.
-11. Repeat the process for the other transfer order lines for the laptops, ensuring their stages progress to **In Transit**.
-
-##### L3.2-B: Receive a Transfer Order
-
-1. Impersonate Luke Wilson.
-2. Navigate to **Inventory > Transfer Orders > Transfer Orders** and open the created transfer order.
-3. Open the **Transfer Order Line** for the Logitech mice and review it.
-4. Open the **Open Transfer Order Line Task** and:
-   - Enter **Quantity received:** 10.
-   - Select **Close Task**.
-5. Repeat the process for the Apple MacBook Pro 15" laptops to mark them as received.
-6. Process the remaining 10 Logitech mice when they are delivered and mark them as received.
-
-##### L3.2: Verify Actions
-
-1. Navigate to **Inventory > Stock > Stockrooms**.
-2. Open **San Diego South Warehouse** and validate that 20 Logitech M510 wireless mice are in stock and available.
-
-##### Lab Challenge: Consume a Consumable
-
-1. Consume one Logitech M510 wireless mouse from the San Diego South Warehouse.
-2. Assign it to **Alejandro Mascall** and validate that the mouse appears in Alejandro’s assigned assets.
-
-#### L3.3: Import Assets
-
-- [lab steps](https://nowlearning.servicenow.com/sys_attachment.do?sys_id=312ee16b974a8294524eb3cf9153af41)
-
-##### L3.3: Objective
-
-1. Load hardware asset data.
-2. Transform hardware asset data into ServiceNow tables.
-3. Import hardware asset data via the advanced shipment notification (ASN) template.
-
-##### L3.3-A: Load Asset Data
-
-1. use the **System Administrator** account
-2. Navigate to **System Import Sets > Load Data**.
-3. Select **Create table**, and add a **Label:** Asset Import.
-4. Under **Source of the import**, select **File**, and upload `3.3-assets_for_import.xls`.
-5. Submit the import.
-
-##### L3.3-B: Create Transform Maps
-
-1. Define the **Hardware Model Import Map**:
-   - Next steps: Create transform map
-     - **Name**: Hardware Model Import Map
-     - **Target table:** Hardware Model [cmdb_hardware_product_model].
-     - Save the map.
-     - Use **Auto Map Matching Fields**
-     - Use **Mapping Assist** to configure mappings for:
-       - **Source field:** model_name → **Target field:** Name
-       - Save
-     - set **Coalesce** to true for: u_model_name, manufacturer
-     - Update
-2. Define the **Asset Import Map**:
-   - Next steps: Create transform map
-     - **Name**: Asset Import Map
-     - **Target table:** Hardware [alm_hardware].
-     - Use **Auto Map Matching Fields**
-     - set **Coalesce** to true for: u_asset_tag
-     - adapt date format for `u_warranty_expiration` by opening the record and clicking Suggestion behind the date format field
-       - format: `yyyy-MM-dd`
-     - create two new mappings:
-       - **Source field:** model_name → **Target field:** Model (**Choice action:** reject, **Reference value**: name).
-       - **Source field:** category → **Target field:** Model category (**Choice action:** reject).
-     - Save.
-
-##### L3.3-C: Transform Data
-
-1. Stay on the Asset Import Map record and select **Transform**.
-2. Move both maps to **Selected maps** and arrange them:
-   - Run **Hardware Model Import Map** first.
-   - Run **Asset Import Map** second.
-3. Execute the transform and verify the import:
-   - Navigate to **Asset > Portfolios > Hardware Assets**.
-   - Confirm `A71001` imported data matches the spreadsheet.
-
-##### L3.3-D: Update Asset Data
-
-1. Navigate to **System Import Sets > Load Data**.
-2. Select **Existing table:** Asset Import [u_asset_import].
-3. Upload `3.3-assets_for_update.xls` and submit.
-4. Transform the data using the maps in the correct order (Hardware Model Import Map, Asset Import Map)
-5. Verify updates to assets, such as **State**, **Substate**, and **Assigned to**.
-   - A71008, A71022
-
-##### L3.3-E: Import Advanced Shipment Notification (ASN) Data
-
-1. Add a new shipping carrier:
-   - Navigate to **sn_itam_common_shipping_carrier.list** and select **New**.
-   - **Name:** FedEx, **Email:** `fedex@example.com`, **Status:** Active.
-2. Navigate to **Procurement > Orders > Import Shipment Notifications**.
-3. Upload `3.3-sn_hamp_import_template.xlsx` and process the import.
-4. Verify the results in the **Import Set Runs** and **Import Set Rows** related lists.
-   - All > Procurement > Orders > Import Status
-   - **Import Set Rows**, one record shows comment `Shipping address is invalid;Ignored by s...`
-5. Correct any errors (e.g., invalid shipping address) and re-import as needed.
-
-##### L3.3: Verify Actions
-
-1. Navigate to **Asset > Portfolios > Hardware Assets**.
-2. Validate imported records, confirming their **State** as **In transit**.
-
-##### L3.3: Lab Challenge: Fix Errors in ASN Template
-
-1. Update the ASN template for Asset tag **AA0124** with a valid shipping address.
-2. Remove already imported rows and re-import the updated template.
-
-#### L3.4: Retire Assets
-
-- [lab steps](https://nowlearning.servicenow.com/sys_attachment.do?sys_id=f07e25eb974a8294524eb3cf9153af08)
-
-##### L3.4: Objective
-
-1. Create a retirement change workflow.
-2. Retire assets both manually and using a workflow.
-
-##### L3.4-A: Apply Update Set
-
-1. Impersonate the **System Administrator**.
-2. Navigate to **System Update Sets > Retrieved Update Sets**.
-3. Under **Related Links**, select **Import Update Set from XML**.
-4. Upload `3.4-Asset Retirement Workflow.xml` and select **Upload**.
-5. Select **Asset Retirement Workflow** and then **Preview Update Set**.
-6. After the preview completes, select **Commit Update Set**.
-7. Close the completion message.
-
-##### L3.4-B: Review Retirement Workflow
-
-1. Navigate to **Workflow > Workflow Editor**.
-2. Search for and open the **Retire Asset** workflow.
-3. Validate the following acceptance criteria:
-   - A change request is created to track the retirement process.
-   - Sequential tasks are created for:
-     - Backing up user files.
-     - Wiping the asset's drive.
-     - Removing entitlements and installations.
-     - Returning leased assets to the vendor or sending purchased assets to a disposal vendor.
-   - The asset's **State** changes to **Retired** and **Substate** updates to **Vendor Credit** (leased) or **Disposed** (purchased).
-   - The change request is closed after all tasks are completed.
-4. Close the workflow tab.
-
-##### L3.4-C: Retire an Asset Manually
-
-1. Impersonate Hamm Dalorian.
-2. Navigate to **Asset > Portfolios > Hardware Assets**.
-3. Open the asset with Asset tag **P1000228**.
-4. Update the **State** to **Retired** and **Substate** to **Disposed**.
-5. Select **Update**.
-
-##### L3.4-D: Use Retirement Workflow
-
-1. Navigate to **Asset > Portfolios > Hardware Assets**.
-2. Open the asset with Asset tag **P1000145**.
-3. Under **Related Links**, select **Retire Asset** to initiate the workflow.
-4. Review the newly created **Change Request** and its associated tasks.
-5. Complete each task sequentially:
-   - Close the backup task with a close note: "User files backed up."
-   - Close the wipe task with a close note: "Hard drive wiped."
-   - Close the disposal task with a close note: "Sent to disposal vendor."
-   - Close the certificate task with a note: "Certificate of disposal attached."
-6. Review the **Change Request**:
-   - Confirm its **State** is **Closed** with **Close notes**: "Asset retired successfully."
-7. Return to the asset record and verify its **State** as **Retired** and **Substate** as **Disposed**.
-
-##### L3.4: Lab Challenge - Validate Workflow for Leased Assets
-
-1. Open an "In use" asset (e.g., P1000056).
-2. Set its **Acquisition method** to **Lease** and save.
-3. Retire the asset using the workflow.
-4. Confirm the asset is returned to the vendor:
-   - **State:** Retired.
-   - **Substate:** Vendor Credit.
-
-#### L3.5: Validate Asset Lifecycle Automation
-
-- [lab steps](https://nowlearning.servicenow.com/sys_attachment.do?sys_id=17ae692f974a8294524eb3cf9153af15)
-
-##### L3.5: Objective
-
-1. Dispose of assets using the HAM Hardware Asset Disposal flow.
-2. Update associated CI and asset records via the automated process flow.
-3. Copy the Hardware Stock Order Flow for modification.
-4. Resolve customer incidents and update associated CI/asset records automatically.
-
-##### L3.5-A: Validate HAM Flows Availability
-
-1. Impersonate Hamm Dalorian.
-2. Navigate to **Process Automation > Flow Designer**.
-3. Verify the following HAM flows exist:
-   - Hardware Asset Disposal Flow
-   - Hardware Asset Reclamation Flow
-   - Hardware Asset Reclamation Line Flow
-   - Hardware Asset Refresh Flow
-   - Hardware Asset Refresh Line Flow
-   - Hardware Stock Order Flow
-   - Standard Hardware Asset Request
-4. (Optional) Open a flow (e.g., Hardware Asset Disposal) to view its logic.
-5. Close the Flow Designer tab.
-
-##### L3.5-B: Create Disposal Order
-
-1. Navigate to **Inventory > Disposal Orders > Create Disposal Order**.
-2. Complete the form:
-   - **Stockroom:** Southern California Warehouse
-   - **Assigned to:** Rob Woodbyrne
-3. Save the order.
-4. Add assets:
-   - Select the **Planned Assets** tab and click **Edit**.
-   - Move three assets with **State:** In stock and **Substate:** Pending disposal to the Planned Assets list.
-   - Save.
-   - Save the order.
-5. Process tasks:
-   - Navigate to the **Hardware Disposal Tasks** tab.
-   - Open the first task, **Verify Assets**, and confirm that all planned assets are listed.
-   - Select all assets on the list and choose **Actions on selected rows > Verify** to confirm their presence.
-   - Verify that the **Stage** of the assets is updated to **Verified**.
-   - Select **Close Task** to complete the verification.
-   - Save the updated disposal order.
-6. Schedule vendor pickup for the assets:
-   - Enter **Vendor:** IngramMicro, **Scheduled date:** Tomorrow, **Vendor order ID:** IM-5597, **Pickup contact:** Luke Skye, and **Pickup details:** Loading dock is slippery in winter.
-   - Close the task.
-   - Save the updated disposal order.
-7. Mark assets as **Departed** once the vendor picks them up.
-8. Confirm vendor receipt:
-   - Open the **Vendor Confirmation** task.
-   - Review the list of Planned Assets and verify their **State:** Retired and **Substate:** Pending disposal.
-   - Confirm vendor receipt and close the task.
-9. Provide disposal documentation:
-   - Open the **Disposal Documentation** task.
-   - From the **Certificate of disposal** dropdown, select **Yes**.
-   - Attach the file `3.5-Certificate_of_Disposal.txt` using the **Manage Attachments** icon.
-   - Mark all assets as **Disposed**:
-     - Select all assets on the **Planned Assets** list.
-     - Choose **Actions on selected rows > Dispose**.
-   - Verify that the final **State:** Retired and **Substate:** Disposed is updated for all assets.
-   - Close the task and save the disposal order.
-
-##### L3.5-C: Copy Hardware Stock Order Flow
-
-1. As System Administrator, navigate to **Process Automation > Flow Designer**.
-2. Open the **Hardware Stock Order Flow** and select **Copy flow** from the **More actions menu**.
-3. Name the new flow **Hardware Stock Order Flow – CloudD**.
-4. Select **Edit flow** and explore adding actions, flow logic, or subflows.
-5. Close the Flow Designer tab.
-
-##### L3.5-D: Resolve Hardware Incident and View Auto-Updates
-
-1. Impersonate Hamm Dalorian, create a test incident:
-   - Navigate to **Incident > Create New**.
-   - Complete the form:
-     - **Caller:** Florine Willardson
-     - **Category:** Hardware
-     - **Configuration Item:** MacBook Air 13"
-       - use search to find the one assigned to Florine Willardson
-     - **Short description:** Broken screen – can’t work.
-   - Save the incident.
-   - Add the following fields to the **Affected CIs** tab:
-     - Asset Action
-     - Swapped CI
-     - Updated
-2. Resolve the incident:
-   - Update **Asset Action** to **Swap** and **Swapped CI** to a new CI (e.g., Apple - MacBook Pro 15" for Technical Staff).
-     - use search to find an unassigned CI
-   - Enter **Resolution code:** Solution provided and **Resolution notes:** Swapped for new laptop.
-   - Resolve the incident and validate updates to the associated CI/asset records.
-
-##### L3.5-E: Configure Asset Lifecycle Category
-
-1. Impersonate Hamm Dalorian, navigate to **Self-Service > Service Catalog**.
-2. Add the **Asset Lifecycle** category:
-   - Select **Add content** and locate the **Asset Lifecycle** section.
-   - Select the desired location for the category and close the form.
-3. Verify the **Asset Lifecycle** card is added
-
-##### L3.5: Lab Verification - Asset Refresh Order
-
-1. Impersonate Hamm Dalorian, navigate to **Self-Service > Service Catalog**.
-2. Open the **Asset Lifecycle** card and select **Hardware Asset Refresh Order**.
-   - Type of refresh: Single model
-   - Replacement model: Lenovo ThinkPad T20 264744U
-3. Modify the **Filter Criteria** to include non-eligible assets:
-   - Set **Eligible for refresh** to **false**.
-   - Add a filter for **Model:** Hewlett-Packard HP EliteBook 2540p.
-4. Select **Run Filter** and confirm assets are listed in the **Available** list.
-5. Move 10 assets to the **Selected** list.
-6. Select **Order Now** to submit the request.
-7. Navigate to the **Requests** tab and verify the **Requested Items**:
-   - Confirm the requested 10 assets are listed under the variables section.
-   - Ensure the replacement model is **Lenovo ThinkPad T20 264744U**.
-
-#### L4.1: Report on Hardware Assets
-
-- [lab steps](https://nowlearning.servicenow.com/sys_attachment.do?sys_id=ee85bda7974e8294524eb3cf9153af73)
-
-##### L4.1: Objective
-
-1. Identify the quantity of assets by model.
-2. Identify total spend by vendor.
-3. Identify computers still under warranty.
-4. Navigate the Hardware Asset Dashboard.
-
-##### L4.1-A: Create a Bar Chart of Assets by Model
-
-1. Impersonate Hamm Dalorian.
-2. Navigate to **Asset > Portfolios > Hardware Assets**.
-3. Select the **Personalize List** gear icon and update columns to include:
-   - **Asset tag**, **Model category**, **Model**, **Assigned to**, **Company**, **State**, **Substate**, **Cost**, and **Configuration item**.
-4. Select **OK** to save changes.
-5. In the **Model category** column, right-click on **Computer** in any record and select **Show Matching**.
-6. Right-click the **Model** column header and select **Bar Chart**.
-7. In the **Create a report** designer panel:
-   - Rename the report to **Computer Assets by Model**.
-   - Save the report.
-
-##### L4.1-B: Report on Total Spend by Vendor
-
-1. Navigate to **Reports > View / Run**.
-2. Select **Create a report**.
-3. Configure the report:
-   - **Report name:** Vendor Spend
-   - **Source type:** Table
-   - **Table:** Hardware [alm_hardware]
-   - **Type:** Pivot table
-4. Under **Configure** options:
-   - Row: **Vendor**
-   - Column: **Model category**
-   - Aggregation: **Sum > Cost**
-5. Save the report and hover over data to analyze spend by vendor.
-
-##### L4.1-C: Report on Computers Still Under Warranty
-
-1. Navigate to **Reports > Create New**.
-2. Configure the report:
-   - **Report name:** Computers Still Under Warranty
-   - **Source type:** Table
-   - **Table:** Hardware [alm_hardware]
-   - **Type:** Pivot table
-3. Under **Configure** options:
-   - Row: **Model category**
-   - Column: **Warranty expiration**
-   - Aggregation: **Sum > Quantity**
-4. Open the **Condition Builder** and filter:
-   - **Model category:** is **Computer**
-   - **Warranty expiration:** after **Today**
-5. Save the report.
-
-##### L4.1-D: Navigate Hardware Asset Dashboard
-
-1. Navigate to **Asset > Hardware Asset Dashboard**.
-2. Explore the **Asset Health** tab to review:
-   - **Incomplete assets** (e.g., missing purchase information).
-   - **Assets with most incidents**.
-   - **Assets due for refresh**.
-   - **Undiscovered assets** within the last month.
-3. Navigate to the **Model Management** tab and analyze:
-   - Hardware and consumable models nearing **End of Life**.
-   - Normalization status and lifecycle overview for models.
-4. Explore additional tabs:
-   - **Procurement** for sourcing requests.
-   - **Inventory** for stock orders, open audits, and new hardware findings.
-   - **End of Life** for disposed assets and lifecycle status.
-
-#### L4.2: Manage Request and Procurement
-
-- [lab steps](https://nowlearning.servicenow.com/sys_attachment.do?sys_id=7306fdeb974e8294524eb3cf9153af07)
-
-##### L4.2: Objective
-
-1. Publish a hardware model to the service catalog.
-2. Request a hardware model from the service catalog.
-3. Source and receive a hardware model from a vendor.
-
-##### L4.2-A: Publish to Hardware Catalog
-
-1. Impersonate Hamm Dalorian.
-2. Navigate to **Product Catalog > Product Models > Hardware Models**.
-3. Open **Scanner CL1000**.
-4. On the **Product Catalog** tab, enter the description: _Wireless scanner used in warehouses and distribution facilities to manage inventory_.
-5. Save the changes.
-6. Under **Related Links**, select **Publish to Hardware Catalog**.
-7. In the **Publish to Hardware Catalog** popup, set the **Category** to **Hardware** and select **OK**.
-8. Navigate to **Self-Service > Service Catalog**, select **Hardware**, and confirm **Scanner CL1000** is listed with accurate information.
-
-##### L4.2-B: Create Vendor Catalog Items
-
-1. Navigate to **Product Catalog > Catalog Definitions > Vendor Items**.
-2. Select **New** and complete the form:
-   - **Vendor:** `Cloudward Inc`
-   - **Product Model:** `Creative Labs Scanner CL1000`
-   - **Product ID:** `CDW-CL1000`
-   - **List Price:** `$100`
-   - **Vendor Price:** `$90`
-   - **Product Catalog Item:** `Scanner CL1000`
-3. Save the record.
-4. Add a second vendor:
-   - Navigate to **Product Catalog > Catalog Definitions > Hardware & Software Items**.
-   - Open **Scanner CL1000**.
-   - In the **Vendor Catalog Items** related list, select **New** and complete the form:
-     - **Vendor:** `Amazon`
-     - **Product Model:** `Creative Labs Scanner CL1000`
-     - **Product ID:** `AMZ-CL1000`
-     - **List Price:** `$110`
-     - **Vendor Price:** `$105`
-   - Submit the record and confirm both vendor catalog items are listed.
-
-##### L4.2-C: Request Items from the Service Catalog
-
-1. Impersonate Luke Wilson.
-2. Navigate to **Self-Service > Service Catalog**, select **Hardware**, and open **Scanner CL1000**.
-3. Set **Quantity** to 2 and select **Order Now**.
-4. Take note of the **REQ number** for tracking.
-
-##### L4.2-D: Source the Request
-
-1. Impersonate Hamm Dalorian and navigate to **Procurement > Requests > Requests**.
-2. Open Luke Wilson's request.
-3. In the **Catalog Tasks** related list, open the task record and select **Source Request**.
-4. Review the available stock:
-   - Transfer one scanner from **Southern California Warehouse** to **San Diego South Warehouse**:
-     - Complete the **Transfer Order** form with the required stockroom details and submit.
-   - Purchase the second scanner:
-     - Select **Vendor:** Cloudward Inc ($90.00).
-     - Submit the purchase order.
-5. Confirm both a purchase order and a transfer order were created and are associated with the request.
-
-##### L4.2-E: Order the Item
-
-1. Impersonate Beth Anglin.
-2. Navigate to **Procurement > Orders > Purchase Orders**.
-3. Open the purchase order for the second scanner and select **Order**.
-
-##### L4.2-F: Create the Asset Before Delivery
-
-1. Impersonate Hamm Dalorian and return to **Procurement > Requests > Requests**.
-2. Open Luke Wilson's request and access the purchase order.
-3. Under **Related Links**, select **Create hardware assets prior to delivery**.
-4. In the **Assets** related list, enter an **Asset Tag** (e.g., HHD12345) and save the record.
-
-##### L4.2-G: Receive the Request
-
-1. On the purchase order, select **Receive**.
-2. If needed, capture **Asset Tag** and **Serial Number** information upon receipt.
-3. Submit the receipt and confirm:
-   - The purchase order status is now **Received**.
-   - The asset state is **In stock**, with a substate of **Available** and a cost of $90.
-
-##### L4.2-H: Lab Verification Steps
-
-1. Confirm the following actions were completed:
-   - **Scanner CL1000** is published to the service catalog and accurately listed.
-   - Vendor catalog items for **Cloudward Inc.** and **Amazon** are created.
-   - A request for 2 scanners is successfully placed by Luke Wilson.
-   - The request is sourced using a combination of stock transfer and vendor purchase.
-2. Verify the asset state for the received scanner:
-   - **State:** In stock.
-   - **Substate:** Available.
-   - **Cost:** Matches the vendor price ($90).
-3. Confirm all associated orders (purchase and transfer) are completed and listed under the request record.
-
-#### L4.3: Automate Stock Management
-
-- [lab steps](https://nowlearning.servicenow.com/sys_attachment.do?sys_id=b146fd6f974e8294524eb3cf9153affa)
-
-##### L4.3: Objective
-
-1. Replenish internal stock from a central warehouse.
-2. Replenish central warehouse stock from a vendor.
-3. Verify replenishment rules.
-4. Replenish stock using HAM bulk stock order.
-
-##### L4.3-A: Replenish Stock from a Stockroom
-
-1. Impersonate Hamm Dalorian.
-2. Navigate to **Inventory > Stock > Stock Rules** and click **New**.
-3. Complete the form:
-   - **Model**: `Acer Notebook Battery`
-   - **Stockroom**: `San Diego South Warehouse`
-   - **Threshold**: `3`
-   - **Restocking option**: `Stockroom`
-   - **Order size**: `5`
-   - **Parent stockroom**: `Southern California Warehouse`
-4. Click **Submit**.
-
-##### L4.3-B: Replenish Stock from a Vendor
-
-1. Navigate to **Inventory > Stock > Stock Rules** and click **New**.
-2. Complete the form:
-   - **Model**: `Acer Notebook Battery`
-   - **Stockroom**: `Southern California Warehouse`
-   - **Threshold**: `10`
-   - **Restocking option**: `Vendor`
-   - **Order size**: `20`
-3. Click **Submit**.
-4. Verify the stockroom manager:
-   - Navigate to **Inventory > Stockrooms**.
-   - Open the Southern California Warehouse stockroom.
-   - Update the **Manager** to `Rob Woodbyrne`.
-   - Click **Update**.
-
-##### L4.3-C: Verify Stock Rules Operate as Expected
-
-1. **Consume stock to trigger replenishment**:
-   - Navigate to **Inventory > Stockrooms** and open the `San Diego South Warehouse`.
-   - Under the **Consumables** tab, open the `Acer Notebook Battery` record.
-   - Consume one battery to drop the quantity below the threshold of `3`.
-   - Navigate back to the `Southern California Warehouse` stockroom.
-   - Under the **Consumables** tab, consume batteries to drop the quantity below the threshold of `10`.
-2. **Run the stock rule job manually**:
-   - Impersonate System Administrator and navigate to **System Scheduler > Scheduled Jobs > Scheduled Jobs**.
-   - Open `Stock Rule Runner` and set the **Next action** date to yesterday.
-   - Click the checkmark to save and then select **Update**.
-3. **Validate stock rules**:
-   - Impersonate Rob Woodbyrne and navigate to **Inventory > Transfer Orders > Transfer Orders**.
-   - Open the transfer order for `Acer Notebook Batteries` to confirm it was triggered by the first stock rule.
-   - Navigate to **Procurement > Requests > Requests** and locate the request triggered by the second stock rule for vendor replenishment.
-4. **Review the workflow**:
-   - Open the request triggered by the vendor replenishment stock rule.
-   - Under **Related Links**, select **Show Workflow**.
-   - Verify the workflow opened in a new tab, noting that the request is over `$1000` and has moved to the second-line approval step.
-   - Close the workflow tab.
-5. **Approve the request**:
-   - Impersonate Eric Schroeder.
-   - Navigate to **Procurement > Requests > Requests** and open the pending request from Rob Woodbyrne.
-   - Set the **Approval status** to `Approved`.
-   - Click **Update** to finalize the approval.
-
-##### L4.3-D: Replenish Stock Using HAM Bulk Stock Order
-
-1. Impersonate Rob Woodbyrne.
-2. Navigate to **Inventory > Stock > Submit Stock Order** and complete the form:
-   - **Model**: `Acer Notebook Battery`
-   - **Quantity**: `10`
-   - **Stockroom**: `Southern California Warehouse`
-   - Click **Order Now**.
-3. Navigate to **Procurement > Requests > Requests** and review the submitted request.
-4. Under **Related Links**, select **Show Workflow** to review the auto-generated workflow.
-
-##### L4.3-E: Replenish Stock from Service Catalog
-
-1. Navigate to **Self-Service > Service Catalog**.
-2. Select **Asset Lifecycle** and choose **Hardware Inventory Stock Order**.
-3. Complete the form:
-   - **Model**: `Acer Notebook Battery`
-   - **Quantity**: `5`
-   - **Stockroom**: `Southern California Warehouse`
-4. Click **Order Now**.
-5. Navigate to **Procurement > Requests > Requests** and confirm the submission.
-
-##### L4.3: Remarks
-
-- Related Link "Show Workflow" was not available during the lab. Maybe no longer available in newer instances?
-
-#### L4.4: Certify Data
-
-- [lab steps](https://nowlearning.servicenow.com/sys_attachment.do?sys_id=4686f563978e8294524eb3cf9153af7d)
-
-##### L4.4: Objective
-
-1. Configure a data certification user.
-2. Configure stockroom managers.
-3. Schedule monthly stockroom inventory.
-
-##### L4.4-A: Prepare to Use Certification
-
-1. Impersonate System Administrator.
-2. Navigate to **User Administration > Users** and click **New**.
-3. Complete the form:
-   - **User ID**: `data.manager`
-   - **First name**: `Data`
-   - **Last name**: `Manager`
-4. Save the record.
-5. Under the **Groups** tab, click **New** and set:
-   - **Name**: `Data Managers`
-6. Save the group.
-7. Under the **Roles** tab, click **Edit** and add:
-   - `certification_admin`
-8. Save the changes.
-
-##### L4.4-B: Configure Stockroom Managers
-
-1. Impersonate Hamm Dalorian.
-2. Navigate to **Inventory > Stock > Stockrooms**.
-3. Update the **Manager** for each stockroom:
-   - **San Diego Border – Pickup/Dropoff**: `Allyson Gillispie`
-   - **San Diego North – Pickup/Dropoff**: `Bertie Luby`
-   - **San Diego North Central – Pickup/Dropoff**: `Candice Bruckman`
-   - **San Diego South – Pickup/Dropoff**: `Dorthy Alexy`
-   - **San Diego South Central – Pickup/Dropoff**: `Enrique Oroark`
-   - **San Diego South Warehouse**: `Felipe Gould`
-   - **Santa Monica Warehouse**: `Aileen Mottern`
-   - **Southern California Warehouse**: `Rob Woodbyrne`
-
-##### L4.4-C: Create Data Certification Filter
-
-1. Impersonate Data Manager.
-2. Navigate to **Data Certification > Schedules > Certification Filters** and click **New**.
-3. Complete the form:
-   - **Name**: `In stock assets`
-   - **Description**: `Assets listed as In stock for monthly inventory`
-   - **Table**: `Asset [alm_asset]`
-   - **Filter condition**:
-     - `State | is | In stock`
-     - AND `Stockroom | is not empty`
-4. Click the **Update count refresh** button to update the matching record count.
-   - Double-Arrows above _Add Filter Condition_
-5. Submit the filter.
-
-##### L4.4-D: Define Certification Schedule
-
-1. Navigate to **Data Certification > Schedules > Create New**.
-2. Complete the form:
-   - **Name**: `Monthly Stockroom Inventory`
-   - **Filter**: `In stock assets`
-   - **Display fields**:
-     - `Model.Display name`
-     - `Model category`
-     - `Substate`
-   - **Certification fields**:
-     - `Asset tag`
-     - `Quantity`
-   - **Assignment type**: `User Field`
-   - **Assign to**: `Stockroom Manager`
-   - **Days to complete**: `3`
-   - **Task description**: `Monthly Stockroom Inventory`
-3. Save the record.
-4. Complete additional fields:
-   - **Run**: `Monthly`
-   - **Day (run_dayofmonth)**: `1`
-   - **Instructions**: `Validate that the actual stock in the stockroom matches what is listed in ServiceNow. Certify items that match and fail certification for those that do not.`
-5. Save the changes.
-6. Under **Related Links**, select **Preview Certification Tasks** and review the results.
-7. Click **Execute Now**.
-8. Navigate to **Data Certification > Schedules > Instances** and verify a new instance was created.
-
-##### L4.4-E: Verify a Certification Task
-
-1. Impersonate Rob Woodbyrne.
-2. Navigate to **Service Desk > My Work** and open the task for `Monthly Stockroom Inventory`.
-3. Sort the **Assets** list by **Display name** in ascending order.
-4. Identify discrepancies:
-   - Select the asset `3Com Cat 5 Cable (10ft)` and enter `Only 95` in the **Optional comment for checked elements** field.
-   - Click **Fail certification for checked elements** (red exclamation mark).
-5. Certify all correct elements:
-   - Select all remaining elements and click **Certify checked elements** (green check mark).
-   - Wait for the **Percentage complete** to update or manually save the form.
-6. Repeat as necessary to certify all remaining records.
-
-#### L5.1: Manage Contracts
-
-- [lab steps](https://nowlearning.servicenow.com/sys_attachment.do?sys_id=a1db3da39742c294524eb3cf9153aff1)
-
-##### L5.1: Objective
-
-1. Create a hardware lease contract.
-2. Associate hardware assets with the lease contract.
-3. Manage the hardware lease contract lifecycle.
-
-##### L5.1-A: Enter a New Contract
-
-1. Impersonate Hamm Dalorian.
-2. Navigate to **Contract > Contracts > Leases** and click **New**.
-3. Complete the form:
-   - **Vendor**: `Lenovo`
-   - **Contract number**: `LNVO-1001`
-   - **Start date**: `<the first day of this year>`
-   - **End date**: `<the last day of this year>`
-   - **Description**: `Lease for Lenovo end user computers`
-   - **Contract administrator**: `Hamm Dalorian`
-   - **Approver**: `Beth Anglin`
-4. Save the record.
-5. Under the **Financial** section, set:
-   - **Payment amount**: `$500.00`
-6. Update the record.
-
-##### L5.1-B: Add Terms and Conditions
-
-1. Navigate to **Contract > Contracts > Terms & Conditions** and click **New**.
-2. Create the first record:
-   - **Name**: `Lenovo Use of Equipment`
-   - **Description**: `USE OF EQUIPMENT: Lessee shall only use the Equipment in a careful and proper manner and will comply with all laws, rules, ordinances, statutes, and orders regarding the use, maintenance, and storage of the Equipment.`
-3. Submit the record.
-4. Create the second record:
-   - **Name**: `Lenovo Lease Maintenance`
-   - **Description**: `MAINTENANCE, DAMAGE, AND LOSS: Lessee will, at Lessee's sole expense, keep and maintain the Equipment clean and in good working order and repair during the Lease Term. If lost or damaged, Lessee shall pay replacement costs.`
-5. Submit the record.
-6. Return to **Contract > Contracts > Leases** and open the Lenovo contract.
-7. Under the **Terms and Conditions** tab:
-   - Insert `Lenovo Use of Equipment` with an order of `100`.
-   - Insert `Lenovo Lease Maintenance` with an order of `200`.
-8. Save the record.
-9. Under **Related Links**, select **Build Terms and Conditions**.
-
-##### L5.1-C: Add Covered Assets
-
-1. In the **Assets Covered** related list, click **Edit**.
-2. In the **Collection** field, search for `*Lenovo ThinkStation S20`.
-3. Select all displayed assets and move them to the **Assets Covered** list.
-4. Save the record.
-5. Verify that the **Date added** field for each asset is updated to today.
-
-##### L5.1-D: Approve and Adjust Contract
-
-1. In the contract record, select **Submit For Review**.
-2. Impersonate Beth Anglin.
-3. Navigate to **Contract > My Approvals**, sort by **Created** (descending), and open the Lenovo contract.
-4. Review the contract details and select **Approve**.
-5. Verify the contract is updated to:
-   - **State**: `Approved`
-   - **Substate**: `None`
-6. Re-impersonate Hamm Dalorian and open the Lenovo contract.
-7. Select **Adjust** and update:
-   - **Payment amount**: `$600.00`
-8. Submit the adjustments and update the record.
-
-##### L5.1-E: Extend Contract
-
-1. Impersonate Beth Anglin.
-2. Navigate to **Contract > Contracts > Leases** and open the Lenovo contract.
-3. Select **Adjust** and update:
-   - **End date**: `<30 June next year>`
-4. Submit the adjustments.
-5. Navigate to **Contract > My Approvals**, open the Lenovo contract, and verify:
-   - **State**: `Active`
-   - The adjustment is applied without additional approval.
-
-#### L5.2: Manage Contract Financials
-
-- [lab steps](https://nowlearning.servicenow.com/sys_attachment.do?sys_id=f50c71679742c294524eb3cf9153af87)
-
-##### L5.2: Objective
-
-1. Create contract rate cards.
-2. Process contract costs.
-
-##### L5.2-A: Add Contract Rate Cards
-
-1. Impersonate Hamm Dalorian.
-2. Navigate to **Contract > Contracts > Leases** and open the Lenovo lease contract created earlier.
-3. Under the **Contract Rate Cards** related list, select **New** and complete the form:
-   - **Name**: `Payment for Support Systems`
-   - **Short description**: `Monthly payment for support systems.`
-   - **Base cost** (Financial tab): `$100.00`
-   - **Distribute cost** (Financial tab): `Allocate and distribute cost per asset`
-4. Save the record.
-5. Under the **Assets Covered** related list, select **New** and:
-   - Use the magnifying glass to search for the asset `P1000235`.
-   - Set the **Date added** to the first day of the current year.
-   - Click **Submit**.
-6. Repeat step 5 for the asset `P1000236`.
-7. On the **Contract Rate Card** form, click the reference icon next to the **Contract** field and select **Open Record** to return to the contract.
-8. View the **Financial** tab to verify the **Total cost**.
-
-###### Challenge: Create Another Rate Card
-
-1. Create another rate card under the **Contract Rate Cards** related list:
-   - **Name**: `Payment for Development Systems`
-   - **Short description**: `Monthly lease payment for development systems.`
-   - **Base cost**: `$500.00`
-   - **Distribute cost**: `Allocate and distribute cost per asset`
-2. Add three more assets to this rate card, following steps 5 and 6, with the **Date added** set to the first day of the current year.
-3. View the **Financial** tab to verify the updated **Total cost** reflects both rate cards.
-
-##### L5.2-B: Process Costs
-
-1. Impersonate the System Administrator.
-2. Navigate to **System Scheduler > Scheduled Jobs > Scheduled Jobs**.
-   - **not** under System Definitions > Scheduled Jobs
-3. Open **Process FM Costs** and update the **Next action** date to day before yesterday
-4. Click **Update** to save the changes and return to the list of scheduled jobs.
-5. Wait for the job to complete. The **State** will be updated to `Ready` when processing is finished.
-6. Verify:
-   1. Impersonate Hamm Dalorian.
-   2. Navigate to **Contract > Contracts > Leases** and open the Lenovo lease contract.
-   3. In the **Assets Covered** related list, open the asset `P1000235 – Lenovo ThinkStation S20`.
-   4. View the **Expense Lines** tab to validate that at least one entry reflects the lease contract.
-
-#### L5.3: Calculate Depreciation
-
-- [lab steps](https://nowlearning.servicenow.com/sys_attachment.do?sys_id=244c3da79742c294524eb3cf9153af89)
-
-##### L5.3: Objective
-
-1. Calculate depreciation for hardware assets.
-2. Create custom depreciation schedules.
-3. Group assets as fixed assets and sum their residual values.
-
-##### L5.3-A: Run Depreciation
-
-1. Impersonate Hamm Dalorian.
-2. Navigate to **Asset > Portfolios > Hardware Assets**.
-3. Open the record for the asset with **Asset tag**: `AA0005`.
-4. Navigate to the **Depreciation** tab and complete the form:
-   - **Depreciation**: `SL 3 Years`
-   - **Depreciation effective date**: `<the first day of this year> 00:00:00`
-   - **Salvage value**: `$100.00`
-5. Save the record using the **Save** option under **Additional Actions**.
-6. Under **Related Links**, select **Calculate Depreciation**.
-7. Review the calculated values:
-   - **Residual date**, **Residual value**, and **Depreciated amount**.
-   - Note: Values vary depending on the day depreciation is run.
-8. Repeat steps 4–7 for the asset with **Asset tag**: `AA0007` using:
-   - **Depreciation**: `SL 1 Year`
-   - **Depreciation effective date**: `<the first day of this year> 00:00:00`
-   - **Salvage value**: `$100.00`
-9. Compare results to observe the faster depreciation rate for the 1-year schedule.
-
-##### L5.3-B: Create Custom Depreciation Schedules
-
-1. Navigate to **Cost > Depreciation**.
-2. Open the depreciation schedule **Straight Line | SL 3 Years**.
-3. Modify the schedule:
-   - **Name**: `SL 2 Years`
-   - **Script**: Replace the number `3` with `2`.
-   - Add a semicolon (`;`) at the end of the script for completeness.
-4. Use the **Insert** option under **Additional Actions** to save the new schedule.
-5. Open the depreciation schedule **Declining Balance | DDB 4 Years**.
-6. Modify the schedule:
-   - **Name**: `DDB 6 Years`
-   - **Script**: Replace the number `4` with `6`.
-   - Add a semicolon (`;`) at the end of the script for completeness.
-7. Use the **Insert** option to save the new schedule.
-
-##### L5.3-C: Create a Fixed Asset
-
-1. Navigate to **Cost > Fixed Assets** and click **New**.
-2. Complete the form:
-   - **Fixed Asset**: `Asus G Series Purchase`
-3. Save the record using the **Save** option.
-4. Under the **Covers Assets** related list, click **Edit**.
-5. Filter assets:
-   - **Model**: `Asus G Series`
-6. Select **Run Filter** and move all matching assets to the **Selected** list.
-7. Save the changes.
-8. Under **Related Links**, select **Sum Residual Value** to calculate the total residual value for the grouped assets.
-
-#### L5.4: Identify Total Cost of Ownership
-
-- [lab steps](https://nowlearning.servicenow.com/sys_attachment.do?sys_id=a87cb92b9742c294524eb3cf9153af83)
-
-##### L5.4: Objective
-
-1. Create and apply a task rate card.
-2. Identify the total cost of ownership of an asset.
-
-##### L5.4-A: Activate Task Rate Card
-
-1. Impersonate Hamm Dalorian.
-2. Navigate to **Cost > Costs > Task Rate Cards**.
-3. Locate the **Incident non-P1** rate card.
-4. Double-click the whitespace next to `false` in the **Active** column and set it to `true`.
-5. Click the checkmark to save.
-
-##### L5.4-B: Apply the Task Rate Card
-
-1. Impersonate Eric Schroeder.
-2. Navigate to **Incident > Create New** and complete the form:
-   - **Caller**: `Joe Employee`
-   - **Configuration item**: `*JEMPLOYEE-IBM`
-   - **Short description**: `Cannot connect to network`
-3. Save the incident.
-4. Resolve and close the incident:
-   - Under the **Resolution information** tab:
-     - **Resolution code**: `Solution provided`
-     - **Resolution notes**: `Network cable was disconnected`
-   - Under the **Affected CIs** tab:
-     - Personalize the list to include the **Asset action** field.
-     - Set **Asset action** to `No action`.
-   - Select **Resolve**.
-   - Navigate to **Incident > Resolved**, locate the incident, and select **Close Incident**.
-
-##### L5.4-C: Generate Expense Lines
-
-1. Impersonate System Administrator.
-2. Navigate to **System Definition > Scheduled Jobs**.
-3. Locate and open the **Process Expense Allocation** job.
-4. Select **Execute Now**.
-
-##### L5.4-D: View New Expense Lines
-
-1. Impersonate Hamm Dalorian.
-2. Navigate to **Configuration > Base Items > Computers**.
-3. Open the record for `*JEMPLOYEE-IBM`.
-4. Click the reference icon next to the **Asset name** and select **Open Record**.
-5. Navigate to the **Expense Lines** tab to review:
-   - Two expense lines:
-     - One for the asset's original purchase.
-     - One for the incident cost.
-
-##### L5.4-E: Report on Total Cost of Ownership
-
-1. Navigate to **Reports > Create New** and complete the form:
-   - **Report name**: `Average Hardware Total Cost of Ownership by Model`
-   - **Source type**: `Table`
-   - **Table**: `Expense Line [fm_expense_line]`
-2. Select **Next**.
-3. Choose **Bar graph** under the **Bars** section, and select **Next**.
-4. Configure the report:
-   - **Group by**: `Asset ● Model`
-   - **Aggregation**: `Average`
-5. Save the report.
-6. Open the condition builder and set:
-   - **Asset**: `is not empty`
-   - **AND Asset.Class**: `is Hardware`
-7. Save the conditions and close the condition builder.
-8. Review the resulting graph.
-
 ## Topics
 
 ### Introduction
@@ -2741,3 +1496,1248 @@ Check also [Lab 1](#l1-a-validate-plugins) for plugin validation.
     - Rate cards for tasks/time tracking help attribute labor costs.
     - Benchmark costs against similar assets or models.
     - Used for strategic planning and decision-making.
+
+### Labs
+
+#### L1:Prepare the Asset Management Environment (W)
+
+- [lab steps](https://nowlearning.servicenow.com/sys_attachment.do?sys_id=4f92791b974a0e54524eb3cf9153af67)
+
+##### L1: Objective
+
+1. Validate that ITSM Asset Management and Hardware Asset Management (HAM) functionality are installed and activated.
+2. Grant appropriate access to the asset manager for these applications.
+3. Download supporting files for future labs.
+
+##### L1-A: Validate Plugins
+
+1. Log in as the System Administrator
+2. Navigate to **System Definition > Plugins**. Switch to **Classic Application Manager** if prompted.
+3. Verify the following plugins are installed:
+   - Asset Management, Asset Management Workspace, Contract Management, Cost Management, Data Certification, Extended CMDB, Hardware Asset Management, Managed Documents, My Assets, Procurement.
+   - Install and activate any missing plugins (optionally include demo data).
+
+##### L1-B: Create a User Account
+
+1. Navigate to **User Administration > Users** and create a new user with the following details:
+   - User ID: hamm.dalorian
+   - First Name: Hamm
+   - Last Name: Dalorian
+   - Title: Asset Manager
+   - Email: `hamm.dalorian@example.com`
+   - Time Zone: US/Pacific (optional).
+2. Save the user record.
+
+##### L1-C: Add User to a New Group
+
+1. On Hamm’s user record, navigate to the **Groups** section and select **New**.
+2. Create and save a group named **Asset Managers**.
+3. Verify Hamm appears in the **Group Members** related list.
+
+##### L1-D: Add Roles to the Group
+
+1. Navigate to the **Roles** section of the **Asset Managers** group and select **Edit**.
+2. Add the following roles to the group:
+   - `asset`, `catalog_admin`, `discovery_admin`, `financial_mgmt_admin`, `flow_designer`, `ham_admin`, `inventory_admin`, `itil`, `procurement_user`.
+3. Save the changes.
+
+##### L1-E: Add User to Another Group
+
+1. On Hamm’s user record, under the **Groups** section, select **Edit**.
+2. Add **Field Services** to the group list.
+3. Verify both **Asset Managers** and **Field Services** groups are listed.
+
+##### L1-F: Verify Actions
+
+1. Impersonate Hamm Dalorian through the **User Menu**.
+2. Verify the following are available in the application navigator:
+   - Asset Management
+   - Hardware Asset Dashboard
+   - Hardware Model Normalization
+3. End impersonation.
+
+##### L1-G: Download Supporting Files
+
+1. Navigate to **Self-Service > Knowledge** as the System Administrator.
+2. Open the **Class knowledge base** and download the SupportingFiles.zip.
+3. Save and unzip the file in an easily accessible location.
+
+#### L2: Manage hardware assets
+
+- [lab steps](https://nowlearning.servicenow.com/sys_attachment.do?sys_id=91157d5b978a0e54524eb3cf9153af20)
+
+##### L2: Objective
+
+1. Create a hardware asset manually.
+2. Create a new model category and hardware model.
+3. Create a new bundled model and asset bundle.
+
+##### L2-A: Add Asset
+
+1. Impersonate Hamm Dalorian.
+2. Navigate to **Asset > Portfolios > All Assets**. Add this to your Favorites by selecting the star icon if desired.
+3. Select **New**, and when prompted, select **Hardware**.
+4. In the form:
+   - **Model category:** Computer
+   - **Model:** Dell Inc. Alienware M17x
+   - **Asset tag:** DELL0123456
+   - **Assigned to:** Beth Anglin
+   - **Serial number:** DELLM17X-000
+5. Save the asset record.
+
+##### L2-B: Create a New Model Category
+
+1. Navigate to **Product Catalog > Product Models > Model Categories**.
+2. Select **New**, and complete the form:
+   - **Name:** Handheld Device
+   - **Asset class:** Hardware [alm_hardware]
+3. Submit the record.
+
+##### L2-C: Create a New Hardware Model
+
+1. Navigate to **Product Catalog > Product Models > Hardware Models**.
+2. Select **New**, and complete the form:
+   - **Manufacturer:** Creative Labs
+   - **Name:** Scanner CL1000
+   - **Short description:** Warehouse inventory scanner
+   - **Model categories:** Handheld Device
+   - **Model number:** CL1000
+   - **Cost:** $100.00
+3. Save the record.
+4. Create a hardware asset using the new model:
+   - **Model category:** Handheld Device
+   - **Model:** Creative Labs Scanner CL1000
+   - **Asset tag:** CLS123456
+   - **State:** In stock
+   - **Stockroom:** Southern California Warehouse
+   - **Serial number:** CLSCN1000-001
+5. Submit the record.
+
+##### L2-D: Create a New Bundled Model
+
+1. Navigate to **Product Catalog > Product Models > Bundled Models**.
+2. Select **New**, and check flag **Bundle assets**.
+   - flag sets state to `Build` and model category to `Bundle`
+3. Complete the form:
+   - **Name:** Support Agent Bundle
+   - **Short description:** Standard support agent bundle
+   - **Model number:** SUPAGTBUNDLE
+4. Save the record.
+5. Add components to the bundle:
+   - Navigate to the **Model Components** tab and add the following components:
+     - **Computer:** Hewlett-Packard HP Compaq dc7700p Ultra-slim Desktop
+       - set **Is main component** to true
+     - **Monitor:** Samsung SyncMaster 27" 3D LED LCD Monitor
+     - **Consumable:** Logitech Logitech Desktop Keyboard
+     - **Consumable:** Logitech Logitech Desktop Optical Wireless Mouse
+     - **Printer:** Canon imageCLASS Laser Printer
+6. Change the **Status** to In Production and save the bundled model.
+
+##### L2-E: Create an Asset Bundle
+
+1. Navigate to **Asset > Portfolios > Bundled Assets**.
+2. Select **New**, and complete the form:
+   - **Model:** Support Agent Bundle
+   - **Asset tag:** BUN0006
+   - **Stockroom:** Southern California Warehouse
+3. Save the record.
+4. Select **Auto-select assets** to automatically add available components to the bundle.
+5. Change the **State** to In Stock and save.
+
+#### L2.2: Hardware Model Normalization
+
+- [lab steps](https://nowlearning.servicenow.com/sys_attachment.do?sys_id=6ff6b5d397ca0e54524eb3cf9153af3a)
+
+##### L2.2: Objective
+
+1. Establish Content Service participation.
+2. Exclude a hardware model from Content Service participation.
+3. Validate hardware model Content Service download.
+4. Normalize an unnormalized hardware model.
+
+##### L2.2-A: Opt-in to Content Service
+
+1. Impersonate Hamm Dalorian.
+2. Navigate to **Asset > Hardware Model Normalization > Content Service Setup**.
+3. Select the **Opt-In Agreement** link, read the details, and select **Done**.
+4. Check **Yes, I have read and accept the Opt-In Agreement**.
+5. Select **Opt-In**.
+6. Expand each **HARDWARE ASSET DATA** section to review the details sent to ServiceNow.
+
+##### L2.2-B: Exclude a Hardware Model from Content Service
+
+1. Navigate to **Product Catalog > Product Models > Hardware Models**.
+2. Open the **Gamer Supreme** hardware model.
+3. Select the **Normalization** tab and check **Exclude from content service**.
+4. Select **Update**.
+
+##### L2.2-C: Opt-in to License Resource Categories
+
+1. Navigate to **Asset > Hardware Model Normalization > HAM Resource Categories**.
+2. Open the **Network Gear** resource category and review associated model categories.
+3. Select **Opt out**, confirm in the popup, and verify the **Opt in** checkbox is deselected.
+4. Return to the list of HAM Resource Categories and confirm the **Network Gear** category is marked as false in the **Opt in** column.
+5. Opt back into the **Network Gear** category, ensuring all categories are set to **true**.
+
+##### L2.2-D: Validate Hardware Model Content Service Download
+
+1. Navigate to **Asset > Hardware Model Normalization > Overview**.
+2. Review the **Hardware Model Content Service Download** section for:
+   - Days until the next content library download.
+   - Days since the last content library download.
+
+##### L2.2-E: Review Fully Normalized Hardware Model
+
+1. Navigate to **Product Catalog > Product Models > Hardware Models**.
+2. Select the **Personalize List** gear icon and add **Normalization status** to the displayed columns.
+3. Open the **Macbook Pro 15** hardware model with a normalization status of **Normalized**. (e.g., Model number MR962LL/A)
+4. Review the **General** tab for the display name and other normalized data.
+5. Open the **Compaq Evo Notebook PC** (n610c) model and review its **Hardware Model Lifecycles** tab for lifecycle data provided by the Content Service.
+
+##### L2.2-F: Normalize an Unnormalized Hardware Model
+
+1. Navigate to **Product Catalog > Product Models > Hardware Models** and select **New**.
+2. Enter the following details:
+   - **Manufacturer:** `Dell Inc.`
+   - **Name:** junk text
+3. Save the record and review the **Normalization** tab.
+4. Update the **Model number** to **PS6000X** and save again.
+5. Review the updated **Normalization** tab for changes.
+
+#### L2.3: Asset and Configuration Item (CI) Relationships
+
+- [lab steps](https://nowlearning.servicenow.com/sys_attachment.do?sys_id=c655a12397468294524eb3cf9153af73)
+
+##### L2.3: Objective
+
+1. Create a configuration item (CI).
+2. Synchronize CI and asset.
+
+##### L2.3-A: Create a Configuration Item and Associated Asset
+
+1. Impersonate Hamm Dalorian.
+2. Navigate to **Configuration > Base Items > Computers**.
+3. Select **New** and complete the form:
+   - **Name:** Serenity
+   - **Asset tag:** DELL1234567
+   - **Manufacturer:** Dell Inc.
+   - **Serial number:** DELLM17X-001
+   - **Model ID:** Dell Inc. Alienware M17x
+   - **Assigned to:** Felipe Gould
+4. Save the record.
+
+To create the associated asset: 5. End impersonation 6. Navigate to **System Definition > Scheduled Jobs**. 7. Locate the job **Asset - Create asset delayed sync** and select **Execute Now**. 8. Re-impersonate Hamm Dalorian and return to **Configuration > Base Items > Computers**. 9. Open the record for **Serenity** and verify the **Asset** field is populated.
+
+##### L2.3-B: Define Model Asset Tracking Strategy
+
+1. Navigate to **Product Catalog > Product Models > Hardware Models**.
+2. Open the record for **MacBook Pro 17”**.
+3. Set **Asset tracking strategy** to **Don’t create assets** and save.
+4. Navigate to **Configuration > Base Items > Computers** and create a new record:
+   - **Name:** Enterprise
+   - **Manufacturer:** Apple
+   - **Serial number:** APPLMBP17-001
+   - **Model ID:** Apple MacBook Pro 17"
+   - **Assigned to:** Fred Luddy
+5. Save the record and verify the **Asset** field is not populated due to the tracking strategy.
+
+##### L2.3-C: Enforce CI Verification
+
+1. Navigate to **Product Catalog > Product Models > Model Categories**.
+2. Open the record for **Computer** and enable **Enforce CI Verification**. Save the changes.
+3. Navigate to **Configuration > Base Items > Computers** and create a new record:
+   - **Name:** Destiny
+   - **Manufacturer:** Dell Inc.
+   - **Serial number:** DELLM17X-002
+   - **Model ID:** Dell Inc. Alienware M17X
+   - **Assigned to:** Felipe Gould
+4. Save the record and add **DELL2345678** to the **Asset tag** field, save the changes
+5. End impersonation and execute the **Asset – Create asset delayed sync** job.
+6. Re-impersonate Hamm Dalorian, open the record for **Destiny**, and select **Create Asset**.
+7. Verify the asset record is created by confirming the **Asset** field is populated or by searching for **DELL2345678** under **Asset > Portfolios > Hardware Assets**.
+
+#### L3.1: Manage Consumables
+
+- [lab steps](https://nowlearning.servicenow.com/sys_attachment.do?sys_id=079da127974a8294524eb3cf9153af51)
+
+##### L3.1: Objective
+
+1. Create a consumable record and associate it with a new consumable model.
+2. Consume a consumable asset.
+
+##### L3.1-A: Create a Consumable Product Model
+
+1. Impersonate Hamm Dalorian.
+2. Navigate to **Product Catalog > Product Models > Consumable Models**.
+3. Select **New** and complete the form:
+   - **Manufacturer:** Logitech
+   - **Name:** M510 wireless mouse
+   - **Short description:** Wireless computer mouse
+   - **Model categories:** Consumable
+   - **Model number:** M510
+   - **Cost:** $19.00
+4. Save the record.
+
+##### L3.1-B: Create a Consumable Asset Record
+
+1. Navigate to **Asset > Portfolios > Consumables**.
+2. Select **New** and complete the form:
+   - **Model category:** Consumable
+   - **Model:** Logitech M510 wireless mouse
+   - **Quantity:** 50
+   - **State:** In stock
+   - **Substate:** Available
+   - **Stockroom:** Southern California Warehouse
+3. Verify the cost is automatically calculated as $950.00 (50 units x $19 each).
+4. Save the record.
+
+##### L3.1-C: Consume a Consumable Asset
+
+1. On the created consumable asset record, select the **Consume** button.
+2. In the **User** field, select **Beth Anglin**.
+3. Select **OK** and verify the results:
+   - The quantity is updated to 49 (50 - 1 consumed = 49).
+   - The cost is updated to $931.00 ($950 - $19 for 1 consumed = $931).
+4. Save the record.
+
+##### L3.1: Lab Challenge: Validate Asset Assignment
+
+1. Impersonate Beth Anglin.
+2. Navigate to **Self-Service > My Assets**.
+3. Verify that one Logitech M510 wireless mouse has been assigned.
+
+#### L3.2: Manage Stock
+
+- [lab steps](https://nowlearning.servicenow.com/sys_attachment.do?sys_id=c6ed21e7974a8294524eb3cf9153af45)
+
+##### L3.2: Objective
+
+1. Transfer assets out of a stockroom.
+2. Transfer assets into a stockroom.
+
+##### L3.2-A: Create a Transfer Order
+
+1. Impersonate Hamm Dalorian.
+2. Navigate to **Inventory > Transfer Orders > Create Transfer Order**.
+3. Complete the form:
+   - **From stockroom:** Southern California Warehouse
+   - **To stockroom:** San Diego South Warehouse
+4. Save the transfer order.
+5. In the **Transfer Order Lines** related list, select **New** and complete the form:
+   - **Model:** Logitech M510 wireless mouse
+   - **Quantity requested:** 20
+6. Submit the transfer order line.
+7. Create two additional transfer order lines for one Apple MacBook Pro 15" laptop each, selecting assets with a state of **In stock** and a substate of **Available**.
+8. Validate that there are three lines:
+
+   - One line for 20 Logitech M510 wireless mice.
+   - Two lines for Apple MacBook Pro 15" laptops.
+
+9. Open the **Transfer Order Line** for the Logitech mice and review the **Transfer Order Line Tasks** related list.
+10. Select **Close Task** to complete fulfillment and begin the asset transfer process.
+11. Repeat the process for the other transfer order lines for the laptops, ensuring their stages progress to **In Transit**.
+
+##### L3.2-B: Receive a Transfer Order
+
+1. Impersonate Luke Wilson.
+2. Navigate to **Inventory > Transfer Orders > Transfer Orders** and open the created transfer order.
+3. Open the **Transfer Order Line** for the Logitech mice and review it.
+4. Open the **Open Transfer Order Line Task** and:
+   - Enter **Quantity received:** 10.
+   - Select **Close Task**.
+5. Repeat the process for the Apple MacBook Pro 15" laptops to mark them as received.
+6. Process the remaining 10 Logitech mice when they are delivered and mark them as received.
+
+##### L3.2: Verify Actions
+
+1. Navigate to **Inventory > Stock > Stockrooms**.
+2. Open **San Diego South Warehouse** and validate that 20 Logitech M510 wireless mice are in stock and available.
+
+##### Lab Challenge: Consume a Consumable
+
+1. Consume one Logitech M510 wireless mouse from the San Diego South Warehouse.
+2. Assign it to **Alejandro Mascall** and validate that the mouse appears in Alejandro’s assigned assets.
+
+#### L3.3: Import Assets
+
+- [lab steps](https://nowlearning.servicenow.com/sys_attachment.do?sys_id=312ee16b974a8294524eb3cf9153af41)
+
+##### L3.3: Objective
+
+1. Load hardware asset data.
+2. Transform hardware asset data into ServiceNow tables.
+3. Import hardware asset data via the advanced shipment notification (ASN) template.
+
+##### L3.3-A: Load Asset Data
+
+1. use the **System Administrator** account
+2. Navigate to **System Import Sets > Load Data**.
+3. Select **Create table**, and add a **Label:** Asset Import.
+4. Under **Source of the import**, select **File**, and upload `3.3-assets_for_import.xls`.
+5. Submit the import.
+
+##### L3.3-B: Create Transform Maps
+
+1. Define the **Hardware Model Import Map**:
+   - Next steps: Create transform map
+     - **Name**: Hardware Model Import Map
+     - **Target table:** Hardware Model [cmdb_hardware_product_model].
+     - Save the map.
+     - Use **Auto Map Matching Fields**
+     - Use **Mapping Assist** to configure mappings for:
+       - **Source field:** model_name → **Target field:** Name
+       - Save
+     - set **Coalesce** to true for: u_model_name, manufacturer
+     - Update
+2. Define the **Asset Import Map**:
+   - Next steps: Create transform map
+     - **Name**: Asset Import Map
+     - **Target table:** Hardware [alm_hardware].
+     - Use **Auto Map Matching Fields**
+     - set **Coalesce** to true for: u_asset_tag
+     - adapt date format for `u_warranty_expiration` by opening the record and clicking Suggestion behind the date format field
+       - format: `yyyy-MM-dd`
+     - create two new mappings:
+       - **Source field:** model_name → **Target field:** Model (**Choice action:** reject, **Reference value**: name).
+       - **Source field:** category → **Target field:** Model category (**Choice action:** reject).
+     - Save.
+
+##### L3.3-C: Transform Data
+
+1. Stay on the Asset Import Map record and select **Transform**.
+2. Move both maps to **Selected maps** and arrange them:
+   - Run **Hardware Model Import Map** first.
+   - Run **Asset Import Map** second.
+3. Execute the transform and verify the import:
+   - Navigate to **Asset > Portfolios > Hardware Assets**.
+   - Confirm `A71001` imported data matches the spreadsheet.
+
+##### L3.3-D: Update Asset Data
+
+1. Navigate to **System Import Sets > Load Data**.
+2. Select **Existing table:** Asset Import [u_asset_import].
+3. Upload `3.3-assets_for_update.xls` and submit.
+4. Transform the data using the maps in the correct order (Hardware Model Import Map, Asset Import Map)
+5. Verify updates to assets, such as **State**, **Substate**, and **Assigned to**.
+   - A71008, A71022
+
+##### L3.3-E: Import Advanced Shipment Notification (ASN) Data
+
+1. Add a new shipping carrier:
+   - Navigate to **sn_itam_common_shipping_carrier.list** and select **New**.
+   - **Name:** FedEx, **Email:** `fedex@example.com`, **Status:** Active.
+2. Navigate to **Procurement > Orders > Import Shipment Notifications**.
+3. Upload `3.3-sn_hamp_import_template.xlsx` and process the import.
+4. Verify the results in the **Import Set Runs** and **Import Set Rows** related lists.
+   - All > Procurement > Orders > Import Status
+   - **Import Set Rows**, one record shows comment `Shipping address is invalid;Ignored by s...`
+5. Correct any errors (e.g., invalid shipping address) and re-import as needed.
+
+##### L3.3: Verify Actions
+
+1. Navigate to **Asset > Portfolios > Hardware Assets**.
+2. Validate imported records, confirming their **State** as **In transit**.
+
+##### L3.3: Lab Challenge: Fix Errors in ASN Template
+
+1. Update the ASN template for Asset tag **AA0124** with a valid shipping address.
+2. Remove already imported rows and re-import the updated template.
+
+#### L3.4: Retire Assets
+
+- [lab steps](https://nowlearning.servicenow.com/sys_attachment.do?sys_id=f07e25eb974a8294524eb3cf9153af08)
+
+##### L3.4: Objective
+
+1. Create a retirement change workflow.
+2. Retire assets both manually and using a workflow.
+
+##### L3.4-A: Apply Update Set
+
+1. Impersonate the **System Administrator**.
+2. Navigate to **System Update Sets > Retrieved Update Sets**.
+3. Under **Related Links**, select **Import Update Set from XML**.
+4. Upload `3.4-Asset Retirement Workflow.xml` and select **Upload**.
+5. Select **Asset Retirement Workflow** and then **Preview Update Set**.
+6. After the preview completes, select **Commit Update Set**.
+7. Close the completion message.
+
+##### L3.4-B: Review Retirement Workflow
+
+1. Navigate to **Workflow > Workflow Editor**.
+2. Search for and open the **Retire Asset** workflow.
+3. Validate the following acceptance criteria:
+   - A change request is created to track the retirement process.
+   - Sequential tasks are created for:
+     - Backing up user files.
+     - Wiping the asset's drive.
+     - Removing entitlements and installations.
+     - Returning leased assets to the vendor or sending purchased assets to a disposal vendor.
+   - The asset's **State** changes to **Retired** and **Substate** updates to **Vendor Credit** (leased) or **Disposed** (purchased).
+   - The change request is closed after all tasks are completed.
+4. Close the workflow tab.
+
+##### L3.4-C: Retire an Asset Manually
+
+1. Impersonate Hamm Dalorian.
+2. Navigate to **Asset > Portfolios > Hardware Assets**.
+3. Open the asset with Asset tag **P1000228**.
+4. Update the **State** to **Retired** and **Substate** to **Disposed**.
+5. Select **Update**.
+
+##### L3.4-D: Use Retirement Workflow
+
+1. Navigate to **Asset > Portfolios > Hardware Assets**.
+2. Open the asset with Asset tag **P1000145**.
+3. Under **Related Links**, select **Retire Asset** to initiate the workflow.
+4. Review the newly created **Change Request** and its associated tasks.
+5. Complete each task sequentially:
+   - Close the backup task with a close note: "User files backed up."
+   - Close the wipe task with a close note: "Hard drive wiped."
+   - Close the disposal task with a close note: "Sent to disposal vendor."
+   - Close the certificate task with a note: "Certificate of disposal attached."
+6. Review the **Change Request**:
+   - Confirm its **State** is **Closed** with **Close notes**: "Asset retired successfully."
+7. Return to the asset record and verify its **State** as **Retired** and **Substate** as **Disposed**.
+
+##### L3.4: Lab Challenge - Validate Workflow for Leased Assets
+
+1. Open an "In use" asset (e.g., P1000056).
+2. Set its **Acquisition method** to **Lease** and save.
+3. Retire the asset using the workflow.
+4. Confirm the asset is returned to the vendor:
+   - **State:** Retired.
+   - **Substate:** Vendor Credit.
+
+#### L3.5: Validate Asset Lifecycle Automation
+
+- [lab steps](https://nowlearning.servicenow.com/sys_attachment.do?sys_id=17ae692f974a8294524eb3cf9153af15)
+
+##### L3.5: Objective
+
+1. Dispose of assets using the HAM Hardware Asset Disposal flow.
+2. Update associated CI and asset records via the automated process flow.
+3. Copy the Hardware Stock Order Flow for modification.
+4. Resolve customer incidents and update associated CI/asset records automatically.
+
+##### L3.5-A: Validate HAM Flows Availability
+
+1. Impersonate Hamm Dalorian.
+2. Navigate to **Process Automation > Flow Designer**.
+3. Verify the following HAM flows exist:
+   - Hardware Asset Disposal Flow
+   - Hardware Asset Reclamation Flow
+   - Hardware Asset Reclamation Line Flow
+   - Hardware Asset Refresh Flow
+   - Hardware Asset Refresh Line Flow
+   - Hardware Stock Order Flow
+   - Standard Hardware Asset Request
+4. (Optional) Open a flow (e.g., Hardware Asset Disposal) to view its logic.
+5. Close the Flow Designer tab.
+
+##### L3.5-B: Create Disposal Order
+
+1. Navigate to **Inventory > Disposal Orders > Create Disposal Order**.
+2. Complete the form:
+   - **Stockroom:** Southern California Warehouse
+   - **Assigned to:** Rob Woodbyrne
+3. Save the order.
+4. Add assets:
+   - Select the **Planned Assets** tab and click **Edit**.
+   - Move three assets with **State:** In stock and **Substate:** Pending disposal to the Planned Assets list.
+   - Save.
+   - Save the order.
+5. Process tasks:
+   - Navigate to the **Hardware Disposal Tasks** tab.
+   - Open the first task, **Verify Assets**, and confirm that all planned assets are listed.
+   - Select all assets on the list and choose **Actions on selected rows > Verify** to confirm their presence.
+   - Verify that the **Stage** of the assets is updated to **Verified**.
+   - Select **Close Task** to complete the verification.
+   - Save the updated disposal order.
+6. Schedule vendor pickup for the assets:
+   - Enter **Vendor:** IngramMicro, **Scheduled date:** Tomorrow, **Vendor order ID:** IM-5597, **Pickup contact:** Luke Skye, and **Pickup details:** Loading dock is slippery in winter.
+   - Close the task.
+   - Save the updated disposal order.
+7. Mark assets as **Departed** once the vendor picks them up.
+8. Confirm vendor receipt:
+   - Open the **Vendor Confirmation** task.
+   - Review the list of Planned Assets and verify their **State:** Retired and **Substate:** Pending disposal.
+   - Confirm vendor receipt and close the task.
+9. Provide disposal documentation:
+   - Open the **Disposal Documentation** task.
+   - From the **Certificate of disposal** dropdown, select **Yes**.
+   - Attach the file `3.5-Certificate_of_Disposal.txt` using the **Manage Attachments** icon.
+   - Mark all assets as **Disposed**:
+     - Select all assets on the **Planned Assets** list.
+     - Choose **Actions on selected rows > Dispose**.
+   - Verify that the final **State:** Retired and **Substate:** Disposed is updated for all assets.
+   - Close the task and save the disposal order.
+
+##### L3.5-C: Copy Hardware Stock Order Flow
+
+1. As System Administrator, navigate to **Process Automation > Flow Designer**.
+2. Open the **Hardware Stock Order Flow** and select **Copy flow** from the **More actions menu**.
+3. Name the new flow **Hardware Stock Order Flow – CloudD**.
+4. Select **Edit flow** and explore adding actions, flow logic, or subflows.
+5. Close the Flow Designer tab.
+
+##### L3.5-D: Resolve Hardware Incident and View Auto-Updates
+
+1. Impersonate Hamm Dalorian, create a test incident:
+   - Navigate to **Incident > Create New**.
+   - Complete the form:
+     - **Caller:** Florine Willardson
+     - **Category:** Hardware
+     - **Configuration Item:** MacBook Air 13"
+       - use search to find the one assigned to Florine Willardson
+     - **Short description:** Broken screen – can’t work.
+   - Save the incident.
+   - Add the following fields to the **Affected CIs** tab:
+     - Asset Action
+     - Swapped CI
+     - Updated
+2. Resolve the incident:
+   - Update **Asset Action** to **Swap** and **Swapped CI** to a new CI (e.g., Apple - MacBook Pro 15" for Technical Staff).
+     - use search to find an unassigned CI
+   - Enter **Resolution code:** Solution provided and **Resolution notes:** Swapped for new laptop.
+   - Resolve the incident and validate updates to the associated CI/asset records.
+
+##### L3.5-E: Configure Asset Lifecycle Category
+
+1. Impersonate Hamm Dalorian, navigate to **Self-Service > Service Catalog**.
+2. Add the **Asset Lifecycle** category:
+   - Select **Add content** and locate the **Asset Lifecycle** section.
+   - Select the desired location for the category and close the form.
+3. Verify the **Asset Lifecycle** card is added
+
+##### L3.5: Lab Verification - Asset Refresh Order
+
+1. Impersonate Hamm Dalorian, navigate to **Self-Service > Service Catalog**.
+2. Open the **Asset Lifecycle** card and select **Hardware Asset Refresh Order**.
+   - Type of refresh: Single model
+   - Replacement model: Lenovo ThinkPad T20 264744U
+3. Modify the **Filter Criteria** to include non-eligible assets:
+   - Set **Eligible for refresh** to **false**.
+   - Add a filter for **Model:** Hewlett-Packard HP EliteBook 2540p.
+4. Select **Run Filter** and confirm assets are listed in the **Available** list.
+5. Move 10 assets to the **Selected** list.
+6. Select **Order Now** to submit the request.
+7. Navigate to the **Requests** tab and verify the **Requested Items**:
+   - Confirm the requested 10 assets are listed under the variables section.
+   - Ensure the replacement model is **Lenovo ThinkPad T20 264744U**.
+
+#### L4.1: Report on Hardware Assets
+
+- [lab steps](https://nowlearning.servicenow.com/sys_attachment.do?sys_id=ee85bda7974e8294524eb3cf9153af73)
+
+##### L4.1: Objective
+
+1. Identify the quantity of assets by model.
+2. Identify total spend by vendor.
+3. Identify computers still under warranty.
+4. Navigate the Hardware Asset Dashboard.
+
+##### L4.1-A: Create a Bar Chart of Assets by Model
+
+1. Impersonate Hamm Dalorian.
+2. Navigate to **Asset > Portfolios > Hardware Assets**.
+3. Select the **Personalize List** gear icon and update columns to include:
+   - **Asset tag**, **Model category**, **Model**, **Assigned to**, **Company**, **State**, **Substate**, **Cost**, and **Configuration item**.
+4. Select **OK** to save changes.
+5. In the **Model category** column, right-click on **Computer** in any record and select **Show Matching**.
+6. Right-click the **Model** column header and select **Bar Chart**.
+7. In the **Create a report** designer panel:
+   - Rename the report to **Computer Assets by Model**.
+   - Save the report.
+
+##### L4.1-B: Report on Total Spend by Vendor
+
+1. Navigate to **Reports > View / Run**.
+2. Select **Create a report**.
+3. Configure the report:
+   - **Report name:** Vendor Spend
+   - **Source type:** Table
+   - **Table:** Hardware [alm_hardware]
+   - **Type:** Pivot table
+4. Under **Configure** options:
+   - Row: **Vendor**
+   - Column: **Model category**
+   - Aggregation: **Sum > Cost**
+5. Save the report and hover over data to analyze spend by vendor.
+
+##### L4.1-C: Report on Computers Still Under Warranty
+
+1. Navigate to **Reports > Create New**.
+2. Configure the report:
+   - **Report name:** Computers Still Under Warranty
+   - **Source type:** Table
+   - **Table:** Hardware [alm_hardware]
+   - **Type:** Pivot table
+3. Under **Configure** options:
+   - Row: **Model category**
+   - Column: **Warranty expiration**
+   - Aggregation: **Sum > Quantity**
+4. Open the **Condition Builder** and filter:
+   - **Model category:** is **Computer**
+   - **Warranty expiration:** after **Today**
+5. Save the report.
+
+##### L4.1-D: Navigate Hardware Asset Dashboard
+
+1. Navigate to **Asset > Hardware Asset Dashboard**.
+2. Explore the **Asset Health** tab to review:
+   - **Incomplete assets** (e.g., missing purchase information).
+   - **Assets with most incidents**.
+   - **Assets due for refresh**.
+   - **Undiscovered assets** within the last month.
+3. Navigate to the **Model Management** tab and analyze:
+   - Hardware and consumable models nearing **End of Life**.
+   - Normalization status and lifecycle overview for models.
+4. Explore additional tabs:
+   - **Procurement** for sourcing requests.
+   - **Inventory** for stock orders, open audits, and new hardware findings.
+   - **End of Life** for disposed assets and lifecycle status.
+
+#### L4.2: Manage Request and Procurement
+
+- [lab steps](https://nowlearning.servicenow.com/sys_attachment.do?sys_id=7306fdeb974e8294524eb3cf9153af07)
+
+##### L4.2: Objective
+
+1. Publish a hardware model to the service catalog.
+2. Request a hardware model from the service catalog.
+3. Source and receive a hardware model from a vendor.
+
+##### L4.2-A: Publish to Hardware Catalog
+
+1. Impersonate Hamm Dalorian.
+2. Navigate to **Product Catalog > Product Models > Hardware Models**.
+3. Open **Scanner CL1000**.
+4. On the **Product Catalog** tab, enter the description: _Wireless scanner used in warehouses and distribution facilities to manage inventory_.
+5. Save the changes.
+6. Under **Related Links**, select **Publish to Hardware Catalog**.
+7. In the **Publish to Hardware Catalog** popup, set the **Category** to **Hardware** and select **OK**.
+8. Navigate to **Self-Service > Service Catalog**, select **Hardware**, and confirm **Scanner CL1000** is listed with accurate information.
+
+##### L4.2-B: Create Vendor Catalog Items
+
+1. Navigate to **Product Catalog > Catalog Definitions > Vendor Items**.
+2. Select **New** and complete the form:
+   - **Vendor:** `Cloudward Inc`
+   - **Product Model:** `Creative Labs Scanner CL1000`
+   - **Product ID:** `CDW-CL1000`
+   - **List Price:** `$100`
+   - **Vendor Price:** `$90`
+   - **Product Catalog Item:** `Scanner CL1000`
+3. Save the record.
+4. Add a second vendor:
+   - Navigate to **Product Catalog > Catalog Definitions > Hardware & Software Items**.
+   - Open **Scanner CL1000**.
+   - In the **Vendor Catalog Items** related list, select **New** and complete the form:
+     - **Vendor:** `Amazon`
+     - **Product Model:** `Creative Labs Scanner CL1000`
+     - **Product ID:** `AMZ-CL1000`
+     - **List Price:** `$110`
+     - **Vendor Price:** `$105`
+   - Submit the record and confirm both vendor catalog items are listed.
+
+##### L4.2-C: Request Items from the Service Catalog
+
+1. Impersonate Luke Wilson.
+2. Navigate to **Self-Service > Service Catalog**, select **Hardware**, and open **Scanner CL1000**.
+3. Set **Quantity** to 2 and select **Order Now**.
+4. Take note of the **REQ number** for tracking.
+
+##### L4.2-D: Source the Request
+
+1. Impersonate Hamm Dalorian and navigate to **Procurement > Requests > Requests**.
+2. Open Luke Wilson's request.
+3. In the **Catalog Tasks** related list, open the task record and select **Source Request**.
+4. Review the available stock:
+   - Transfer one scanner from **Southern California Warehouse** to **San Diego South Warehouse**:
+     - Complete the **Transfer Order** form with the required stockroom details and submit.
+   - Purchase the second scanner:
+     - Select **Vendor:** Cloudward Inc ($90.00).
+     - Submit the purchase order.
+5. Confirm both a purchase order and a transfer order were created and are associated with the request.
+
+##### L4.2-E: Order the Item
+
+1. Impersonate Beth Anglin.
+2. Navigate to **Procurement > Orders > Purchase Orders**.
+3. Open the purchase order for the second scanner and select **Order**.
+
+##### L4.2-F: Create the Asset Before Delivery
+
+1. Impersonate Hamm Dalorian and return to **Procurement > Requests > Requests**.
+2. Open Luke Wilson's request and access the purchase order.
+3. Under **Related Links**, select **Create hardware assets prior to delivery**.
+4. In the **Assets** related list, enter an **Asset Tag** (e.g., HHD12345) and save the record.
+
+##### L4.2-G: Receive the Request
+
+1. On the purchase order, select **Receive**.
+2. If needed, capture **Asset Tag** and **Serial Number** information upon receipt.
+3. Submit the receipt and confirm:
+   - The purchase order status is now **Received**.
+   - The asset state is **In stock**, with a substate of **Available** and a cost of $90.
+
+##### L4.2-H: Lab Verification Steps
+
+1. Confirm the following actions were completed:
+   - **Scanner CL1000** is published to the service catalog and accurately listed.
+   - Vendor catalog items for **Cloudward Inc.** and **Amazon** are created.
+   - A request for 2 scanners is successfully placed by Luke Wilson.
+   - The request is sourced using a combination of stock transfer and vendor purchase.
+2. Verify the asset state for the received scanner:
+   - **State:** In stock.
+   - **Substate:** Available.
+   - **Cost:** Matches the vendor price ($90).
+3. Confirm all associated orders (purchase and transfer) are completed and listed under the request record.
+
+#### L4.3: Automate Stock Management
+
+- [lab steps](https://nowlearning.servicenow.com/sys_attachment.do?sys_id=b146fd6f974e8294524eb3cf9153affa)
+
+##### L4.3: Objective
+
+1. Replenish internal stock from a central warehouse.
+2. Replenish central warehouse stock from a vendor.
+3. Verify replenishment rules.
+4. Replenish stock using HAM bulk stock order.
+
+##### L4.3-A: Replenish Stock from a Stockroom
+
+1. Impersonate Hamm Dalorian.
+2. Navigate to **Inventory > Stock > Stock Rules** and click **New**.
+3. Complete the form:
+   - **Model**: `Acer Notebook Battery`
+   - **Stockroom**: `San Diego South Warehouse`
+   - **Threshold**: `3`
+   - **Restocking option**: `Stockroom`
+   - **Order size**: `5`
+   - **Parent stockroom**: `Southern California Warehouse`
+4. Click **Submit**.
+
+##### L4.3-B: Replenish Stock from a Vendor
+
+1. Navigate to **Inventory > Stock > Stock Rules** and click **New**.
+2. Complete the form:
+   - **Model**: `Acer Notebook Battery`
+   - **Stockroom**: `Southern California Warehouse`
+   - **Threshold**: `10`
+   - **Restocking option**: `Vendor`
+   - **Order size**: `20`
+3. Click **Submit**.
+4. Verify the stockroom manager:
+   - Navigate to **Inventory > Stockrooms**.
+   - Open the Southern California Warehouse stockroom.
+   - Update the **Manager** to `Rob Woodbyrne`.
+   - Click **Update**.
+
+##### L4.3-C: Verify Stock Rules Operate as Expected
+
+1. **Consume stock to trigger replenishment**:
+   - Navigate to **Inventory > Stockrooms** and open the `San Diego South Warehouse`.
+   - Under the **Consumables** tab, open the `Acer Notebook Battery` record.
+   - Consume one battery to drop the quantity below the threshold of `3`.
+   - Navigate back to the `Southern California Warehouse` stockroom.
+   - Under the **Consumables** tab, consume batteries to drop the quantity below the threshold of `10`.
+2. **Run the stock rule job manually**:
+   - Impersonate System Administrator and navigate to **System Scheduler > Scheduled Jobs > Scheduled Jobs**.
+   - Open `Stock Rule Runner` and set the **Next action** date to yesterday.
+   - Click the checkmark to save and then select **Update**.
+3. **Validate stock rules**:
+   - Impersonate Rob Woodbyrne and navigate to **Inventory > Transfer Orders > Transfer Orders**.
+   - Open the transfer order for `Acer Notebook Batteries` to confirm it was triggered by the first stock rule.
+   - Navigate to **Procurement > Requests > Requests** and locate the request triggered by the second stock rule for vendor replenishment.
+4. **Review the workflow**:
+   - Open the request triggered by the vendor replenishment stock rule.
+   - Under **Related Links**, select **Show Workflow**.
+   - Verify the workflow opened in a new tab, noting that the request is over `$1000` and has moved to the second-line approval step.
+   - Close the workflow tab.
+5. **Approve the request**:
+   - Impersonate Eric Schroeder.
+   - Navigate to **Procurement > Requests > Requests** and open the pending request from Rob Woodbyrne.
+   - Set the **Approval status** to `Approved`.
+   - Click **Update** to finalize the approval.
+
+##### L4.3-D: Replenish Stock Using HAM Bulk Stock Order
+
+1. Impersonate Rob Woodbyrne.
+2. Navigate to **Inventory > Stock > Submit Stock Order** and complete the form:
+   - **Model**: `Acer Notebook Battery`
+   - **Quantity**: `10`
+   - **Stockroom**: `Southern California Warehouse`
+   - Click **Order Now**.
+3. Navigate to **Procurement > Requests > Requests** and review the submitted request.
+4. Under **Related Links**, select **Show Workflow** to review the auto-generated workflow.
+
+##### L4.3-E: Replenish Stock from Service Catalog
+
+1. Navigate to **Self-Service > Service Catalog**.
+2. Select **Asset Lifecycle** and choose **Hardware Inventory Stock Order**.
+3. Complete the form:
+   - **Model**: `Acer Notebook Battery`
+   - **Quantity**: `5`
+   - **Stockroom**: `Southern California Warehouse`
+4. Click **Order Now**.
+5. Navigate to **Procurement > Requests > Requests** and confirm the submission.
+
+##### L4.3: Remarks
+
+- Related Link "Show Workflow" was not available during the lab. Maybe no longer available in newer instances?
+
+#### L4.4: Certify Data
+
+- [lab steps](https://nowlearning.servicenow.com/sys_attachment.do?sys_id=4686f563978e8294524eb3cf9153af7d)
+
+##### L4.4: Objective
+
+1. Configure a data certification user.
+2. Configure stockroom managers.
+3. Schedule monthly stockroom inventory.
+
+##### L4.4-A: Prepare to Use Certification
+
+1. Impersonate System Administrator.
+2. Navigate to **User Administration > Users** and click **New**.
+3. Complete the form:
+   - **User ID**: `data.manager`
+   - **First name**: `Data`
+   - **Last name**: `Manager`
+4. Save the record.
+5. Under the **Groups** tab, click **New** and set:
+   - **Name**: `Data Managers`
+6. Save the group.
+7. Under the **Roles** tab, click **Edit** and add:
+   - `certification_admin`
+8. Save the changes.
+
+##### L4.4-B: Configure Stockroom Managers
+
+1. Impersonate Hamm Dalorian.
+2. Navigate to **Inventory > Stock > Stockrooms**.
+3. Update the **Manager** for each stockroom:
+   - **San Diego Border – Pickup/Dropoff**: `Allyson Gillispie`
+   - **San Diego North – Pickup/Dropoff**: `Bertie Luby`
+   - **San Diego North Central – Pickup/Dropoff**: `Candice Bruckman`
+   - **San Diego South – Pickup/Dropoff**: `Dorthy Alexy`
+   - **San Diego South Central – Pickup/Dropoff**: `Enrique Oroark`
+   - **San Diego South Warehouse**: `Felipe Gould`
+   - **Santa Monica Warehouse**: `Aileen Mottern`
+   - **Southern California Warehouse**: `Rob Woodbyrne`
+
+##### L4.4-C: Create Data Certification Filter
+
+1. Impersonate Data Manager.
+2. Navigate to **Data Certification > Schedules > Certification Filters** and click **New**.
+3. Complete the form:
+   - **Name**: `In stock assets`
+   - **Description**: `Assets listed as In stock for monthly inventory`
+   - **Table**: `Asset [alm_asset]`
+   - **Filter condition**:
+     - `State | is | In stock`
+     - AND `Stockroom | is not empty`
+4. Click the **Update count refresh** button to update the matching record count.
+   - Double-Arrows above _Add Filter Condition_
+5. Submit the filter.
+
+##### L4.4-D: Define Certification Schedule
+
+1. Navigate to **Data Certification > Schedules > Create New**.
+2. Complete the form:
+   - **Name**: `Monthly Stockroom Inventory`
+   - **Filter**: `In stock assets`
+   - **Display fields**:
+     - `Model.Display name`
+     - `Model category`
+     - `Substate`
+   - **Certification fields**:
+     - `Asset tag`
+     - `Quantity`
+   - **Assignment type**: `User Field`
+   - **Assign to**: `Stockroom Manager`
+   - **Days to complete**: `3`
+   - **Task description**: `Monthly Stockroom Inventory`
+3. Save the record.
+4. Complete additional fields:
+   - **Run**: `Monthly`
+   - **Day (run_dayofmonth)**: `1`
+   - **Instructions**: `Validate that the actual stock in the stockroom matches what is listed in ServiceNow. Certify items that match and fail certification for those that do not.`
+5. Save the changes.
+6. Under **Related Links**, select **Preview Certification Tasks** and review the results.
+7. Click **Execute Now**.
+8. Navigate to **Data Certification > Schedules > Instances** and verify a new instance was created.
+
+##### L4.4-E: Verify a Certification Task
+
+1. Impersonate Rob Woodbyrne.
+2. Navigate to **Service Desk > My Work** and open the task for `Monthly Stockroom Inventory`.
+3. Sort the **Assets** list by **Display name** in ascending order.
+4. Identify discrepancies:
+   - Select the asset `3Com Cat 5 Cable (10ft)` and enter `Only 95` in the **Optional comment for checked elements** field.
+   - Click **Fail certification for checked elements** (red exclamation mark).
+5. Certify all correct elements:
+   - Select all remaining elements and click **Certify checked elements** (green check mark).
+   - Wait for the **Percentage complete** to update or manually save the form.
+6. Repeat as necessary to certify all remaining records.
+
+#### L5.1: Manage Contracts
+
+- [lab steps](https://nowlearning.servicenow.com/sys_attachment.do?sys_id=a1db3da39742c294524eb3cf9153aff1)
+
+##### L5.1: Objective
+
+1. Create a hardware lease contract.
+2. Associate hardware assets with the lease contract.
+3. Manage the hardware lease contract lifecycle.
+
+##### L5.1-A: Enter a New Contract
+
+1. Impersonate Hamm Dalorian.
+2. Navigate to **Contract > Contracts > Leases** and click **New**.
+3. Complete the form:
+   - **Vendor**: `Lenovo`
+   - **Contract number**: `LNVO-1001`
+   - **Start date**: `<the first day of this year>`
+   - **End date**: `<the last day of this year>`
+   - **Description**: `Lease for Lenovo end user computers`
+   - **Contract administrator**: `Hamm Dalorian`
+   - **Approver**: `Beth Anglin`
+4. Save the record.
+5. Under the **Financial** section, set:
+   - **Payment amount**: `$500.00`
+6. Update the record.
+
+##### L5.1-B: Add Terms and Conditions
+
+1. Navigate to **Contract > Contracts > Terms & Conditions** and click **New**.
+2. Create the first record:
+   - **Name**: `Lenovo Use of Equipment`
+   - **Description**: `USE OF EQUIPMENT: Lessee shall only use the Equipment in a careful and proper manner and will comply with all laws, rules, ordinances, statutes, and orders regarding the use, maintenance, and storage of the Equipment.`
+3. Submit the record.
+4. Create the second record:
+   - **Name**: `Lenovo Lease Maintenance`
+   - **Description**: `MAINTENANCE, DAMAGE, AND LOSS: Lessee will, at Lessee's sole expense, keep and maintain the Equipment clean and in good working order and repair during the Lease Term. If lost or damaged, Lessee shall pay replacement costs.`
+5. Submit the record.
+6. Return to **Contract > Contracts > Leases** and open the Lenovo contract.
+7. Under the **Terms and Conditions** tab:
+   - Insert `Lenovo Use of Equipment` with an order of `100`.
+   - Insert `Lenovo Lease Maintenance` with an order of `200`.
+8. Save the record.
+9. Under **Related Links**, select **Build Terms and Conditions**.
+
+##### L5.1-C: Add Covered Assets
+
+1. In the **Assets Covered** related list, click **Edit**.
+2. In the **Collection** field, search for `*Lenovo ThinkStation S20`.
+3. Select all displayed assets and move them to the **Assets Covered** list.
+4. Save the record.
+5. Verify that the **Date added** field for each asset is updated to today.
+
+##### L5.1-D: Approve and Adjust Contract
+
+1. In the contract record, select **Submit For Review**.
+2. Impersonate Beth Anglin.
+3. Navigate to **Contract > My Approvals**, sort by **Created** (descending), and open the Lenovo contract.
+4. Review the contract details and select **Approve**.
+5. Verify the contract is updated to:
+   - **State**: `Approved`
+   - **Substate**: `None`
+6. Re-impersonate Hamm Dalorian and open the Lenovo contract.
+7. Select **Adjust** and update:
+   - **Payment amount**: `$600.00`
+8. Submit the adjustments and update the record.
+
+##### L5.1-E: Extend Contract
+
+1. Impersonate Beth Anglin.
+2. Navigate to **Contract > Contracts > Leases** and open the Lenovo contract.
+3. Select **Adjust** and update:
+   - **End date**: `<30 June next year>`
+4. Submit the adjustments.
+5. Navigate to **Contract > My Approvals**, open the Lenovo contract, and verify:
+   - **State**: `Active`
+   - The adjustment is applied without additional approval.
+
+#### L5.2: Manage Contract Financials
+
+- [lab steps](https://nowlearning.servicenow.com/sys_attachment.do?sys_id=f50c71679742c294524eb3cf9153af87)
+
+##### L5.2: Objective
+
+1. Create contract rate cards.
+2. Process contract costs.
+
+##### L5.2-A: Add Contract Rate Cards
+
+1. Impersonate Hamm Dalorian.
+2. Navigate to **Contract > Contracts > Leases** and open the Lenovo lease contract created earlier.
+3. Under the **Contract Rate Cards** related list, select **New** and complete the form:
+   - **Name**: `Payment for Support Systems`
+   - **Short description**: `Monthly payment for support systems.`
+   - **Base cost** (Financial tab): `$100.00`
+   - **Distribute cost** (Financial tab): `Allocate and distribute cost per asset`
+4. Save the record.
+5. Under the **Assets Covered** related list, select **New** and:
+   - Use the magnifying glass to search for the asset `P1000235`.
+   - Set the **Date added** to the first day of the current year.
+   - Click **Submit**.
+6. Repeat step 5 for the asset `P1000236`.
+7. On the **Contract Rate Card** form, click the reference icon next to the **Contract** field and select **Open Record** to return to the contract.
+8. View the **Financial** tab to verify the **Total cost**.
+
+###### Challenge: Create Another Rate Card
+
+1. Create another rate card under the **Contract Rate Cards** related list:
+   - **Name**: `Payment for Development Systems`
+   - **Short description**: `Monthly lease payment for development systems.`
+   - **Base cost**: `$500.00`
+   - **Distribute cost**: `Allocate and distribute cost per asset`
+2. Add three more assets to this rate card, following steps 5 and 6, with the **Date added** set to the first day of the current year.
+3. View the **Financial** tab to verify the updated **Total cost** reflects both rate cards.
+
+##### L5.2-B: Process Costs
+
+1. Impersonate the System Administrator.
+2. Navigate to **System Scheduler > Scheduled Jobs > Scheduled Jobs**.
+   - **not** under System Definitions > Scheduled Jobs
+3. Open **Process FM Costs** and update the **Next action** date to day before yesterday
+4. Click **Update** to save the changes and return to the list of scheduled jobs.
+5. Wait for the job to complete. The **State** will be updated to `Ready` when processing is finished.
+6. Verify:
+   1. Impersonate Hamm Dalorian.
+   2. Navigate to **Contract > Contracts > Leases** and open the Lenovo lease contract.
+   3. In the **Assets Covered** related list, open the asset `P1000235 – Lenovo ThinkStation S20`.
+   4. View the **Expense Lines** tab to validate that at least one entry reflects the lease contract.
+
+#### L5.3: Calculate Depreciation
+
+- [lab steps](https://nowlearning.servicenow.com/sys_attachment.do?sys_id=244c3da79742c294524eb3cf9153af89)
+
+##### L5.3: Objective
+
+1. Calculate depreciation for hardware assets.
+2. Create custom depreciation schedules.
+3. Group assets as fixed assets and sum their residual values.
+
+##### L5.3-A: Run Depreciation
+
+1. Impersonate Hamm Dalorian.
+2. Navigate to **Asset > Portfolios > Hardware Assets**.
+3. Open the record for the asset with **Asset tag**: `AA0005`.
+4. Navigate to the **Depreciation** tab and complete the form:
+   - **Depreciation**: `SL 3 Years`
+   - **Depreciation effective date**: `<the first day of this year> 00:00:00`
+   - **Salvage value**: `$100.00`
+5. Save the record using the **Save** option under **Additional Actions**.
+6. Under **Related Links**, select **Calculate Depreciation**.
+7. Review the calculated values:
+   - **Residual date**, **Residual value**, and **Depreciated amount**.
+   - Note: Values vary depending on the day depreciation is run.
+8. Repeat steps 4–7 for the asset with **Asset tag**: `AA0007` using:
+   - **Depreciation**: `SL 1 Year`
+   - **Depreciation effective date**: `<the first day of this year> 00:00:00`
+   - **Salvage value**: `$100.00`
+9. Compare results to observe the faster depreciation rate for the 1-year schedule.
+
+##### L5.3-B: Create Custom Depreciation Schedules
+
+1. Navigate to **Cost > Depreciation**.
+2. Open the depreciation schedule **Straight Line | SL 3 Years**.
+3. Modify the schedule:
+   - **Name**: `SL 2 Years`
+   - **Script**: Replace the number `3` with `2`.
+   - Add a semicolon (`;`) at the end of the script for completeness.
+4. Use the **Insert** option under **Additional Actions** to save the new schedule.
+5. Open the depreciation schedule **Declining Balance | DDB 4 Years**.
+6. Modify the schedule:
+   - **Name**: `DDB 6 Years`
+   - **Script**: Replace the number `4` with `6`.
+   - Add a semicolon (`;`) at the end of the script for completeness.
+7. Use the **Insert** option to save the new schedule.
+
+##### L5.3-C: Create a Fixed Asset
+
+1. Navigate to **Cost > Fixed Assets** and click **New**.
+2. Complete the form:
+   - **Fixed Asset**: `Asus G Series Purchase`
+3. Save the record using the **Save** option.
+4. Under the **Covers Assets** related list, click **Edit**.
+5. Filter assets:
+   - **Model**: `Asus G Series`
+6. Select **Run Filter** and move all matching assets to the **Selected** list.
+7. Save the changes.
+8. Under **Related Links**, select **Sum Residual Value** to calculate the total residual value for the grouped assets.
+
+#### L5.4: Identify Total Cost of Ownership
+
+- [lab steps](https://nowlearning.servicenow.com/sys_attachment.do?sys_id=a87cb92b9742c294524eb3cf9153af83)
+
+##### L5.4: Objective
+
+1. Create and apply a task rate card.
+2. Identify the total cost of ownership of an asset.
+
+##### L5.4-A: Activate Task Rate Card
+
+1. Impersonate Hamm Dalorian.
+2. Navigate to **Cost > Costs > Task Rate Cards**.
+3. Locate the **Incident non-P1** rate card.
+4. Double-click the whitespace next to `false` in the **Active** column and set it to `true`.
+5. Click the checkmark to save.
+
+##### L5.4-B: Apply the Task Rate Card
+
+1. Impersonate Eric Schroeder.
+2. Navigate to **Incident > Create New** and complete the form:
+   - **Caller**: `Joe Employee`
+   - **Configuration item**: `*JEMPLOYEE-IBM`
+   - **Short description**: `Cannot connect to network`
+3. Save the incident.
+4. Resolve and close the incident:
+   - Under the **Resolution information** tab:
+     - **Resolution code**: `Solution provided`
+     - **Resolution notes**: `Network cable was disconnected`
+   - Under the **Affected CIs** tab:
+     - Personalize the list to include the **Asset action** field.
+     - Set **Asset action** to `No action`.
+   - Select **Resolve**.
+   - Navigate to **Incident > Resolved**, locate the incident, and select **Close Incident**.
+
+##### L5.4-C: Generate Expense Lines
+
+1. Impersonate System Administrator.
+2. Navigate to **System Definition > Scheduled Jobs**.
+3. Locate and open the **Process Expense Allocation** job.
+4. Select **Execute Now**.
+
+##### L5.4-D: View New Expense Lines
+
+1. Impersonate Hamm Dalorian.
+2. Navigate to **Configuration > Base Items > Computers**.
+3. Open the record for `*JEMPLOYEE-IBM`.
+4. Click the reference icon next to the **Asset name** and select **Open Record**.
+5. Navigate to the **Expense Lines** tab to review:
+   - Two expense lines:
+     - One for the asset's original purchase.
+     - One for the incident cost.
+
+##### L5.4-E: Report on Total Cost of Ownership
+
+1. Navigate to **Reports > Create New** and complete the form:
+   - **Report name**: `Average Hardware Total Cost of Ownership by Model`
+   - **Source type**: `Table`
+   - **Table**: `Expense Line [fm_expense_line]`
+2. Select **Next**.
+3. Choose **Bar graph** under the **Bars** section, and select **Next**.
+4. Configure the report:
+   - **Group by**: `Asset ● Model`
+   - **Aggregation**: `Average`
+5. Save the report.
+6. Open the condition builder and set:
+   - **Asset**: `is not empty`
+   - **AND Asset.Class**: `is Hardware`
+7. Save the conditions and close the condition builder.
+8. Review the resulting graph.
