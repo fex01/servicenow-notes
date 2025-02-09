@@ -25,6 +25,14 @@
 
 ## Topics
 
+### To Sort
+
+- Empfehlung: als System laufen lassen
+  - nur in der Paketierten Version einstellbar
+  - in der Konfig IQuery = true nach Installation setzen
+- ACC Mid Server Empfehlung: Linux - kann mit deutlich mehr ACC Agents umgehen
+  - wenn per Internet erreichbar: in der Cloud autark ohne Verbindung zum Kernnetz laufen
+
 ### Assigned To Discovery
 
 - resources

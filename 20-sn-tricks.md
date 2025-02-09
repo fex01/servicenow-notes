@@ -1,5 +1,12 @@
 # SNow Tricks
 
+## To Sort
+
+- [Pricing](https://partnerportal.service-now.com/kb?id=kb_article_view&sysparm_article=KB0011614&campid=146442&cid=e:eDM-PTR-Vancouver.email09%2F20-20SEP23-Global.Email1&utm_source=marketo&utm_medium=email&utm_campaign=eDM-PTR-Vancouver.email09%2F20-20SEP23-Global.Email1&mkt_tok=MDg5LUFOUy02NzMAAAGOUkyKeFE825UAMvR_MneTnj2Dk6GBSFzu2c0v_qgvsd_4UuP4FO3IkQxYGIRSFH6RgeVLpDO2QGqVsPyNMm4PRrlp64a74AlJADleRYujDiRlgkB4&sys_kb_id=6dbeca678795bd50de17ea473cbb3510&spa=1)
+  - overview decks
+  - gezielte decks pro module
+  - capability übersicht
+
 ## Resources
 
 - [Data Models](https://www.snow-mirror.com/wp-content/uploads/2016/07/ServiceNow-Data-Model-v3.4.pdf)
