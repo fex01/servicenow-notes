@@ -45,6 +45,121 @@ back to [Asset Management](./sn-asset.md)
 
 ## Topics
 
+### HAM Workspace
+
+- General Notes
+  - The Hardware Asset Workspace acts as a command center for ITSM Asset Management and Hardware Asset Management (HAM).
+  - Full workspace functionality requires two activated plugins: **Asset Management Workspace** and **Hardware Asset Management**.
+    - A scaled-down version of this workspace is available in baseline ITSM Asset Management (does not include expanded HAM features).
+  - Installation of the workspace does **not** remove the classic interface—users can switch between the new workspace and classic as desired.
+  - Access the workspace under **Asset → Hardware Asset Workspace**.
+- Workspace Structure & Common Features
+  - Main landing page (Hardware Asset Overview) consolidates metrics, tasks, and important actions across all HAM modules.
+  - Each view provides:
+    - **Important Actions** (top banners/cards) to quickly address data issues (e.g., missing model numbers, missing PO info).
+    - **Overview Section** with quick links and KPI-driven reports.
+    - Ability to drill down into specific lists/records for targeted updates.
+  - Shared goals:
+    - Streamlined navigation for HAM-related tasks.
+    - Data quality and completeness (missing fields, normalization issues).
+    - Cost optimization and risk mitigation (alerts on undiscovered assets, contract expirations, etc.).
+- **Hardware Asset Overview**
+  - Serves as the primary launchpad for all HAM functions.
+  - Aggregates “action cards” from other views (Inventory, Asset Estate, Model Management, Procurement, Contract Management).
+  - Displays quick links and metrics such as:
+    - Missing or incomplete data fields in asset records/models.
+    - KPI overviews: asset count by state, assets nearing end-of-life, undiscovered in-use assets, etc.
+  - One-stop carousel for all important pending actions (e.g., normalizations, transfers, missing fields).
+- **Asset Analytics View**
+  - **Purpose**: Central dashboard for analyzing asset-related costs and insights, primarily focusing on **Total Cost of Ownership (TCO)**.
+  - **TCO Dashboard**:
+    - Highlights which assets have met or exceeded TCO benchmarks.
+    - Displays top cost drivers (e.g., purchase, labor, contracts, parts, etc.) and monthly expense trends.
+    - Provides comparative reports (e.g., “Top 10 models by highest average TCO”) for targeted decision-making.
+  - **Drill-Down & Filtering**:
+    - Drill into individual assets to see detailed expense lines.
+    - Filter data by model, location, or time range to refine cost analysis.
+  - **Integration**:
+    - Pulls data from purchase orders, labor/time tracking, contract costs, shipping, and more.
+    - Uses model-level benchmarks to flag high-cost assets for potential refresh or re-evaluation.
+- **Inventory View**
+  - Central place for stock-related activities and orders:
+    - **All Stockrooms** (view/create/manage stockroom records).
+    - **Asset Audits** (scheduled or blind audits for locations/stockrooms).
+    - **Disposal Orders** (end-of-life or non-functional hardware/consumables).
+    - **Loaner Asset Orders** (manage loaners, due dates, returns).
+    - **RMA Orders/Line Items** (repair or replacement returns to vendor).
+    - **Transfer Orders** (ship/receive assets among stockrooms).
+    - **Donation Orders** (manage asset donations).
+  - Overview page shows:
+    - Inventory-specific data issues (missing assignment groups, stockroom managers, etc.).
+    - Open inventory tasks (pending transfer orders, open requests from stock, etc.).
+    - KPI charts for stockrooms, deliveries, audits, etc.
+- **Asset Estate View**
+  - Manages the full range of assets (hardware, consumables, software licenses if SAM plugin is active, etc.).
+  - Overview page highlights:
+    - Data gaps (missing location, acquisition method, PO number).
+    - KPIs: warranties/leases expiring, pending asset refresh requests, assets by lifecycle state, etc.
+    - Cost distribution by model category, frequently reported incidents on certain assets, disposed assets by category.
+  - Additional tabs for quick navigation:
+    - **All Assets**, **Hardware Assets**, **Consumable Assets**, **Software Licenses** (if SAM plugin present), **Bundle Assets**, **Pallets**, **Other Assets**, **Asset Tasks**.
+- **Model Management View**
+  - Focuses on product/model records for hardware, consumables, contracts, and software (if SAM plugin present).
+  - Overview shows:
+    - Actions for missing model data (numbers, manufacturer, useful life).
+    - Key reports: upcoming end-of-life models, normalization status (normalized vs. unnormalized), life cycle phase counts.
+    - Days until next content refresh from ServiceNow for model normalization data.
+  - Tabs for managing:
+    - **All Models**, **Hardware Models**, **Consumable Models**, **Bundled Models**, **Contract Models**, **Software Models** (if SAM plugin active).
+- **Procurement View**
+  - Manages procurement tasks and related data (purchase orders, sourcing tasks, receiving slips).
+  - Overview includes:
+    - Actions for long-pending draft POs, unreceived transfer orders, orders open >30 days, requests awaiting approval, etc.
+    - Filterable KPI cards for open purchase orders, pending approvals, spend by vendor, and total purchase orders by vendor.
+    - Quick access to:
+      - **Requests** (purchase requests in various states).
+      - **Items** (requested items).
+      - **Tasks** (catalog tasks linked to sourcing).
+      - **Purchase Orders**.
+      - **Receiving Slips**.
+- **Contract Management View**
+  - Centralized dashboard for all contract types (leases, warranties, maintenance, NDAs, etc.).
+  - Overview lists:
+    - Important actions to renew expiring contracts, fill in missing data, or address duplicates.
+    - KPIs for contract expenditure by type/vendor, soon-to-expire contracts, etc.
+  - Additional tabs:
+    - **All Contracts**, **Leases**, **Insurance**, **Maintenance**, **Warranties**, **Purchasing Agreements**, **Purchase Orders** (contract-related), **Service**, **Software Licenses**, **Subscriptions**, and more.
+    - Allows easy filtering by contract type to locate/renew quickly.
+- **Success Portal Enhancements**
+  - A new **Success portal** view in the Hardware Asset Workspace helps track and manage overall success goals and activities for Hardware Asset Management.
+  - Create **success goals** (e.g., aiming to reduce costs, improve inventory accuracy) and assign **success activities** to each goal.
+  - The **Success portal dashboard** displays:
+    - Goals by status (draft, in progress, pending review, completed).
+    - Cost savings (projected vs. actual), categorized by areas like normalization, automation, vendor negotiation, etc.
+    - A centralized list of **open success activities** tied to the goals.
+  - **Maturity tracking**: The portal can include stages (e.g., Crawl → Walk → Run) and predefined maturity items that guide you through advanced HAM processes.
+    - Mark each maturity item as complete or skipped, then progress to the next level.
+    - Provides visibility into how far along your organization is in adopting and optimizing HAM.
+- **Asset Operations View**
+  - Different layout than other views, divided into:
+    - **Inventory**: stockroom types, stock rules, stock orders.
+    - **Procurement**: requests for new assets, purchase orders, or transfers in a single list.
+    - **Hardware Asset Normalization**: custom products/models for normalization rules.
+    - **Contract Renewal**: renewal requests and line items for contract management.
+  - Allows users to define or update stockroom types, create stock rules, and manage stock order fulfillments.
+  - Sourcing and contract renewal tasks can also be viewed/updated here.
+  - **Shipment Tracking & Integration**
+    - **Shipment records** are automatically created when assets are shipped via standard workflows (e.g., transfer orders).
+    - Each shipment record includes carrier info, tracking numbers, and the real-time shipment status of assets in transit.
+    - An **Asset operations → Shipments** list provides a central location to view/track all incoming and outgoing shipments.
+    - Shipment statuses update automatically upon task completion (Ship, Receive), providing end-to-end visibility.
+  - **Total Cost of Ownership (TCO)**
+    - A **TCO dashboard** in a new **Asset analytics** module offers comprehensive cost tracking for each asset.
+    - **Expense categories** cover purchase, labor, contracts, shipping, disposal, parts, etc.
+    - **Rate cards** allow fixed-cost or time-based calculations for asset tasks. Technicians can record time worked, and costs are calculated automatically.
+    - **TCO benchmarks** can be configured at the model level. If actual cost meets or exceeds the benchmark, the workspace flags the asset for potential refresh or review.
+    - **Refresh score** and **capital planning** widgets help identify high-cost or aging assets that may require early replacement.
+
 ### Introduction
 
 - separately licensed Hardware Asset Management (HAM)
