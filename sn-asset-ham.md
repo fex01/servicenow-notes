@@ -21,6 +21,7 @@ back to [Asset Management](./sn-asset.md)
   - [community: Generating and Printing Barcodes for Single and Bulk Assets](https://www.servicenow.com/community/cmdb-forum/generating-and-printing-barcodes-for-single-and-bulk-assets/m-p/3131824/thread-id/13825)
     - [blog: Barcode or QR codes generation in ServiceNow](https://servicenowwithrunjay.com/barcode-or-qr-codes-generation-in-servicenow/#:~:text=Printing%20barcodes%20or%20QR%20codes,generate%20Barcode%20or%20QR%20code.)
   - [KB1216637 Auto-generating Asset Tags](https://support.servicenow.com/kb?id=kb_article_view&sysparm_article=KB1216637)
+  - [community: Deep Dive Into Normalization Data Services - Company Normalization](https://www.servicenow.com/community/developer-blog/deep-dive-into-normalization-data-services-company-normalization/ba-p/2978302)
 - Non-ServiceNow ITAM Resources:
   - **International Organization for Standardization (ISO)**
     - Largest developer of voluntary international standards
@@ -665,12 +666,12 @@ Check also [Lab 1](#l1-a-validate-plugins) for plugin validation.
   - aligns assets under common **Display name (manufacturer + product name + model number)**
   - aligns models with the United Nations Standard Product and Services Code (**UNSPSC**)
 - **Hardware Model Normalization Tables**
-  - Device Type
-  - Hardware Lifecycle Definition
-  - Hardware Manufacturer
-  - Hardware Model Library
-  - Hardware Normalization Map
-  - Hardware Product.
+  - Device Type [sn_hamp_hw_device_type]: Standardizes hardware models based on the UNSPSC.
+  - Hardware Lifecycle Definition [sn_hamp_lifecycle_definition]
+  - Hardware Manufacturer [sn_hamp_hw_manufacturer]
+  - Hardware Model Library [sn_hamp_hw_product_model]
+  - Hardware Normalization Map [sn_hamp_hw_normalization_map]
+  - Hardware Product [sn_hamp_hw_product]
 - **Hardware Asset Management Content Service**
   - **Functionality**: Offers ongoing improvement of hardware and consumable model recognition.
   - **Data Sharing**: Allows secure sharing of data with ServiceNow to enhance normalization processes.
