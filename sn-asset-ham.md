@@ -89,7 +89,7 @@ back to [Asset Management](./sn-asset.md)
     - **Asset Audits** (scheduled or blind audits for locations/stockrooms).
     - **Disposal Orders** (end-of-life or non-functional hardware/consumables).
     - **Loaner Asset Orders** (manage loaners, due dates, returns).
-    - **RMA Orders/Line Items** (repair or replacement returns to vendor).
+    - **RMA Orders/Line Items** (repair or replacement returns to vendor) (Return Merchandise Authorization)
     - **Transfer Orders** (ship/receive assets among stockrooms).
     - **Donation Orders** (manage asset donations).
   - Overview page shows:
