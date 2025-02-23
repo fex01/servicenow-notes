@@ -6,6 +6,16 @@
   - overview decks
   - gezielte decks pro module
   - capability übersicht
+- reset record number counter: [community](https://www.servicenow.com/community/developer-forum/how-to-re-set-the-number-counter/m-p/2091882/page/1https://www.servicenow.com/community/developer-forum/how-to-re-set-the-number-counter/m-p/2091882/page/1)
+
+  ```js
+  var sncRec = new GlideRecord("sys_number_counter");
+  sncRec.query();
+  while (sncRec.next()) {
+    sncRec.number = 0;
+    sncRec.update();
+  }
+  ```
 
 ## Resources
 

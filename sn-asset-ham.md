@@ -12,8 +12,8 @@ back to [Asset Management](./sn-asset.md)
 
 - [x] [Hardware Asset Management (HAM) Fundamentals On Demand (Washington)](https://nowlearning.servicenow.com/lxp/en/it-asset-management/hardware-asset-management-ham-fundamentals-on-demand?id=learning_course_prev&course_id=944ea00847908654db63fb25126d4320)
 - [x] Hardware Asset Simulator
-- [ ] Hardware Asset Workspace Overview
-- [ ] Mobile Hardware Asset Management Fundamentals
+- [x] Hardware Asset Workspace Overview
+- [x] Mobile Hardware Asset Management Fundamentals
 
 ### Links
 
@@ -45,6 +45,72 @@ back to [Asset Management](./sn-asset.md)
     - [Website](https://www.bsigroup.com/en-GB/iso-20000-it-service-management/)
 
 ## Topics
+
+### Flows
+
+#### Standard Hardware Asset Request
+
+- [docs: Use a hardware asset request flow](https://www.servicenow.com/docs/bundle/xanadu-it-asset-management/page/product/hardware-asset-management/task/hardware-request-flow.html)
+  - procedure
+    - All > Service Catalog > Maintain Items
+      - either via table or catalog item form: add column / field `Flow`
+      - select `Standard Hardware Asset Request`
+      - save
+    - start request via Service Catalog
+    - HAM Workspace > Procurement > Tasks
+      - select Service Catalog Task > Source request button
+        - Local Stock: requires stock for the hardware model in stockroom local to requestor
+        - Transferable stock: stock for the hardware model in some stockroom
+          - -> Transfer Order
+        - Vendor purchase: configured Vendor / Vendor Catalog items
+          - -> Purchase Order
+        - REQ get's updated to "sourced=true"
+      - Receiving
+        - Local: Asset Task Confirm assigned asset
+          - HAM Workspace > Asset estate > Asset Tasks
+            - open task > Start Work button
+            - select asset and close task
+        - TO: HAM Workspace > Inventory Transfer Orders
+          - select TO > TO Lines > select TOL > TOL Tasks > select task
+            - Ready for fulfillment
+            - Prepare for shipment
+            - Ship
+            - Receive
+            - Deliver
+        - PO: HAM Workspace > Procurement > Purchase Orders
+          - receiving required Asset Tag & Serial Number!
+          - Asset get's created on receiving, receiving slip get's created and attached
+      - Stage asset: if required, pick up task will be created
+        - depends on stockroom
+        - asset substate updated to `Pending install`
+      - Deploy Task
+        - define Assignment group - static or based on Catalog Item Variables
+        - task to build / configure asset for operational use
+        - deploy asset to user
+        - task closed -> deployment is done -> Request is closed
+      - Automated Asset update
+        - update asset fields: State, Assigned, Installed, Location, and Assigned to
+        - asset is now in use
+- publish hardware model as catalog item
+  - example (rix3): Apple 11-inch iPad Pro Wi-Fi + Cellular
+- copy flow to adapt
+  - flow in detail
+    - option to set durations for Flow stages (... > Flow stages)
+    - Ask for Approval
+      - [docs](https://www.servicenow.com/docs/bundle/xanadu-build-workflows/page/administer/flow-designer/reference/ask-approval-flow-designer.html)
+      - requires Approver
+        - select user or group
+        - dynamic user or group from data pills, for example manager of requestor
+        - manual approvers: add users to related list
+      - optional: Due Date
+    - Source RITM Catalog Task
+      - where is it created?
+        - workflow `Source Request`
+      - where is the Assignment Group specified?
+        - workflow `Source Request`> Create Task > Populate task variables > Fulfillment group
+      - workflow triggers `Create procurement task` activity
+      - condition "sourceable=True" on Request
+    - work on source request task
 
 ### HAM Workspace
 
@@ -1026,7 +1092,7 @@ Check also [Lab 1](#l1-a-validate-plugins) for plugin validation.
     - Substates for some states (e.g., Available, Reserved, Defective, Donated, Sold)
       - ![Asset States and Substates](./attachments/sn-asset-states.png)
     - When you opt-in to CSDM, these states may be replaced by Life Cycle Stage and Life Cycle Stage Status
-      - ![CSDM Life Cycle Stages: Hardware](./attachments/sn-csdm-lc-harware.png)
+      - ![CSDM Life Cycle Stages: Hardware](./attachments/sn-csdm-lc-hardware.png)
   - Importance of Selecting a Substate
     - Indicates what actually happened to the asset (e.g., Sold, Disposed)
     - Helps meet internal/external regulations governing asset retirement
