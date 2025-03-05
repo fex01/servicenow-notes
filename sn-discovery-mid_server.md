@@ -249,3 +249,16 @@ With these steps, you can build, launch, and manage Containerized MID Servers on
 ### MID Server FileNameComplianceInSync Error
 
 - [community: MID Server FileNameComplianceInSync Error](https://www.servicenow.com/community/itom-forum/mid-server-filenamecomplianceinsync-error/td-p/3017630)
+
+### Logs
+
+#### Agent Logs on Host
+
+- [KB0535148 Review the agent log for MID Server errors](https://support.servicenow.com/kb?id=kb_article_view&sysparm_article=KB0535148)
+  - windows (default): `C:\<mid server folder>\logs\agent0.log.0`
+
+#### Tail MID Server Logs
+
+- [KB0534869 Tailing a MID server log file on Linux and Windows](https://support.servicenow.com/kb?id=kb_article_view&sysparm_article=KB0534869)
+  - linux: `tail -f agent0.log.0` or `tail -f agent0.log.0 | grep -i "warning"`
+  - windows: `C:\ Get-Content agent0.log.0 -Wait` or `C:\ Get-Content agent0.log.0 -Wait | where { $_ -match "warning" }`

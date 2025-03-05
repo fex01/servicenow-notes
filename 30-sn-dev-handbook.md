@@ -116,3 +116,28 @@ function changeState(tableName, newState, encodedQuery) {
   - setVisible() vs. setDisplay() (Client Script)
     - `g_form.setVisible()` hides the field and its label, but leaves a blank space
     - `g_form.setDisplay()` hides the field and its label, and collapses the blank space
+- Business Rule Order: `current.update()`
+  - ![Business Rule Order](./attachments/sn-dev-hb-business-rule-trigger.png)
+  - always triggered by database operations: `insert`, `update`, `delete`, `query`
+  - when - in relation to db operations:
+    - `before`
+      - alter the record before it is written to the db, do not use to alter other records
+      - `current.setAbortAction(true)` - stop the operation
+        - or use the _Abort action_ checkbox in the Business Rule
+      - no need for `current.update()`, as the operation is already on the way to the db
+      - avoid long scripts - user has to **wait** for execution!
+    - `after`
+      - after db operation but before the record is displayed
+      - very good to update related records that should be displayed in the current view - for example related list records
+        - use async for related records that are currently not displayed
+      - be careful with `current.update()`, as it triggers the Business Rule again (infinite loop potential!)
+      - avoid long scripts - user has to **wait** for execution!
+    - `async`
+      - will be executed in a few seconds - but the user does not have to wait
+      - for related records that are currently not displayed
+      - caveat: previous state of `current` record is not available
+      - be careful not to run into race conditions
+    - `display`
+      - triggered after the record is _retrieved_ from the db
+      - modify displayed data **without** altering the record (as long as `current.update()` is not used - do not!)
+      - often used to populate the _scratchpad_ for client scripts
