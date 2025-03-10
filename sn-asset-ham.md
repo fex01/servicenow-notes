@@ -46,6 +46,55 @@ back to [Asset Management](./sn-asset.md)
 
 ## Topics
 
+### TO Sort
+
+#### Model Creation
+
+This section outlines the research and procedures for creating new hardware models in ServiceNow HAM (Hardware Asset Management). The steps detail how to link products and model numbers, create custom hardware models when required, and handle procurement processes.
+
+- The content portal contains:
+  - **Hardware products** linked to multiple Hardware Model Library records
+  - **Hardware Model Library** records linking a hardware product to a specific model number (on Content lookup start page, referenced as “Hardware model numbers”)
+- For new (non-discoverable*) models (e.g., product: HP 527pq - Series 5 Pro - LED-Monitor, model number: 9D9S0UT), follow these steps:
+  - Use **HAM Workspace → Content lookup**:
+    - Search the model number; if a matching **Hardware Model Library** entry is found, open the referenced Product record (done)
+    - If no match:
+      - Search the product name; if a **Hardware Product** entry is found, open it, confirm details (e.g., Device type), then check the **Hardware Model Libraries** tab
+      - If an existing entry matches the model number, you’re done
+      - If no entry matches, click **New** to link the model number to the Hardware Product
+        - Name example: “Series 5 Pro-527pq 9D9S0UT”
+        - Optionally fill **Features** (e.g., product specs)
+        - Save
+      - If no match at all, proceed with manual model creation (no normalization data)
+  - Create a Hardware Model (HAM Workspace → Model Management → Hardware Models → New):
+    - Fill **Manufacturer** (match Content Lookup’s manufacturer name)
+    - Fill **Name** (prefer the Product name from Content Lookup), **Model number** (e.g., 9D9S0UT), **Model Categories** (e.g., “Monitor”), and **Price**, then **Save**
+    - In the **Normalization** section:
+      - If **Product** is empty, select the Product from Content Lookup
+      - Select the model number from the related Hardware Model Library entry
+      - Device type fills automatically once Product is selected
+    - Save again
+    - (Optional) Check **Features** (carried from the Hardware Model Library record if filled)
+    - (Optional) **Publish to Hardware Catalog** if needed
+    - Use **HAM Workspace → Asset operations → Hardware asset normalization → Custom models** to manage self-created models
+- For procurement:
+  - Create a **Vendor Catalog Item** (All → Product Catalog → Catalog Definitions → Vendor Items → New):
+    - Let **Name** auto-generate
+    - Select a **Vendor** (Company with **Vendor=true**)
+    - Select the **Product Model** you created (e.g., “Hewlett-Packard Series 5 Pro-527pq 9D9S0UT”)
+    - Enter **Product ID** (vendor’s article number), **Vendor price** (if available), and other details
+    - Save
+  - Create a **Bulk order** (HAM Workspace → Procurement → Purchase orders → New):
+    - Assign to the executing Asset Manager
+    - Select a **Ship to** stockroom
+    - Save
+    - Add a **Purchase order line item**:
+      - Select the same **Vendor** (Company with **Vendor=true**)
+      - Select the **Product Model** (display name)
+      - Enter **Ordered quantity**
+      - Note that **List price** and **Cost** default to the **Model Price** (not the Vendor Catalog Item price)
+      - Save
+
 ### Flows
 
 #### Standard Hardware Asset Request
