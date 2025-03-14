@@ -32,6 +32,9 @@
   - in der Konfig IQuery = true nach Installation setzen
 - ACC Mid Server Empfehlung: Linux - kann mit deutlich mehr ACC Agents umgehen
   - wenn per Internet erreichbar: in der Cloud autark ohne Verbindung zum Kernnetz laufen
+- find Ruby Scripts for the ACC: All > Agent Client Collector > Configuration > ACC Plugins
+  - for example: acc-f-modules (Windows)
+  - scripts attached as tag.gz file
 
 ### Assigned To Discovery
 
