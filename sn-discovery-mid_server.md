@@ -132,27 +132,35 @@ Back to [ServiceNow Discovery](./sn-discovery.md)
 
 ### Windows
 
-- Step 1: Create the Service Account
-  - Open Computer Management:
-    - Press Windows + R, type compmgmt.msc, and press Enter.
-    - In the Computer Management window, expand Local Users and Groups and then click Users.
-  - Create a New User:
-    - Right-click Users, and then click New User.
-    - In the New User window, fill in the required details for the new account:
-    - Username: Name the service account (e.g., ServiceAccount1).
-    - Password: Set a strong password for this account.
-    - Uncheck User must change password at next logon and check Password never expires.
-    - Click Create.
-- Step 2: Assign “Log on as a Service” Permission
-  - The “Log on as a service” permission must be granted to this service account so that it can be used to run services. Here’s how you can do that:
-    - Open Local Security Policy:
-      - Press Windows + R, type secpol.msc, and press Enter to open the Local Security Policy editor.
-      - Expand Local Policies and then click User Rights Assignment.
-    - Grant Log on as a Service Permission:
-      - In the right pane, find and double-click Log on as a service.
-      - In the Log on as a service Properties window, click Add User or Group.
-      - In the dialog box, enter the name of the service account you created (e.g., ServiceAccount1), then click OK.
-      - Click OK again to close the properties window.
+- install MID server: elevated CMD Prompt `msiexec /i "Path\to\your\file.msi"`
+  - SHIFT + Right-click > Copy as path
+  - required information:
+    - ServiceNow Instance URL, e.g. `https://instance.service-now.com`
+    - ServiceNow MID Server Username
+    - ServiceNow MID Server Password
+    - MID Server Name - name for the MID server record in the SNow instance
+    - Service Account Name - configured local service account with log on as a service permissions
+      - Step 1: Create the Service Account
+        - Open Computer Management:
+          - Press Windows + R, type compmgmt.msc, and press Enter.
+          - In the Computer Management window, expand Local Users and Groups and then click Users.
+        - Create a New User:
+          - Right-click Users, and then click New User.
+          - In the New User window, fill in the required details for the new account:
+          - Username: Name the service account (e.g., ServiceAccount1).
+          - Password: Set a strong password for this account.
+          - Uncheck User must change password at next logon and check Password never expires.
+          - Click Create.
+      - Step 2: Assign “Log on as a Service” Permission
+        - The “Log on as a service” permission must be granted to this service account so that it can be used to run services. Here’s how you can do that:
+          - Open Local Security Policy:
+            - Press Windows + R, type secpol.msc, and press Enter to open the Local Security Policy editor.
+            - Expand Local Policies and then click User Rights Assignment.
+          - Grant Log on as a Service Permission:
+            - In the right pane, find and double-click Log on as a service.
+            - In the Log on as a service Properties window, click Add User or Group.
+            - In the dialog box, enter the name of the service account you created (e.g., ServiceAccount1), then click OK.
+            - Click OK again to close the properties window.
 - Step 3: Configure the Service to Use the Service Account
   - Open Services:
     - Press Windows + R, type services.msc, and press Enter.
@@ -176,6 +184,45 @@ Configuration
   - mid.instance.username: instance mid server user
   - mid.instance.password: instance mid server user password hash
   - name: mid server name
+
+#### Multiple MID Server Services on One Windows Host
+
+- [docs: Install multiple MID Servers on a single system](https://www.servicenow.com/docs/bundle/yokohama-servicenow-platform/page/product/mid-server/task/t_InstallMultplMIDSvrOnASingleSys.html)
+
+When installing multiple MID Servers on the same Windows host, the process differs from a standard single-instance installation in several key ways:
+
+1. **Separate Installation Directories**  
+   - Each MID Server must have its own unique installation directory at the top level of the drive (e.g., `C:\MIDServer1\`, `C:\MIDServer2\`).
+   - Extract the MID Server installation package into each designated directory separately.
+
+2. **Unique MID Server Names and Service Identifiers**  
+   - During installation, provide a distinct name for each MID Server (e.g., `MIDServer_Discovery`, `MIDServer_Integration`).
+   - Assign a unique Windows service wrapper name and display name to each MID Server service to avoid conflicts.
+
+3. **Independent Configuration Files**  
+   - Each MID Server has its own `config.xml` file, typically located in `C:\<MID Server Directory>\agent\config.xml`.  
+   - Modify the parameters separately for each MID Server:
+     - `url`: URL of the ServiceNow instance.
+     - `mid.instance.username`: MID Server user credentials.
+     - `mid.instance.password`: Hashed password for authentication.
+     - `name`: Unique MID Server name.
+
+4. **Service Account Considerations**  
+   - While multiple MID Servers can run under the same Windows service account, it is best practice to use separate accounts for security and performance management.
+   - If using a dedicated service account per MID Server, repeat the process of granting "Log on as a Service" permissions for each account.
+
+5. **Starting Multiple MID Server Services**  
+   - Navigate to the respective installation directories and start each MID Server using:
+
+     ```sh
+     /agent/start.bat
+     ```
+
+   - Ensure each service is registered and recognized in the Windows Services panel (`services.msc`).
+
+6. **Validation in ServiceNow**  
+   - Once installed, navigate to the **MID Server List** in ServiceNow.
+   - Validate each MID Server separately to ensure proper registration and connectivity.
 
 ### Docker
 
@@ -223,6 +270,7 @@ Configuration
 #### 2. Launch Containerized MID Server (Docker)
 
 1. **Prerequisites**
+
    - **Docker Engine & CLI 20.10.4+**
 
 2. **Start the Container**
@@ -232,8 +280,8 @@ Configuration
    ```
 
    - remarks:
-    - `--network host` seems to reliably kill the mid server start
-    - `-p 8800:8800` expose port for ACC Listener
+     - `--network host` seems to reliably kill the mid server start
+     - `-p 8800:8800` expose port for ACC Listener
 
 #### 7. Additional Notes & Best Practices
 
