@@ -1,212 +1,330 @@
-# CMDB
+# CMDB Reference Notes
 
-## Tag Governance
+## 1. Introduction
 
-- [docs: Tag Governance](https://docs.servicenow.com/bundle/washingtondc-it-operations-management/page/product/it-operations-management/concept/tag-governance.html)
-- summary (ChatGPT):
-  - Tag Governance App: Identifies non-compliant cloud/on-premises resources against organizational tag policies.
-  - Tags: Key-value pairs used to categorize assets for better visibility into cloud usage and costs.
-  - Discovery Features:
-    - Collects cloud tags for VMs and saves them in the Key Value table.
-    - Supports major cloud providers (AWS, Azure, GCP) and container ecosystems.
-  - Tagging Policies:
-    - Establish policies based on organizational needs (e.g., finance, IT security).
-    - Consider user access levels and real-time checks for effective management.
-  - Dashboard Functions:
-    - Monitor compliance with tag policies.
-    - Identify non-compliant CIs and use remediation flows for bulk updates.
-  - Policy Types for Auditing:
-    - Tag Count: Checks specified tag key counts.
-    - Tag Presence: Verifies presence of specified tag key values.
-    - Tag Key & Value: Confirms presence of specific key-value pairs.
-  - Auto-Remediation: Automates tagging of cloud resources using AWS permissions.
-  - Requirements: ITOM Visibility entitlements needed for remediation tasks.
+- **Purpose**: Provide a single source of truth for configuration items (CIs) in ServiceNow, aligned with the Common Service Data Model (CSDM).
+- **Goals**:
+  - Deliver high-quality CMDB data for ITSM, ITOM, and other processes.
+  - Ensure consistent service definitions and governance.
+  - Drive continuous improvement using best practices and built-in ServiceNow capabilities.
 
-## Change Management
+---
 
-- [CMDB - Process Guide](https://nowlearning.servicenow.com/nowcreate/en/pages/assets?id=nc_asset&nc_ai_search=true&sys_id=8efe3ca0db289c1077c0ce46b99619ef&table=x_snc_accel_asset&asset_id=31ac790b474112504f97dc84f16d438b&searchTerm=CMDB%20-%20Process%20Guide)
-  - chapter Data Maintenance/Update and Maintenance
-    - Configuration Control: ensures only authorized and identifiable CIs are added to the CMDB
-      - governs updates to the CMDB
-      - forward unauthorized changes to Change Management
-      - discrepancies and errors are to be forwarded to the CI Owner for resolution
-    - change management for any CI updates
-      - configuration manager receives change request to update existing CI
-      - authorized changes are prioritized and forwarded to CMDB Admin
-      - rejected changes are returned to requestor with an explanation
-      - for changes to CIs / new CIs discovered with Discovery and other tools, verify that an authorized change request exists
-        - alternative: trigger discovery for associated CI during change implementation / review to update the CMDB in accordance with the change
-    - managing proposed changes
-      - feature to pre-configure changes to configuration items and their associated relationships
-      - do not happen until applied
-      - can be displayed on the CI record
-      - use to approve changes:
-        - if approved, all proposals can be applied with a quick command
-        - if rejected, no changes have to be rolled back
-      - options:
-        - modify any field on the CI form
-        - add or delete CI relationships
-      - [docs: Managing proposed changes](https://docs.servicenow.com/bundle/xanadu-servicenow-platform/page/product/configuration-management/concept/c_ProposedChanges.html)
-- [Maintain a healthy CMDB](https://nowlearning.servicenow.com/nowcreate/en/pages/assets?id=nc_asset&nc_ai_search=true&sys_id=4450f8c0c32746501ac0f60f05013152&table=x_snc_accel_asset&asset_id=70e2839cc3601ed05922751ce001313e&searchTerm=Configuration%20Control)
-  - chapter Manage and control change
-    - Use ServiceNow Change Management to handle change requests – And use the Proposed Change function for updates of non-discoverable, manually-entered data.
-    - Make sure that changes are reviewed and approved before they’re made
-    - Use the Identification and Reconciliation Engine (IRE) to import new data in your CMDB –IRE
-      processes help maintain data integrity in the CMDB, preventing duplicate CIs by uniquely
-      identifying CIs and CI attributes by allowing only authoritative data sources to write to CMDB.
-    - Configure permissions so that only authorized users can make changes to your CMDB
-    - Communicate changes to stakeholders
+## 2. Resources
 
-## Access Control Options
+### 2.1 Learning and Documentation
 
-- alternative: activate auditing for CMDB tables
-  - [community: How to Enable Audit History for CI and Asset Tables](https://www.servicenow.com/community/cmdb-forum/how-to-enable-audit-history-for-ci-and-asset-tables/m-p/2842781)
-    - All > System Definition -> Dictionary
-      - open table record and set Audit to true
-      - can have performance impact, configure data cleanups
-- check: have ITIL user CMDB write permissions
-  - yes: [sn_cmdb_editor]
-  - [itil_admin] contains [sn_cmdb_admin]
-- not in scope: admin, security_admin
-- light restrictions:
-  - ensure that roles [sn_cmdb_editor] and [sn_cmdb_admin] are only assigned to Configuration Manager, CMDB Admin, and Class Owners
-  - ensure that no other roles have write access to the CMDB
-    - if [itil] loses [sn_cmdb_editor], it has to be assigned on Class Owner level
-  - no further restrictions
-- heavy restrictions:
-  - write
-    - Configuration Manager, CMDB Admin with role [sn_cmdb_admin]: full access
-    - Class Owners: restrict to respective CI Classes / CI Groups
-    - Technical Service Offerings for Application Services Managed by Group: down to Application level
-    - Technical Service Offerings for Infrastructure (Dynamic CI Groups) Managed by Groups: all CIs in Dynamic CI Group
-    - discovery source service accounts: restrict to CI Classes according to Reconciliation Rules
-  - Services CIs restricted according to service roles: [service_author], [service_admin], [service_editor]
-  - erweitert: Schreibschutz auf spezifischen Feldern möglich
-  - sensitive tables:
-    - [cmdb_ci_config_file_tracked]
+- **Courses**
+  - [Learning Path CMDB Fundamentals](https://nowlearning.servicenow.com/lxp/en/now-platform/configuration-management-database-cmdb-fundamentals?id=learning_path_prev&path_id=c120bb5bdbd0c8103e3aaca2ca9619bf)
+  - [MID Server Fundamentals](https://nowlearning.service-now.com/lxp?id=learning_course_prev&course_id=dcfdb5b5dbf5acd030c91fdc1396199a)
+  - **CSDM: Getting Started with Services and Service Offerings**
+    - [NowCreate: CSDM Workshop - Getting Started](https://nowlearning.servicenow.com/nowcreate?id=nc_asset&asset_id=dde64c62875255d0f2f443f7dabb354b)
+    - [CSDM workshop](https://nowlearning.servicenow.com/nowcreate?id=nc_asset&asset_id=5c4d48bfdb998d100c912b691396198e)
+    - [CMDB workshop](https://nowlearning.servicenow.com/nowcreate?id=nc_asset&asset_id=3054c3838795d9d8af9f213acebb35c5)
+    - [CSDM Data model examples](https://nowlearning.servicenow.com/nowcreate?id=nc_asset&asset_id=c0ddb115db6d0d900c912b6913961987)
+- **Documentation & Guides**
+  - CMDB Best Practices
+    - [CMDB Health](https://docs.servicenow.com/csh?topicname=c_CMDBHealth.html&version=latest)
+    - [Tables and Classes](https://docs.servicenow.com/csh?topicname=r_TablesAndClasses.html)
+    - [Table Hierarchy & the Extension Model](https://docs.servicenow.com/csh?topicname=t_TableHierarchyAndTheExtModel.html)
+    - [Tree Picker](https://docs.servicenow.com/csh?topicname=c_TreePicker.html)
+    - [Create a CI Class](https://docs.servicenow.com/csh?topicname=t_CreateCIType.html)
+    - [Properties for CMDB Query Builder](https://docs.servicenow.com/csh?topicname=cmdb-querybldr-sysproprties.html)
+    - [Suggested Class Relationships](https://docs.servicenow.com/csh?topicname=r_SuggestedRelationshipModel.html)
+    - [Instance Customization FAQ](https://hi.service-now.com/kb_view.do?sysparm_article=KB0553407)
+    - [Add or Edit a Business Application](https://docs.servicenow.com/csh?topicname=manage-business-appln.html)
+  - [Activate Multisource CMDB](https://www.servicenow.com/community/itom-forum/task-07-enable-multisource-cmdb-how-to-add-the-property/m-p/967768)
+    - [Now CMDB 360](https://docs.servicenow.com/bundle/washingtondc-servicenow-platform/page/product/configuration-management/concept/multisource-cmdb.html#d308326e158)
+  - [Best Practices for CMDB Data Management](https://www.servicenow.com/community/cmdb-articles/best-practices-for-cmdb-data-management/ta-p/2841377)
+  - CMDB Health References & Further Reading
+    - [CMDB Remediation Rules (docs)](https://docs.servicenow.com/bundle/xanadu-servicenow-platform/page/product/configuration-management/task/t_CreateCMDBRemediationRule.html)
+    - [CMDB Data Foundations Dashboards](https://docs.servicenow.com/csh?topicname=csdm-cmdb-foundations-dashboards.html)
+    - [Attestation & Certification vs. CMDB Health (KB articles)](https://support.servicenow.com/kb?id=kb_article_view&sysparm_article=KB0829106)
+    - [Dynamic Reconciliation](https://docs.servicenow.com/bundle/washingtondc-servicenow-platform/page/product/configuration-management/concept/multisource-cmdb.html)
 
-## Workshop Topics
+### 2.2 Additional Links
 
-### Themenliste
+- **Archiving**
+  - [CMDB Data archiving (forum)](https://www.servicenow.com/community/cmdb-forum/cmdb-data-archiving/m-p/3077930/highlight/true#M13073)
+  - [Non-CMDB Data Archiving Walkthrough](https://www.servicenow.com/community/now-platform-articles/data-archiving-walkthrough/ta-p/2316478)
+- **Change & Proposed Changes**
+  - [ServiceNow Change Management](https://docs.servicenow.com/csh?topicname=c_ITILChangeManagement.html&version=latest)
+  - [Proposed Changes](https://docs.servicenow.com/csh?topicname=c_ProposedChanges.html&version=latest)
+- **Identification & Reconciliation**
+  - [Identification and Reconciliation Engine (IRE)](https://docs.servicenow.com/csh?topicname=ire.html&version=latest)
 
-- Business goals and Use Cases
-  - ITOM Starter Package_SN_v003.pptx, s13,
-  - CMDB - PreWorkshop Readiness Kickoff.pptx, s12-14
-- Begriffsklärung
-  - Configuration Management
-    - CMDB - PreWorkshop Readiness Kickoff.pptx, s13
-  - CMDB
-    - CMDB - PreWorkshop Readiness Kickoff.pptx, s14
-    - ITOM Starter Package_SN_v003.pptx, s17
-      - inkl. Ziele Configuration Management
-  - Discovery
-    - ITOM Starter Package_SN_v003.pptx, s32
-  - CI
-    - CMDB - Project Workshop.pptx, s40
-  - Asset vs CI
-    - ITOM Starter Package_SN_v003.pptx, s18, s76
-    - CMDB - Project Workshop.pptx, s41-42
-    - Starterpaket ITOM/01 Input/CMDB v0.1.pptx, s37-40, s67
-  - Key Concepts
-    - ITOM Starter Package_SN_v003.pptx, s73
-    - CMDB - Project Workshop.pptx, s44
-- ServiceNow Application Interactions
-  - CMDB - PreWorkshop Readiness Kickoff.pptx, s15
-  - ITOM Starter Package_SN_v003.pptx, s19
-    - Interaktionen ITSM Prozesse
-- Design CMDB Data Model
-  - CMDB - PreWorkshop Readiness Kickoff.pptx, s19
-  - CMDB - Project Workshop.pptx, s30-35
-    - incl. CSDM
-  - ITOM Starter Package_SN_v003.pptx, s20-21
-    - only CSDM
-- Configuration Management Prozess
-  - ITOM Starter Package_SN_v003.pptx, s22-23
-  - Operationalize CMDB
-    - CMDB - PreWorkshop Readiness Kickoff.pptx, s20
-    - CMDB - Project Workshop.pptx, s36
-- Personas and Roles
-  - ITOM Starter Package_SN_v003.pptx, s26, s60
-  - CMDB - PreWorkshop Readiness Kickoff.pptx, s24-29
-  - CMDB - Project Workshop.pptx, s25-29
-- Populating the CMDB
-  - ITOM Starter Package_SN_v003.pptx, s34
-    - Typical CIs for Crawl Phase Discovery s41
-  - CMDB - PreWorkshop Readiness Kickoff.pptx, s29-30
-- Implementation and Maintenance Plan – High Level
-  - ITOM Starter Package_SN_v003.pptx, s33
-- MID server implementation
-  - ITOM Starter Package_SN_v003.pptx, s52-58
-    Starterpaket ITOM/ITOM_MID_Server Konfig.pptx, 29 slides
-- Final Slides
-  - Links to Resources
-    - CMDB - PreWorkshop Readiness Kickoff.pptx, s32
+---
 
-### Steps
+## 3. Implementation Approach
 
-- according to `CMDB - Project Workshop.pptx`
-  - 1. Set your direction - s12ff, Business goals and use cases
-    - Plan your successful CMDB deployment.pdf, p5-6
-  - 2. Build a team - s25ff, Personas and Roles
-  - 3. Design Data Model - s30ff
-  - 4. Operationalize and Maintain the CMDB - s36
-- further slidedeck structure
+1. **Set Direction**
+   - Define business outcomes and success criteria (e.g., reduce incidents by X%, improve change success rate).
+   - “Scoping: only required data in the CMDB” for key processes like CMDB Health or data policies.
+2. **Build a Team & Governance**
+   - _Roles_:
+     - **Configuration Management Executive Sponsor**: Oversees the plan, resolves cross-functional issues, communicates goals and objectives at a senior level.
+     - **Configuration Management Process Owner**: Responsible for strategic development of the process, ensuring resources and consistent execution.
+     - **Configuration Manager**: Manages day-to-day activities, resolves compliance issues, approves changes to the CMDB infrastructure.
+     - **Configuration Management System Analyst**: Performs daily operational tasks, audits, and fulfillment of CM service requests.
+     - **Configuration Management Specialist**: (Optional) Maintains expert-level knowledge of CI classes, discovery results, data integration points.
+   - Implement a **Configuration Control Board (CCB)** as a steering committee for major CMDB changes:
+     - Triggers for CCB review: new CI classes, significant changes to the CM plan, major updates from architecture or security processes.
+   - Emphasize that _Configuration Management is an ongoing process_, not a one-time project.
+3. **Design Your Configuration Plan**
+   - Identify critical CI classes first; align data sources with the IRE to avoid duplicates.
+   - **Start Small**: Only track the data you truly need (e.g., for CMDB Health, audits, or key governance requirements).
+   - Implement minimal mandatory fields initially; expand to recommended fields before making them required (see [CMDB Health Dashboard](#63-cmdb-health-dashboard)).
+   - Plan for **Asset–CI Synchronization** if financial lifecycles are relevant.
+4. **Show Value**
+   - Demonstrate improvements in incident or change management.
+   - Tie CMDB data back to business drivers like cost savings, risk reduction, or better compliance.
+   - Communicate changes clearly to business stakeholders for long-term CMDB health.
 
-  - 5. CMDB definitions and concepts - s37ff
-  - 6. ServiceNow CMDB Basics
-    - s44 Key Concepts
-    - s45-46 Data Tables
-      - ITOM Starter Package_SN_v003.pptx, s72
-    - s47-52 Class Structure
-      - Crawl CIs also in ITOM...: s24, s41
-    - s53-58 CI Attributes
-      - CI Groups also in ITOM...: s74
-      - CI Record Form also in ITOM...: s44
-    - s59-68 Product Models and CSDM
-    - s69-76 Lifecycle Stage/Status
-    - s77-80 CI Groups
-      - CI Groups also in ITOM...: s74
-    - s81-87 Dynamic CI Groups
-      - Verantwortlichkeiten CI Klassen (TS, TSO), Starterpaket ITOM/01 Input/CMDB v0.1.pptx, s55
-  - 7. Populating the CMDB - s88-94
-    - s95-112 Identification and Reconciliation
-      - Discovery and IRE Engine Process Flow also in ITOM...: s104
-    - s113-120 CMDB 360
-  - 8. Manage - Data Management and CMDB Health - s120ff
-    - s121-136 Data Manager
-    - s137-157 CMDB Health
-    - s158-174 CMDB Management
-  - 9. Decisions - s175
-    - also Itom...: s45-48
-    - s179-180 CMDB Story Themes
-  - 10. Additional Resources - s181
-    - s182 links
-    - s183 plugins
-      - ITOM..., s6
-    - 185 Next steps
+### 3.1 Key Implementation Best Practices
 
-- Agenda
-  - first draft:
-    - 1 CMDB
-      - 1.1 CMDB Einführung
-      - 1.2 Strategie
-        - Ziele
-        - CMDB Team
-        - Data Model
-        - Operation & Management
-      - 1.3 CMDB Konzepte
-      - 1.4 CMDB Grundlagen
-      - 1.5 CMDB Datenimport
-      - 1.6 CMDB Pflege
-      - 1.7 Entscheidungen
-    - 2 Discovery
-    - 3 Asset Management
-  - second try
-    - Ziele
-    - Einführung und Begriffsklärung
-    - Grundlagen CSDM
-    - Grundlagen CMDB Health
-    - CMDB Use Cases, Datenmodell und CI-Quellen
-    - CMDB Discovery - Grundlagen und Zulieferleistungen
-    - CMDB Rollen und Verantwortlichkeiten
-    - Config Management Prozess / Pflegeprozesse
+1. **Start Small**
+   - Focus on key CI classes and attributes (e.g., servers, applications).
+   - Don’t attempt to populate every table before validating your core needs.
+2. **Automate Data Collection**
+   - Use Discovery, IntegrationHub ETL, or Service Graph Connectors to reduce manual data entry.
+3. **Leverage CMDB Health**
+   - Continuously monitor for duplicates, orphans, stale records (see [CMDB Health Dashboard](#63-cmdb-health-dashboard)).
+4. **Align with Change Management**
+   - Use Proposed Changes to handle manual CI edits that need approval.
+   - Store each CI update in the CMDB only after it’s fully authorized.
+5. **Communicate**
+   - Keep stakeholders informed about the CMDB plan and data model changes to maintain organizational buy-in.
+
+- **Sources**
+  - [Design a Successful CMDB Implementation](https://nowlearning.servicenow.com/lxp/en/pages/learning-course?id=learning_course&path_id=c120bb5bdbd0c8103e3aaca2ca9619bf&course_id=cd7d6ee5db1a7700760a7104399619f1&child_id=7abde9c3db804d109e32db85ca9619a3&spa=1)
+  - [CMDB Implementation Best Practices (community)](https://www.servicenow.com/community/cmdb-articles/best-practices-for-cmdb-data-management/ta-p/2841377)
+
+---
+
+## 4. Service Modeling & CSDM
+
+### 4.1 CSDM Overview
+
+- **Service Definitions**:
+  - Business Service Offerings (BSOs), Technical Service Offerings (TSOs), Application Services (mapped vs. dynamic).
+- **Minimal Overlap**:
+  - CSDM guidance: each CI should map to one TSO to avoid conflicting SLAs/OLAs.
+
+### 4.2 Teams Related List (Multi-Level Support)
+
+- Used on **Service** CI forms to track Approval, Change, Managed By, or Support groups.
+- Enable the _Teams_ related list in the form layout.
+- To add a custom group type, edit the `group_type` dictionary (roles: `itil_admin`, `asset`, or `cmdb_admin`).
+
+- **Sources**
+  - [Teams Related List docs](https://docs.servicenow.com/bundle/xanadu-servicenow-platform/page/product/configuration-management/concept/teams-related-list.html)
+
+### 4.3 Synchronizing Group Assignment Attributes
+
+![Synchronizing Assignment Group Attributes](./attachments/sn-cmdb-sync-groups.png)
+
+- **Purpose**: Automate assignment of support or change groups to CIs:
+  - Priority: _TSO_ > _Dynamic CI Group_ > _CI Class_ or individual CIs.
+- **Dynamic CI Groups**:
+  - Create a CMDB Group (query-based) → Link to a Dynamic CI Group → Optionally attach to a TSO.
+- **Scheduled Job**:
+  - _CSDM Data Sync_ (if enabled) propagates group assignments from TSOs to associated CIs.
+- **Potential Overlaps**:
+
+  - If multiple TSOs or groups reference the same CI, they can conflict.
+  - CSDM recommends one TSO per CI to avoid contradictory assignments.
+
+- **Sources**
+  - [Enable the CSDM Data Synchronize plugin](https://docs.servicenow.com/bundle/washingtondc-servicenow-platform/page/product/csdm-implementation/task/csdm-data-synchronize-enable.html)
+  - [CMDB Groups (docs)](https://docs.servicenow.com/bundle/washingtondc-servicenow-platform/page/product/configuration-management/concept/cmdb-groups.html)
+  - [Manage Technical Services domain (CSDM)](https://docs.servicenow.com/bundle/washingtondc-servicenow-platform/page/product/csdm-implementation/concept/manage-tech-servs-domain.html)
+
+### 4.4 Incident Alignment with CSDM
+
+- **Form Configuration**:
+  - Service Offering first → auto-populate parent Service, filter relevant CIs.
+- **Use Cases**:
+  - End-users reference Business Services.
+  - IT staff references Technical Services.
+  - System-generated incidents link to discovered or monitored CIs.
+- **Further Reading**: See [Align Incident Management with CSDM](./sn-csdm-incident.md)
+
+---
+
+## 5. Security & Access Control
+
+- **Role-Based Access**:
+  - Typically `sn_cmdb_editor` or `sn_cmdb_admin` for editing.
+  - _Class Ownership_ can restrict writes for specific CI classes or groups.
+- **Auditing**:
+  - Enable table audit for sensitive classes but monitor performance impact.
+- **Change & Proposed Changes**:
+  - [ServiceNow Change Management](https://docs.servicenow.com/csh?topicname=c_ITILChangeManagement.html&version=latest)
+  - [Proposed Changes](https://docs.servicenow.com/csh?topicname=c_ProposedChanges.html&version=latest) for manual edits that need approvals.
+- **Configure Permissions**:
+  - Make sure only authoritative data sources can write to the CMDB.
+  - Communicate any changes or expansions in access rights to stakeholders.
+
+---
+
+## 6. Data Maintenance & Quality
+
+### 6.1 Tables, Classes, & Relationships
+
+- **Extension Model**: Child classes inherit from parent classes.
+- **Suggested Relationships**: Guides valid CI connections.
+
+### 6.2 Data Ingestion & Reconciliation
+
+- **Data Population Best Practices**:
+  - _Scoping_: Only bring in data you need for key use cases or policies.
+  - Use _Service Graph Connectors_ or _IntegrationHub ETL_ for large or external data imports.
+  - Keep _Asset–CI Synchronization_ in mind if you track financial lifecycles.
+- **Identification & Reconciliation Engine (IRE)**:
+  - Ensure stable unique attributes to avoid duplicates (e.g., serial number).
+  - Reconciliation rules define which source updates which fields.
+  - [Multisource CMDB](https://www.servicenow.com/community/itom-forum/task-07-enable-multisource-cmdb-how-to-add-the-property/m-p/967768) can store full data history and revert incorrect updates.
+
+### 6.3 CMDB Health Dashboard
+
+ServiceNow’s **CMDB Health Dashboard** calculates an overall health score based on three major scorecards: **Completeness**, **Compliance**, and **Correctness**. Each category has its own set of rules and metrics (e.g., required and recommended fields for completeness, audits for compliance, and checks for duplicates/orphans/staleness for correctness).
+
+1. **Health Remediation Rules**
+   - After the CMDB Health jobs run, you can **auto-create remediation tasks** for stale CIs, missing fields, orphaned items, or duplicates.
+   - To automate or standardize your remediation, define **CMDB Remediation Rules** via **All → Configuration → CMDB Remediations**.
+     - Each rule specifies which health issues it targets (e.g., “stale CIs”) and which workflow to trigger for resolution (e.g., re-discover the CI, merge duplicates, or simply close the task).
+   - System properties like `glide.class.upgrade.enabled` or `glide.class.switch.enabled` control whether reclassification happens automatically or creates manual tasks.
+2. **Distinguishing CMDB Health From “Get Well” Metrics**
+   - The **CMDB Health Dashboard** focuses primarily on the standard CCC (Completeness, Compliance, Correctness) checks.
+   - ServiceNow also offers **CMDB & CSDM Data Foundations Dashboards** (sometimes called “Get Well” dashboards) that use Performance Analytics (PA) metrics to track additional data quality indicators (see [Section 6.7](#67-cmdb--csdm-data-foundations-dashboards) below).
+   - Decide which metrics to enable based on your environment’s needs, since some may overlap with the main health checks.
+3. **Scheduled Jobs & Task Creation**
+   - Several OOB scheduled jobs (e.g., _CMDB Health Metric jobs_) recalculate scores daily or weekly.
+   - Enabling the creation of tasks for each issue is optional; you can configure the “Create tasks” flag on each CMDB Health rule, or use additional remediation workflows to automate fixes.
+4. **Performance Considerations**
+   - If you have a large dataset, reduce overhead by limiting Health checks to only the classes you care about, using **Health Inclusion Rules** and disabling unneeded audits, staleness checks, or orphan rules.
+
+- **Sources**
+  - [CMDB Health (docs)](https://docs.servicenow.com/csh?topicname=c_CMDBHealth.html&version=latest)
+  - [Manage Duplicate CIs (ServiceNow docs)](https://docs.servicenow.com)
+
+### 6.4 CMDB Data Manager
+
+**CMDB Data Manager** provides policy-driven automation for life cycle events such as **attestation**, **certification**, **archiving**, **retiring**, or **deleting** CIs. It includes subflows that create tasks for specific groups, handle approvals, and then execute the desired action (e.g., move a CI to ‘retired’ status, archive it, etc.).
+
+#### 6.4.1 Attestation vs. Certification
+
+- **Attestation**
+
+  - Verifies whether the CI still exists or is valid in an operational sense.
+  - Often functions as a simple survey: a user (potentially without any special role) confirms “Yes, this CI still exists” or “No, it’s defunct.”
+  - A “Rejected” attestation can trigger follow-up actions (e.g., retire or delete the CI).
+  - Key fields include `attested_by`, `attested_date`, and `attestation_status`.
+  - Typically does **not** directly allow field edits; it’s more of a yes/no confirmation.
+
+- **Data Certification**
+  - Focuses on **verifying specific field values** (e.g., checking that the ‘Owner’ field is correct).
+  - Usually requires roles such as `itil` or `sn_cmdb_editor` because users might need to update CMDB data.
+  - If a field fails certification, the policy can create tasks to correct the data or update missing fields.
+
+#### 6.4.2 Data Manager Flow
+
+1. **Policies & Subflows**
+   - Each **Data Manager policy** (Retire, Archive, Attestation, etc.) has an associated subflow that defines what to do with matched CIs.
+   - Example: _Retire Policy_ uses a subflow to set `install_status` = ‘Retired’, then triggers a second policy to archive or delete after a defined retention period.
+2. **Daily Scheduled Job**
+   - Once a policy is active, a daily job evaluates matching CIs (based on the filter criteria).
+   - It creates **tasks** for each unique “Managed By” group. If approval is required, the task must be approved before the subflow executes.
+3. **Integration With Attestation / Certification**
+   - A separate policy can be configured to retire or delete any CI that fails attestation or certification (e.g., `attestation_status` = ‘Rejected’).
+   - Additional manual checks can be inserted in the flow if you want a final review step.
+4. **Exclusion Lists**
+   - Users assigned tasks can add certain CIs to an **exclusion list**, preventing them from being retired/archived/deleted if they are special exceptions.
+
+- **Sources**
+  - [CMDB Data Manager Overview (docs)](https://docs.servicenow.com/bundle/washingtondc-servicenow-platform/page/product/configuration-management/concept/cmdb-data-management-landing.html)
+  - [Data Manager Retire policy example (KB0853633)](https://support.servicenow.com/kb?id=kb_article_view&sysparm_article=KB0853633)
+  - [CMDB Data Archiving (forum)](https://www.servicenow.com/community/cmdb-forum/cmdb-data-archiving/m-p/3077930/highlight/true#M13073)
+  - [Non-CMDB Data Archiving Walkthrough](https://www.servicenow.com/community/now-platform-articles/data-archiving-walkthrough/ta-p/2316478)
+
+### 6.5 Dependent CI Management
+
+- **Cascade Cleanup**: Automatically retire/delete child CIs when a parent is retired.
+- **Orphan Rules**: 1 rule/class to detect missing relationships.
+- **Properties**:
+  - `cmdb.dependent.ci.cascade.op.enabled`, `cmdb.dependent.ci.cascade.retire.enabled`
+- **Scheduled Jobs**:
+  - _CMDB DependentCI Policy Processor_, _CMDB Cascade Retire Dependent CIs_
+- **Cleanup Orphan CIs** can be activated for a one-time cascade cleanup of historical orphans.
+- **Sources**
+  - [Manage Dependent CI (docs)](https://docs.servicenow.com/bundle/washingtondc-servicenow-platform/page/product/configuration-management/concept/manage-dependent-ci.html)
+  - [Dependent CI Retirement (community)](https://www.servicenow.com/community/cmdb-forum/dependent-ci-retirement/m-p/2983566)
+
+### 6.6 CMDB Query Builder
+
+- **Overview**: Build visual or logical queries across CI classes and relationships.
+- **Common Use Cases**:
+  - Validate orphan rule results, staleness checks, or discover specific topologies.
+  - Generate CMDB Groups from saved queries.
+- **Query Types**:
+  - _CMDB Query_, _Service Mapping Query_, _Combination Query_.
+- **System Properties**:
+  - `glide.cmdb.query.max_results_limit` (default 10,000), etc.
+- **Sources**
+  - [Properties for CMDB Query Builder](https://docs.servicenow.com/csh?topicname=cmdb-querybldr-sysproprties.html)
+  - [Tables and Classes docs](https://docs.servicenow.com/csh?topicname=r_TablesAndClasses.html)
+
+## 6.7 CMDB & CSDM Data Foundations Dashboards
+
+Beyond the standard Health Dashboard (Completeness, Compliance, Correctness), ServiceNow offers **Data Foundations** or **“Get Well” Dashboards** that use Performance Analytics (PA) to track a broader set of metrics:
+
+1. **Example Metrics**
+   - “Hardware CIs Missing Serial Number”
+   - “Business Applications Without an Owner”
+   - “CIs Missing a Support Group”
+   - Many others, found in the `sn_getwell_metric` table.
+2. **Enabling / Disabling Indicators**
+   - By default, numerous “get well” metrics are active. Evaluate which ones you truly need; excessive metrics can increase performance overhead.
+   - **Deactivate** unneeded metrics by setting their `Active` field to false in **All → sn_getwell_metric**.
+3. **Scheduled Collection Jobs**
+   - These dashboards rely on data collection jobs such as _CMDB Get Well Metric Collection_ and _CSDM Get Well Metric Collection_.
+   - You can manually run them or schedule them to run daily/weekly.
+4. **Comparing to CMDB Health Dashboard**
+   - **CMDB Health Dashboard** = standard CCC checks.
+   - **Data Foundations Dashboards** = extended data quality insights (like owners, location data, or other recommended fields).
+   - They can overlap, so you’ll want to disable any duplicate checks to avoid confusion or double-counting.
+5. **Remediation**
+   - You can still create tasks or workflows for these metrics, similar to the core Health Dashboard approach.
+   - Performance Analytics allows you to chart trends over time, set improvement targets, and gauge data quality progress.
+
+---
+
+## 7. CMDB Delta (Advanced/Newer Features)
+
+This section highlights features not always covered in the classic CMDB documentation.
+
+1. **Recommended Fields (1-Level Dot-Walking)**
+   - You can make certain fields “recommended” instead of “required.”
+   - Recommended fields appear in Health checks but do **not** block record creation.
+   - Supports **one-level dot-walking** (e.g., `location.u_region`) to encourage deeper data completeness.
+2. **CMDB 360 & Multisource CMDB**
+   - Provides a single view of attribute-level updates from multiple discovery sources.
+   - Allows you to revert to a prior source if the current data is invalid.
+   - Needs the property `glide.identification_engine.multisource_enabled = true`.
+3. **Dynamic Reconciliation Rules**
+   - In addition to standard precedence rules (“Source A overrides Source B” for certain attributes), **dynamic** rules can pick field values based on:
+     - **First reported** (the earliest data is kept)
+     - **Last reported** (the newest data is kept)
+     - **Most reported** (the majority value from multiple sources)
+     - **Largest or smallest** value (for numeric fields)
+   - These rules can reduce manual conflict resolution when multiple data sources supply overlapping attributes.
+4. **IRE for Non-CMDB Tables**
+   - Extends the **Identification & Reconciliation Engine** to standard ServiceNow tables like `sys_user`, `cmn_location`, and custom app tables.
+   - Requires setting the property `glide.identification_engine.non_cmdb_tables` appropriately.
+   - Helpful if you want a consistent, “single source of truth” approach across non-CMDB data as well.
+5. **Class Switch Properties**
+   - Control whether or not the platform **automatically** reclassifies CIs when new data indicates a different class. Examples:
+     - `glide.class.switch.enabled`
+     - `glide.class.upgrade.enabled`
+     - `glide.class.downgrade.enabled`
+   - If disabled, the system raises a _Reclassification Task_ instead of switching automatically.
