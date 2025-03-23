@@ -4,7 +4,7 @@ back to [Asset Management](./sn-asset.md)
 
 ## TODO
 
-- [ ]
+- [ ] [Associate a stockroom with service locations](https://www.servicenow.com/docs/bundle/xanadu-it-asset-management/page/product/hardware-asset-management/task/associate-stockroom-with-service-locations.html)
 
 ## Resources
 
@@ -55,7 +55,7 @@ This section outlines the research and procedures for creating new hardware mode
 - The content portal contains:
   - **Hardware products** linked to multiple Hardware Model Library records
   - **Hardware Model Library** records linking a hardware product to a specific model number (on Content lookup start page, referenced as “Hardware model numbers”)
-- For new (non-discoverable*) models (e.g., product: HP 527pq - Series 5 Pro - LED-Monitor, model number: 9D9S0UT), follow these steps:
+- For new (non-discoverable\*) models (e.g., product: HP 527pq - Series 5 Pro - LED-Monitor, model number: 9D9S0UT), follow these steps:
   - Use **HAM Workspace → Content lookup**:
     - Search the model number; if a matching **Hardware Model Library** entry is found, open the referenced Product record (done)
     - If no match:
@@ -160,6 +160,85 @@ This section outlines the research and procedures for creating new hardware mode
       - workflow triggers `Create procurement task` activity
       - condition "sourceable=True" on Request
     - work on source request task
+
+#### Bulk Stock Order
+
+- Components:
+  - Catalog Item: Hardware Inventory Stock Order
+  - Flow: Hardware Stock Order Flow
+  - Script Include: StockOrderUtils
+- Access:
+  - Service Catalog > Asset Lifecycle > Hardware Inventory Stock Order Catalog Item
+- Model inclusion criteria:
+  - life_cycle_stage = Operational AND life_cycle_stage_status = In Use
+  - OR status = In Production
+- Trigger options:
+  - All > Inventory > Stock > Submit Stock Order
+  - Service Catalog > Asset Lifecycle > Hardware Inventory Stock Order
+  - Not available via Workspace
+- Process phases:
+  - Request approval
+  - Sourcing (PO creation and order)
+  - Receiving (PO)
+  - Close request
+
+#### Hardware Asset Disposal
+
+- Components:
+  - Flow: Hardware Asset Disposal flow
+- Trigger options:
+  - HAM Workspace > Inventory > Disposal Orders > New (add assets via Planned Assets tab)
+- Process phases:
+  - Create disposal order (select Assignee, add assets)
+    - Asset State = In Use, Substate = None
+  - Hardware Disposal Tasks:
+    - Verify Assets
+      - outcome: Retired/Pending Disposal, Assigned To removed
+    - Schedule Pickup
+    - Asset Departure
+      - outcome: State = In transit, contracts removed, retired allocations
+    - Vendor Confirmation
+      - outcome: shipment stage goes to delivered
+    - Disposal Documentation
+      - outcome: Retired/Disposed
+- Effects:
+  - Assets end in Retired/Disposed state
+
+#### Asset Actions
+
+- Source:
+  - [docs: Asset life-cycle automation](https://www.servicenow.com/docs/bundle/xanadu-it-asset-management/page/product/hardware-asset-management/concept/asset-lifecycle-automation.html)
+- Components:
+  - Business Rules:
+    - Change:
+      - Check HAM Action for Unauth change
+      - Check HAM Action is selected
+    - Incident:
+      - Check HAM Action is selected on incident
+      - Check swapped ci HAM on incident
+- Tasks (via incident or change request):
+  - Update/Repair
+  - Swap
+  - Retire:
+    - Remove assigned to
+    - Move to stockroom (if stockroom is assigned to location)
+    - Update asset state to In Stock, substate Pending Disposal
+    - Remove device allocations
+    - Set Install Status = In Stock
+    - Clear Installed field
+    - Set Hardware Status = In Disposition
+- Configuration:
+  - Incident form > related list Affected CIs: add columns Asset Action, Swapped CI
+  - SOW > Incidents > Related Lists > Affected CIs: same configuration
+  - [Associate stockrooms with relevant service locations](https://www.servicenow.com/docs/bundle/xanadu-it-asset-management/page/product/hardware-asset-management/task/associate-stockroom-with-service-locations.html)
+- Usage:
+  - Performed on incident (requires itil role)
+  - Select Asset Action, then Resolve
+- Ties in with Disposal flow:
+  - Create disposal order for stockroom
+  - Add assets filtered by:
+    - Current stockroom
+    - Substate = Pending Disposal
 
 ### HAM Workspace
 
