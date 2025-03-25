@@ -1137,6 +1137,11 @@ Check also [Lab 1](#l1-a-validate-plugins) for plugin validation.
     3. Move desired lines from the **Available** box to the **Selected** box.
     4. Click **Update**. The tasks and sub-tasks are closed; the next tasks are created.
     5. Repeat until all line tasks for the transfer order are completed.
+- **Service Locations**
+  - source: [docs: Associate a stockroom with service locations](https://www.servicenow.com/docs/bundle/xanadu-it-asset-management/page/product/hardware-asset-management/task/associate-stockroom-with-service-locations.html)
+    - required role: inventory_admin (included in ham_admin)
+    - Navigation: All > Hardware Asset Workspace > Inventory > All stockrooms > [select stockroom] > More > Service locations
+    - add locations to be served by the stockroom, for example for Loaner Assets and Asset Tasks
 
 #### PM: Automated Asset Population
 
