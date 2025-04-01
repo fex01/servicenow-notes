@@ -17,6 +17,8 @@
   }
   ```
 
+- fix scripts: [sys_script_fix]
+
 ## Resources
 
 - [Data Models](https://www.snow-mirror.com/wp-content/uploads/2016/07/ServiceNow-Data-Model-v3.4.pdf)
