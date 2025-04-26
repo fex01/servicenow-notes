@@ -262,3 +262,267 @@ function changeState(tableName, newState, encodedQuery) {
   - Explicitly enforce single-record queries using `.setLimit(1)` for efficiency.
   - Use `if (grTask.next())` instead of `while (grTask.next())` when expecting exactly one record.
   - Validate single-record assumptions using `.setLimit(2)` and `.hasNext()`
+
+## Naming Conventions
+
+### Tables
+
+- **Singular Table Names**
+  - Always use **singular names and labels** for tables.
+    - Correct examples: `incident`, `problem`, `change`
+    - Incorrect: `incidents`, `problems`
+  - Plural labels can be set explicitly in the table dictionary if needed (e.g., "Logbook Entries").
+- **Specialized Table Prefixes**
+  - Use clear prefixes for specialized utility tables:
+    - **Data Lookup tables**: prefix with `u_dl_`  
+      Example: `u_dl_incident_priority`
+      - Must extend the Data Lookup Matcher Rules (`dl_matcher`) table.
+    - **Many-to-many tables**: prefix with `u_m2m_`  
+      Example: `u_m2m_user_group`
+- **Capitalization**
+  - Table labels should use **Title Case** (capitalize the first letter of each word).
+  - Acronyms should be fully capitalized.
+
+### Field Names and Labels
+
+- **Consistency in Names and Labels**
+  - Field **names** should clearly reflect their labels, using `snake_case`.
+    - Example: Label "Business justification" → Name: `u_business_justification`
+  - Do **NOT** include table names within field labels or names unless referencing a different table explicitly.
+- **Reference Fields**
+  - For fields referencing other tables, indicate clearly:
+    - Label: "Related problem" | Name: `u_related_problem`
+  - If a reference might change to another table in the future, consider using a more generic name (e.g., `u_related_task`) and a specific label.
+- **Avoid Unnecessary Words**
+  - Do **NOT** add redundant terms like "ID" or "number" in labels for reference fields.
+    - Example: Reference field to Incident table → simply labeled "Incident", not "Incident ID" or "Incident number".
+- **Capitalization**
+  - Field labels: **Sentence case** (capitalize only the first word, except acronyms).
+  - Table labels: **Title Case** (capitalize first letter of each word).
+- **Catalog Variables**
+  - Use clear, concise "Question" fields to prompt users (e.g., "What is the business justification?").
+  - Variable **names** use `snake_case`, no spaces, and **no** "u\_" prefix required.
+- **Duplicate Variables**
+  - General rule:
+    - Avoid having multiple variables or fields with similar names and purposes (e.g., `u_name_1`, `u_name_2`).
+  - Best Practices:
+    - Use distinct, meaningful names whenever possible.
+    - Only introduce numbered variables if absolutely necessary and no better solution exists.
+    - Apply the same standard to both **names** and **labels** for database fields and catalog variables.
+
+### JavaScript Variables
+
+- **Naming conventions**:
+  - Variables: use **camelCase** (e.g., `assigneeSysId`)
+  - Classes (Script Includes): use **TitleCase** (e.g., `AssigneeUtils`)
+  - Constants: use **UPPERCASE_WITH_UNDERSCORES** (e.g., `DEFAULT_QUERY_LIMIT`)
+  - Variable names must start with a letter (lowercase for non-class variables).
+- **Best Practices**:
+  - Declare variables at the top of their scope or function.
+  - **Do NOT** declare variables within loops (`while`, `for`) or conditional (`if`) blocks.
+    - Avoids re-initialization, scope-related errors, or undefined variables.
+  - Initialize variables with default values to prevent undefined errors (e.g., integers to `-1` or `0`).
+
+#### Object Properties (Keys)
+
+- **Naming conventions**:
+  - Property names (keys) may use either **camelCase** (`propertyOne`) or **snake_case** (`property_one`).
+  - Choose one style consistently throughout each object or related set of functionality.
+  - Avoid mixing styles within the same context or object.
+
+#### GlideRecords
+
+- **Naming conventions**:
+  - GlideRecord variables should start with `gr` (e.g., `grIncident`, `grOpenIncident`).
+  - Use **singular** names, reflecting that a GlideRecord holds only one record at a time.
+  - Arrays should use **plural** names (e.g., `sectionNames`, `openIncidents`).
+- **Best Practices**:
+  - Name GlideRecord variables descriptively to reflect their query context.
+  - Update variable names if the associated query logic changes.
+  - Prefer indicating object type prefixes for Glide objects (e.g., `gdtNoonYesterday` for a GlideDateTime object).
+
+#### Iterators
+
+- **Naming conventions**:
+  - Use meaningful names if possible (e.g., `snInstance`, `food`).
+  - Simple names like `i`, `p`, or `index` are acceptable for general-purpose loops.
+  - Always differentiate iterator names in nested loops to avoid overwriting outer loop variables.
+- **Best Practices**:
+  - Iterators should be **block-scoped** — only used within the loop they control.
+  - When iterating over object properties, always check `.hasOwnProperty()` to avoid inherited properties.
+  - Prefer avoiding heavy nested loops (e.g., nested GlideRecord queries); instead, gather necessary data first (e.g., array of sys_ids) and query once.
+  - For arrays, iterators usually represent integers — use simple names like `i` or descriptive names related to the content type if helpful.
+
+### NC: Database Views
+
+- **Naming conventions**:
+  - Prefix all database view names with `dv_`.
+  - Follow with a description of the joined tables (e.g., `dv_incident_problem`).
+
+## Tables and Columns
+
+### Custom Fields
+
+- **Considerations before creating a custom field**:
+  - **Necessity**:
+    - Only add fields if the data genuinely adds value and no better solution exists.
+  - **Existing Data**:
+    - If the data already exists elsewhere, use a reference, derived field, or calculated field instead of creating a duplicate field.
+- **Best Practices**:
+  - If the value is always scripted or computed, use the **Calculated** option on the field's dictionary record and make the field read-only on the client.
+  - Carefully decide whether the field should appear on forms or lists, and manage its visibility across views.
+  - Follow established **naming conventions** for field names and labels (see: [Tables](#tables)).
+- **Field Access and Security**:
+  - Set fields to read-only or mandatory as appropriate.
+  - Use server-side controls (ACLs, Data Policies, or Business Rules) to enforce access and edit rules, rather than relying only on client-side controls.
+  - If blocking actions with `current.setAbortAction(true)`, consider checking `gs.getSession().isInteractive()` to allow background processes to proceed without interruption.
+
+### Reference Fields
+
+- **Concept**:
+  - Reference fields (foreign keys) link records between tables but can impact performance when referencing large tables.
+- **Best Practices**:
+  - Use **Reference Qualifiers** to pre-filter available options and reduce search scope.
+    - Improves client-side performance by limiting the number of queried records.
+    - Makes auto-complete and search functionality faster and more responsive.
+- **Further Optimization**:
+  - Apply query efficiency principles (see: Performance > Query Efficiency) when defining reference qualifiers.
+
+### Extending Tables
+
+- **Concept**:
+  - Table extensions inherit all fields from the parent table and store only additional differences in the child table.
+- **Best Practices**:
+  - Only extend a table if you need **most** of its fields.
+  - Be aware that records from extending tables are also visible in the parent table (e.g., Incidents, Changes, and Problems all appear under Task).
+
+### The Task Table
+
+- **Concept**:
+  - The `Task` table is a critical, heavily extended base table, represented as a large flat structure in the backend database.
+- **Best Practices**:
+  - **Protect the Task table**:
+    - Avoid adding unnecessary fields, especially large fields (long strings, large max lengths).
+    - Changes to Task directly affect all extended tables (Incident, Problem, Change, etc.).
+  - **Use Overrides**:
+    - Use **Label Overrides** and **Dictionary Overrides** to make changes specific to a child table without impacting all task-based tables.
+- **Considerations**:
+  - Only add new fields to `Task` if they are universally needed across all extending tables.
+  - Be mindful of database performance impacts when modifying or extending the `Task` table structure.
+
+#### The State Field
+
+- **Concept**:
+  - The `state` field on the `Task` table is an **integer** field that drives important ticket lifecycle logic across the platform.
+- **Best Practices**:
+  - **Do not** arbitrarily modify or remove existing state values or labels.
+  - When adding new state values:
+    - **Active states**: use integers **< 7** (positive or negative numbers like `-1`, `-2` if needed).
+    - **Inactive states**: use integers **≥ 7** (aligned with "Resolved", "Closed", "Cancelled").
+- **System Behavior**:
+  - State values ≥ 7 are assumed inactive.
+  - State values < 7 are assumed active.
+  - Platform logic (e.g., `TaskStateUtil` Script Include) relies on dictionary attributes like `close_states` and `default_close_state` to manage state behavior.
+- **Helpful Techniques**:
+  - Use a **helper Script Include** to define and maintain state models for custom Task-based tables (e.g., `MyTaskStates` class).
+  - When needed on the client side, pass state models using a **Display Business Rule** with `g_scratchpad`.
+- **Additional Notes**:
+  - **Value** defines the system meaning; **Sequence** controls the dropdown order.
+
+### TaC: Database Views
+
+- **Concept**:
+  - Database Views combine data from multiple tables for reporting or simplified querying but must be used carefully due to performance impacts.
+- **Best Practices**:
+  - Prefer **dot-walking** over database views if using proper reference fields.
+    - Example: Use `ordered_for.department` instead of creating a view to join Orders and Users tables.
+  - Only use a database view if dot-walking is insufficient.
+- **Creation Guidelines**:
+  - The **first (left) table** should be the table with **fewer records** to optimize performance.
+  - **Coalesce** only on fields with **existing database indexes**.
+  - Avoid using [SQL reserved words](https://dev.mysql.com/doc/refman/5.7/en/keywords.html) for table names or aliases.
+  - **Access Control**:
+    - Non-admins cannot access new views by default; **explicit ACLs** must be created.
+- **Additional Notes**:
+  - Database views are resource-intensive—always consult your team or architect before creating one.
+
+### Default vs. Calculated Fields
+
+- **Default Fields**:
+  - Apply default values when a form loads or when a record is inserted **only if the field is blank**.
+  - Default values can be static or scripted using `javascript:`.
+    - example: `javascript:'Record created by ' + gs.getUser().getDisplayName() + ' on ' + current.getValue('sys_created_on')+'.';`
+  - Default value is **not re-evaluated** after the initial insertion.
+  - On form load, the default script may not have full `current` object data.
+  - To restrict default execution only at insert, check if `current.sys_created_on.nil()`.
+    - example: `javascript:if (!current.sys_created_on.nil()) { ... }`
+- **Calculated Fields**:
+  - Always scripted and **re-evaluated on every record update and read**.
+  - Useful for dynamic values that must reflect the current state of the record.
+  - Impact on performance: every read operation recalculates the field—even when the field is not displayed.
+  - Prefer **Insert/Update Business Rules** over calculated fields if recalculation is not strictly necessary.
+- **Key Differences**:
+  - **Default** = static or first-time-only value (insert time or form load).
+  - **Calculated** = dynamic value updated every time the record is read or modified.
+- **Performance Tip**:
+  - Only use calculated fields when necessary; otherwise, use Business Rules for better scalability.
+
+## List and Form Design
+
+### Form Layouts
+
+- **General Structure**:
+  - Forms should be organized into logical sections to improve usability and clarity:
+    1. **Top Section**: Two-column layout with critical "at-a-glance" details (e.g., Number, Priority, Assigned to).
+    2. **Middle Section**: Additional data fields and optional form sections (grouped logically to avoid excessive tab flipping).
+    3. **Bottom Section**: Long text fields, journal inputs, and activity formatters before related lists.
+- **Best Practices**:
+  - Keep journal inputs directly above journal lists to avoid confusion.
+  - Maintain rough **symmetry** between columns for visual balance (real-world use takes precedence over Form Designer appearance).
+  - **Do not duplicate** fields within the same form view.
+  - For modifications on **admin-only forms** (e.g., ACLs), be cautious about whether changes are captured in an Update Set.
+- **UX Considerations**:
+  - Avoid putting frequently updated or long fields in the middle of the form.
+  - Design forms to minimize unnecessary scrolling, especially for users without the tabbed interface enabled.
+
+### List Layouts
+
+- **General Structure**:
+  - Always configure the **default list view** when creating a new table.
+  - Prioritize fields that users need to see at a glance:
+    - Start with a **unique identifying field** (not `sys_id`, e.g., Number).
+    - Follow with important context fields (e.g., Assigned to).
+    - Date fields are often positioned toward the **right** of the list.
+- **Best Practices**:
+  - Avoid clutter: limit the number of fields to those essential for quick reference.
+  - Exclude large, non-wrapped text fields unless they add meaningful list-view value.
+  - Keep the layout clean to fit within a reasonably sized browser window.
+- **Pro-tip**:
+  - To make a String field appear as a **multi-line input** on forms, set its Max Length to **256 characters or more**.
+
+## OOB Records
+
+### General Guidelines
+
+- **Do not modify OOB records** directly if avoidable.
+  - Prefer adding conditions to **disable** unwanted behavior without altering the script.
+  - Use **Insert and Stay** to duplicate and customize functionality separately.
+  - Minimizes upgrade issues and makes reviewing skipped updates easier.
+- **Why it matters**:
+  - Modified OOB records complicate upgrades and can trigger unpredictable cascading bugs.
+  - Skipped updates during upgrades require manual intervention if OOB scripts were changed.
+- **Deprecated practice**:
+  - Deactivating OOB records and cloning them with changes is generally discouraged due to hidden dependencies.
+- **Best Practices**:
+  - Review system warnings and error logs regularly after changes.
+  - Catch and log predictable errors proactively for easier debugging.
+
+### Extending OOB Script Includes
+
+- **Extending is preferred** over modifying:
+  - Create a new Script Include extending the original via `Object.extendsObject()`.
+  - Override or add new methods/properties as needed.
+  - Inherits functionality without breaking or modifying the original OOB logic.
+- **Example Figures**:
+  - [Fig. 6.01 - ExampleScriptInclude.js](https://github.com/thisnameissoclever/sn_dev_handbook_3/blob/a31e35c9f09a61dd021bf4883159307222b00f58/Chapter%2006%20-%20OOB%20Records/Fig%206.01.js)
+  - [Fig. 6.02 - ExampleExtendedScript.js](https://github.com/thisnameissoclever/sn_dev_handbook_3/blob/a31e35c9f09a61dd021bf4883159307222b00f58/Chapter%2006%20-%20OOB%20Records/Fig%206.02.js)
