@@ -8,7 +8,7 @@
 - [blog](http://snprotips.com/)
 - [code examples](https://github.com/thisnameissoclever/sn_dev_handbook_3/tree/a31e35c9f09a61dd021bf4883159307222b00f58)
 
-## Code & Coding Guidelines
+## 01 Code & Coding Guidelines
 
 - use _pure functions_: functions without side effects
   - avoid pass-by-reference (PBR) problems:
@@ -195,7 +195,7 @@ function changeState(tableName, newState, encodedQuery) {
     - **Mobile / Service Portal** (specifically for portal-only scenarios)
   - Clearly document exceptions where scripts differ between classic UI and Service Portal to maintain clarity
 
-## Debugging
+## 02 Debugging
 
 - _All > System Diagnostics > Session Debug_
 
@@ -243,6 +243,8 @@ function changeState(tableName, newState, encodedQuery) {
   - **Asynchronous Debugging**:
     - Place `debugger;` statements within callback functions to debug asynchronous code.
     - To retain context during asynchronous debugging, add a second `debugger;` statement in synchronous code and click "Resume Execution" in between
+- Code example:
+  - [Client-side Watch List Debugging (Fig. 2.02)](https://github.com/thisnameissoclever/sn_dev_handbook_3/blob/a31e35c9f09a61dd021bf4883159307222b00f58/Chapter%2002%20-%20Debugging/Fig%202.02.js)
 
 ### Common Bugs
 
@@ -262,8 +264,11 @@ function changeState(tableName, newState, encodedQuery) {
   - Explicitly enforce single-record queries using `.setLimit(1)` for efficiency.
   - Use `if (grTask.next())` instead of `while (grTask.next())` when expecting exactly one record.
   - Validate single-record assumptions using `.setLimit(2)` and `.hasNext()`
+  - code examples:
+    - [Inefficient Ticket Lookup (Fig. 2.03)](https://github.com/thisnameissoclever/sn_dev_handbook_3/blob/a31e35c9f09a61dd021bf4883159307222b00f58/Chapter%2002%20-%20Debugging/Fig%202.03.js)
+    - [Improved Ticket Lookup with Validation (Fig. 2.04)](https://github.com/thisnameissoclever/sn_dev_handbook_3/blob/a31e35c9f09a61dd021bf4883159307222b00f58/Chapter%2002%20-%20Debugging/Fig%202.04.js)
 
-## Naming Conventions
+## 03 Naming Conventions
 
 ### Tables
 
@@ -359,7 +364,7 @@ function changeState(tableName, newState, encodedQuery) {
   - Prefix all database view names with `dv_`.
   - Follow with a description of the joined tables (e.g., `dv_incident_problem`).
 
-## Tables and Columns
+## 04 Tables and Columns
 
 ### Custom Fields
 
@@ -467,7 +472,7 @@ function changeState(tableName, newState, encodedQuery) {
 - **Performance Tip**:
   - Only use calculated fields when necessary; otherwise, use Business Rules for better scalability.
 
-## List and Form Design
+## 05 List and Form Design
 
 ### Form Layouts
 
@@ -500,7 +505,7 @@ function changeState(tableName, newState, encodedQuery) {
 - **Pro-tip**:
   - To make a String field appear as a **multi-line input** on forms, set its Max Length to **256 characters or more**.
 
-## OOB Records
+## 06 OOB Records
 
 ### General Guidelines
 
@@ -526,3 +531,142 @@ function changeState(tableName, newState, encodedQuery) {
 - **Example Figures**:
   - [Fig. 6.01 - ExampleScriptInclude.js](https://github.com/thisnameissoclever/sn_dev_handbook_3/blob/a31e35c9f09a61dd021bf4883159307222b00f58/Chapter%2006%20-%20OOB%20Records/Fig%206.01.js)
   - [Fig. 6.02 - ExampleExtendedScript.js](https://github.com/thisnameissoclever/sn_dev_handbook_3/blob/a31e35c9f09a61dd021bf4883159307222b00f58/Chapter%2006%20-%20OOB%20Records/Fig%206.02.js)
+
+## 07 Testing
+
+### Testing Execution Paths
+
+- **Test all control flow branches** (e.g., `if`, `else if`, `else`) to ensure correct behavior in all scenarios.
+- **Include negative tests**: verify the code does _not_ run when it shouldn't.
+- **Monitor logs**:
+  - Use browser console for client-side scripts — see [Client-Side Debugging](#client-side-debugging)
+  - Use system logs for server-side scripts — see [Server-Side Debugging](#server-side-debugging)
+- **Test across UIs**:
+  - Validate catalog items in both **Service Portal** and **Backend** — APIs differ
+- Tool: [tryinportal.snc.guru](http://tryinportal.snc.guru) – quickly test catalog items in Service Portal
+
+### Impersonation
+
+- **Always test as an end user**, not just as an admin.
+  - Ensures permissions, visibility, and access controls are functioning correctly.
+- **Impersonate users** who _should_ and _should not_ have access to the feature.
+- **Best practice**: Request a specific _testing user_ as part of project requirements.
+  - Use real business users for realistic permission testing.
+- **Tip**: Use an incognito/private browser tab to impersonate without affecting your main session.
+
+### Errors
+
+- **Check for runtime errors**, even if the feature works — silent failures often go unnoticed.
+- Use:
+  - **Browser console (F12)** for client-side errors and warnings.
+  - **System Logs > System Log > Errors** for server-side issues.
+- **Wrap fragile logic in `try/catch`** to catch and handle known risks:
+  - Log errors using `console.error()`, `gs.logError()`, or `gs.error()` (scoped apps).
+  - Provide fallback logic inside `catch`.
+- **Prefer prevention over exception**:
+  - Guard known risky operations with checks (e.g., `if (typeof someFunc !== 'undefined')`).
+  - Then use `try/catch` inside the check for safer error handling.
+- Example: [Graceful fallback for unavailable APIs (gel)](https://github.com/thisnameissoclever/sn_dev_handbook_3/blob/a31e35c9f09a61dd021bf4883159307222b00f58/Chapter%2007%20-%20Testing/Fig%207.03.js)
+
+### Logging
+
+- **Log purposefully**: Log only when information is valuable for debugging or monitoring — not just for habit or curiosity.
+- **Client-side logging**:
+  - Use `console.log()`, `console.warn()`, `console.error()`, and `jslog()` (ServiceNow-specific)
+  - View in browser console (F12) or toggle **JavaScript Log** in System Settings
+- **Server-side logging**:
+  - Available: `gs.debug()`, `gs.log()`, `gs.warn()`, `gs.error()`, `gs.logWarning()`, `gs.logError()`
+  - Use `gs.debug()` during development — won't clutter logs unless debugging is enabled
+- **Avoid logging sensitive data**: Never log passwords, tokens, or PII
+- **Don't log on every execution**:
+  - Wrap logs in conditions
+  - Use `try/catch` to log exceptions only when they occur
+- **Help others trace logs**:
+
+  - Use `gs.logWarning(message, source)` / `gs.logError(message, source)` (not in scoped apps)
+  - In scoped apps, use `gs.warn()` and `gs.error()` with string replacements: `{0}`, `{1}`, ...
+
+    - Example:
+
+      ```javascript
+      gs.warn(
+        "The ticket {0} is assigned to {1}",
+        current.number,
+        current.assigned_to.getDisplayValue()
+      );
+      ```
+
+- **Clean up before deploy**: Remove dev/test logs before moving to production
+
+## 08 Code Documentation
+
+### Self-Documenting Code
+
+- **Goal**: Make code clear and understandable through naming, structure, and syntax.
+- **Purpose**: Complements code comments by reducing the need for them — but does _not_ eliminate them.
+- **Core principles**:
+  - [Structure](#structure): Organize code logically (e.g., group related logic, avoid deep nesting).
+  - [Naming](#naming): Use clear, descriptive names for variables, functions, and classes.
+    - Example: `getUserDepartment()` vs. `getDep()`
+  - [Syntax](#syntax): Write simple, expressive code using consistent formatting and spacing.
+    - Avoid unnecessary complexity — clarity beats cleverness.
+- **Reminder**: Even well-named code benefits from brief comments explaining why something exists or how it fits into the bigger picture.
+
+#### Structure
+
+- Break complex logic into **named functions** to clarify purpose and reduce in-line complexity.
+- Use **clear, descriptive names** for functions and variables to communicate intent without needing comments.
+- Group **variable declarations together** (typically at the top of a function) for readability and execution clarity.
+- Extract complex conditions into **boolean-returning functions or variables** with meaningful names.
+- Avoid declaring variables inside loops or conditionals to prevent undefined behavior and improve maintainability.
+
+#### Naming
+
+- Use clear, descriptive names for variables and functions to reflect their purpose.
+- Avoid vague verbs like `handle` or `manage` — prefer specific actions (e.g. `sendFile`, `convertToJSON`).
+- Functions should do one thing and be named accordingly; avoid hidden side effects.
+- Chain functionality explicitly instead of nesting actions within unrelated functions.
+- Include units in variable names when relevant (e.g. `timeInSeconds`, `heightPx`).
+- Always use curly braces in conditionals for readability and safe maintenance.
+- For broader naming rules, refer to [Naming Conventions](#javascript-variables).
+
+#### Syntax
+
+- Use concise, well-supported syntax to improve clarity and compatibility.
+- Ternary operators are useful for simple conditionals: `isValid ? doA() : doB()`, but avoid chaining them.
+- Avoid less-readable shorthand like `isValid && doSomething();` — prefer explicit conditionals.
+- Clarity and maintainability outweigh brevity in most cases.
+
+### Code Comments
+
+- Use comments to clarify intent, especially when code may not be self-explanatory.
+- Prefer block comments (`/* ... */`) above complex logic or multi-line explanations.
+- Use `//` for inline comments, ideally with manual line breaks for readability.
+- Always explain hardcoded values (e.g. sys_ids) with comments so future devs understand their context.
+- Avoid hardcoding IDs when possible — use reference lookups or system properties instead for maintainability.
+- Comments should enhance clarity, not just repeat the code. Prioritize future readability.
+
+### JSDoc
+
+- **JSDoc** is a markup standard for documenting JavaScript code via structured comments.
+- It's especially useful for shared or reusable code like **Script Includes**, even in ServiceNow.
+- While ServiceNow’s built-in IDE doesn’t use JSDoc for auto-complete, external IDEs (like WebStorm or VS Code) often do.
+- JSDoc helps clarify function inputs, outputs, and behavior at a glance, improving maintainability.
+- see [https://jsdoc.app/](https://jsdoc.app/) for full syntax and usage details.
+
+```js
+/**
+ * Converts a GlideRecord to a plain object.
+ * @param {GlideRecord} gr - A GlideRecord instance
+ * @returns {Object} The record's fields as a plain object
+ */
+function convertGRToObj(gr) {
+  var obj = {};
+  var fields = gr.getFields();
+  for (var i = 0; i < fields.size(); i++) {
+    var f = fields.get(i);
+    obj[f.getName()] = f.getDisplayValue();
+  }
+  return obj;
+}
+```
