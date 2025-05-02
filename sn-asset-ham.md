@@ -46,7 +46,30 @@ back to [Asset Management](./sn-asset.md)
 
 ## Topics
 
-### TO Sort
+### To Sort
+
+#### Company Normalization
+
+- source: [community: Deep Dive Into Normalization Data Services - Company Normalization](https://www.servicenow.com/community/developer-blog/deep-dive-into-normalization-data-services-company-normalization/ba-p/2978302)
+- setup
+  - All > User Administration > Normalization Data Services > Guided Setup
+  - properties
+    - set to true
+      - glide.cmdb.canonical.company.qualifier.enabled
+      - glide.cmdb.canonical.always_run
+      - glide.cmdb.canonical.discovery.enabled
+      - glide.cmdb.canonical.company.enabled
+      - glide.cmdb.canonical.normalize.existing.canonical.core_company_records
+    - if needed:
+      - glide.cmdb.canonical.debug
+      - glide.canonical_name.enable.logging
+  - troubleshooting:
+    - [How to manually normalize reference qualifiers](https://support.servicenow.com/kb?id=kb_article_view&sysparm_article=KB0784201)
+    - [Normalization Data Services Guided Setup did not update some reference qualifiers](https://support.servicenow.com/kb?id=kb_article_view&sysparm_article=KB0752238)
+    - [ServiceNow Company Normalization - Duplicate Company](https://support.servicenow.com/kb?id=kb_article_view&sysparm_article=KB0852264)
+    - [Admin users not able to view the Normalization Data Services scheduled job entries.](https://support.servicenow.com/kb?id=kb_article_view&sysparm_article=KB0746726)
+    - [Normalization Issue - Duplicate entries of normalized records for same vendor on core_company table](https://support.servicenow.com/kb?id=kb_article_view&sysparm_article=KB0855759)
+    - [Normalization data services doesn't work on Contract table](https://support.servicenow.com/kb?id=kb_article_view&sysparm_article=KB0825321)
 
 #### Model Creation
 
