@@ -345,6 +345,8 @@ function changeState(tableName, newState, encodedQuery) {
   - Name GlideRecord variables descriptively to reflect their query context.
   - Update variable names if the associated query logic changes.
   - Prefer indicating object type prefixes for Glide objects (e.g., `gdtNoonYesterday` for a GlideDateTime object).
+- other resources:
+  - [GlideRecord Query Cheat Sheet](https://servicenowguru.com/scripting/gliderecord-query-cheat-sheet/)
 
 #### Iterators
 
