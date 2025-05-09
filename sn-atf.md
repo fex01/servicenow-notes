@@ -8,12 +8,13 @@
 
 ### Courses
 
-- [ ][ATF Learning Path](https://learning.servicenow.com/lxp/en/now-platform/automated-test-framework-atf-essentials?id=learning_path_prev&path_id=e7c6e2e2876b19946a0bedbd0ebb3592)
-  - [ ][ATF Introduction](https://learning.servicenow.com/lxp/en/now-platform/automated-test-framework-atf-introduction?id=learning_course_prev&course_id=2eebce6687a319946a0bedbd0ebb35db)
-  - [ ][ATF Run Tests and Test Suites](https://learning.servicenow.com/lxp/en/now-platform/automated-test-framework-atf-run-tests-and-test-suites?id=learning_course_prev&course_id=0ff09ea2872719946a0bedbd0ebb35d9)
-  - [ ][ATF Create and Schedule Tests and Test Suites](https://learning.servicenow.com/lxp/en/now-platform/automated-test-framework-atf-create-and-schedule-tests-and?id=learning_course_prev&course_id=ff945eae872719946a0bedbd0ebb3584)
-  - [ ][ATF Additional Tips, Techniques, and Resources](https://learning.servicenow.com/lxp/en/now-platform/automated-test-framework-atf-additional-tips-techniques-and?id=learning_course_prev&course_id=5cf816ae876719946a0bedbd0ebb3539)
-  - [ ][ATF Administration](https://learning.servicenow.com/lxp/en/now-platform/automated-test-framework-atf-administration?id=learning_course_prev&course_id=0f5e1a6687e719946a0bedbd0ebb351a)
+- [x][ATF Learning Path](https://learning.servicenow.com/lxp/en/now-platform/automated-test-framework-atf-essentials?id=learning_path_prev&path_id=e7c6e2e2876b19946a0bedbd0ebb3592)
+  - [x][ATF Introduction](https://learning.servicenow.com/lxp/en/now-platform/automated-test-framework-atf-introduction?id=learning_course_prev&course_id=2eebce6687a319946a0bedbd0ebb35db)
+  - [x][ATF Run Tests and Test Suites](https://learning.servicenow.com/lxp/en/now-platform/automated-test-framework-atf-run-tests-and-test-suites?id=learning_course_prev&course_id=0ff09ea2872719946a0bedbd0ebb35d9)
+  - [x][ATF Create and Schedule Tests and Test Suites](https://learning.servicenow.com/lxp/en/now-platform/automated-test-framework-atf-create-and-schedule-tests-and?id=learning_course_prev&course_id=ff945eae872719946a0bedbd0ebb3584)
+  - [x][ATF Additional Tips, Techniques, and Resources](https://learning.servicenow.com/lxp/en/now-platform/automated-test-framework-atf-additional-tips-techniques-and?id=learning_course_prev&course_id=5cf816ae876719946a0bedbd0ebb3539)
+  - [x][ATF Administration](https://learning.servicenow.com/lxp/en/now-platform/automated-test-framework-atf-administration?id=learning_course_prev&course_id=0f5e1a6687e719946a0bedbd0ebb351a)
+- [ATF Micro Certificate Assessment](https://learning.servicenow.com/lxp/en/now-platform/automated-test-framework-atf-micro-certification-assessment?id=learning_path_prev&path_id=e22631dddbdef300760a71043996191f)
 
 ### Links
 
@@ -46,6 +47,10 @@
 
 - [Compare Results and Execution Times](https://www.servicenow.com/docs/bundle/yokohama-application-development/page/administer/auto-test-framework/task/atf-compare-runs.html)
 
+- [ATF System Properties](https://docs.servicenow.com/csh?topicname=atf-admin-properties.html&version=latest)
+
+- [ATF Headless Browser](https://docs.servicenow.com/csh?topicname=atf-headless-browser.html&version=latest)
+
 #### 🚫 Error Handling & Debugging
 
 - [Allowed Client Errors](https://docs.servicenow.com/csh?topicname=whitelisted-client-errors.html&version=latest)  
@@ -57,6 +62,8 @@
 
 - [Test Management 2 – Strategic Portfolio Management](https://www.servicenow.com/docs/bundle/yokohama-it-business-management/page/product/test-management2/concept/test-management-overview.html)  
   Manage manual and automated test plans together.
+
+- [Locale settings](https://docs.servicenow.com/csh?topicname=locales.html&version=latest)
 
 #### ✅ Best Practices & Use Cases
 
@@ -81,6 +88,8 @@
 #### 🌐 ServiceNow Community Articles
 
 - [How to Avoid ATF Testing Failures](https://community.servicenow.com/community?id=community_blog&sys_id=84dc2665dbd0dbc01dcaf3231f96190f)
+
+- [Now Community: Reduce ATF maintenance with custom steps](https://community.servicenow.com/community?id=community_blog&sys_id=ec74896fdb3d9010d5c4d9d9689619ff)
 
 ### Labs
 
@@ -161,11 +170,7 @@
     - Click **Go to Result** to review detailed results; confirm all steps have **Status: Success**
     - Screenshots available for UI steps
 
-#### TODO - Lab instance was broken
-
-- [ATF: Create and Schedule Tests and Test Suites](https://learning.servicenow.com/lxp/en/pages/learning-course?id=learning_course&course_id=ff945eae872719946a0bedbd0ebb3584)
-
-##### Activity 2 - Create a test from scratch (ATF Create Tests)
+#### Activity 2 - Create a test from scratch (ATF Create Tests)
 
 - **Goal**: Create and run a test to verify correct pricing for an Apple iPhone 13 Pro catalog order (500MB data, Silver, 512GB storage).
 
@@ -187,20 +192,21 @@
 
     - Navigate: **System Properties > System Localization**
     - Set **Locale code**: `en.US`, save changes.
+    - [docs: Locale settings](https://docs.servicenow.com/csh?topicname=locales.html&version=latest)
 
   - **C. Create the Test**
 
     - Navigate: **Automated Test Framework > Tests**, set scope to **Global**
     - Create new test:
       - **Name**: Apple iPhone 13 Pro: 500MB/ Silver/ 512GB
-      - **Description**: Clearly state expected price details.
+      - **Description**: Expected Result: when a silver Apple iPhone 13 Pro with 500MB and 512GB is ordered, the Price is $1,299.99, the Recurring Price is $41.00, and the Recurring Price Frequency is Monthly
+    - Save
 
   - **D. Add Test Steps**
 
-    1. **Impersonate User**
+    1. **Create a User**
 
-       - Category: **Server**, Configuration: **Impersonate**
-       - User: **Joe Employee** (or create equivalent new user if preferred)
+       - Category: **Server**, Configuration: **Create a User**
 
     2. **Open Catalog Item**
 
@@ -211,7 +217,7 @@
 
        - Category: **Service Catalog**, Configuration: **Set Variable Values**
        - Replacement: **No**
-       - Monthly Data Allowance: **500MB**
+       - Monthly Data Allowance (data_plan): **500MB**
        - Color: **Silver**
        - Storage: **512GB**
 
@@ -238,7 +244,7 @@
       - Correct any errors (e.g., update storage variable) and re-run test
       - Ensure successful execution and correct price validation
 
-##### Activity 3 - Create parent and child test suites (ATF Create Tests)
+#### Activity 3 - Create parent and child test suites (ATF Create Tests)
 
 - **Goal**: Create a parent test suite (**My New Test Suite A**) and a child test suite (**My New Test Suite B**) to organize tests for efficient execution.
 
@@ -296,7 +302,7 @@
       - Only previously failed tests run (`Failing Jasmine Test` and `Simple UI Test`).
       - Test suite continues despite failure, executing remaining tests.
 
-##### Activity 4 – Schedule a test suite (ATF Create Tests)
+#### Activity 4 – Schedule a test suite (ATF Create Tests)
 
 - **Goal**: Create a daily schedule to run two existing test suites and ensure a scheduled client test runner is available for UI steps.
 
@@ -334,6 +340,98 @@
 - Notes:
   - Only **test suites** can be scheduled (not individual tests)
   - Scheduled test runners are required for UI steps in scheduled runs
+
+#### Activity 1 - Enable ATF to run on instances (ATF Administration)
+
+- **Goal**: Enable the ATF system properties that allow running tests and test suites, including scheduled execution, on a non-production instance.
+
+- **Steps**:
+
+  - Navigate to **Automated Test Framework > Tests** and open _Basic UI Test_.
+  - Confirm **Run Test** is not available and the message indicates test execution is disabled.
+  - Click the blue banner link or go to **Automated Test Framework > Administration > Properties**.
+  - Set the following properties:
+    - **Enable test/test suite execution**: Yes
+    - **Enable schedule test suite execution**: Yes
+  - Select **Save** to apply changes.
+  - Reopen _Basic UI Test_ and verify the **Run Test** button is now visible.
+
+- **Result**: Instance is now configured to support both manual and scheduled ATF test execution.
+
+#### Activity 2 - Create a test template (ATF Administration)
+
+- **A. Create the "Reject a Request" Test Template**
+
+  - Set application scope to **Global**
+  - Navigate to: `Automated Test Framework > Administration > Test Templates`
+  - Select **New**
+  - Set **Name**: `Reject a Request`
+  - Open the test template list (unlock the list)
+  - Add the following test step configurations in order:
+    - Impersonate
+    - Record Query
+    - Open an Existing Record
+    - Set Field Values
+    - Click a UI Action
+  - Set **Description**: `Open an existing request and reject it`
+  - Select **Submit**
+
+- **B. Create the Test**
+
+  - Ensure application scope is **Global**
+  - Go to: `Automated Test Framework > Tests`
+  - Select **New**
+  - Set **Name**: `Reject Change Request by Approver`
+  - Set **Description**: `Reject a Change Request assigned to the Help Desk by an Approver`
+  - Select **Save**
+
+  Add the following test steps manually:
+
+  - **Impersonate**
+    - User: `Fred Luddy`
+  - **Record Insert**
+    - Table: `Change Request [change_request]`
+    - Fields:
+      - Assignment group: Help Desk
+      - Type: Normal
+      - Short Description: Rejected
+  - **Open an Existing Record**
+    - Table: `Change Request`
+    - Record: Reference `Step 2: Record Insert > Record`
+  - **Record Update**
+    - Table: `Change Request`
+    - Record: Reference `Step 2: Record Insert > Record`
+    - Field:
+      - State: Assess
+
+- **C. Add the Test Template**
+
+  - Select **Add Test Template**
+  - Template: `Reject a Request`
+  - Table: `Approval [sysapproval_approver]`
+  - Select **Add**
+
+  Configure the test steps added from the template:
+
+  - **Impersonate**
+    - User: `User 1` (approver)
+  - **Record Query**
+    - Timeout: `5`
+    - Conditions:
+      - Approver is `Step 5: Impersonate > User`
+      - Approving is `Step 2: Record Insert > Record`
+  - **Open an Existing Record**
+    - Record: `Step 6: Record Query > First record`
+  - **Set Field Values**
+    - State: Rejected
+    - Comments: `Need more documentation`
+  - **Click a UI Action**
+    - UI Action: `Reject`
+
+- **D. Run the Test**
+  - Select **Run Test** on the test form
+  - Choose a **client test runner** for UI steps
+  - Verify the test passes or debug and re-run as needed
 
 ## Topics
 
@@ -378,32 +476,6 @@
   - Individual actions or assertions within a test (e.g., creating users, opening forms, validating fields)
   - OOB test steps provided for a no-code approach
   - Additional custom test steps can be created by an ATF Test Admin as needed
-
-#### ATF Roles
-
-- **Test Designer**
-  - `atf_test_designer`
-  - Primary ATF role; typically assigned to application developers
-  - Responsibilities:
-    - Create, edit, delete tests and test suites
-    - Add existing test steps (cannot create new configurations)
-    - Run tests and suites; view results
-    - View ATF system properties
-  - Skills Required: Low-code or No-code; advanced debugging experience beneficial
-- **Test Administrator**
-  - `atf_test_admin`
-  - Manages ATF environment and creates reusable test step configurations
-  - Responsibilities include all Test Designer capabilities plus:
-    - Create and edit ATF system properties
-    - Develop custom test step configurations through scripting
-    - Assist Test Designers with advanced debugging
-  - Skills Required: Advanced scripting/programming experience
-- **Web Service Tester**
-  - Specializes in building and maintaining web service integration tests (REST, SOAP)
-  - Responsibilities include all Test Designer capabilities plus:
-    - Build web service tests involving integrations
-    - Assist Test Designers in complex debugging tasks involving scripting
-  - Skills Required: Advanced scripting/programming, with expertise in web services
 
 #### ATF Process
 
@@ -970,3 +1042,287 @@
   - Run ATF tests on ServiceNow’s infrastructure via the ATF Test Generator and Cloud Runner app.
   - Frees up your local machine.
   - Store link: [ATF Test Generator and Cloud Runner](https://store.servicenow.com/sn_appstore_store.do#!/store/application/db1676d7421441106f046193880e0b37/1.0.17?referer=%2Fstore%2Fsearch%3Flistingtype%3Dallintegrations%25253Bancillary_app%25253Bcertified_apps%25253Bcontent%25253Bindustry_solution%25253Boem%25253Butility%25253Btemplate%26q%3DATF%2520Test%2520Generator%2520and%2520Cloud%2520Runner&sl=sh)
+
+### ATF Administration
+
+#### ATF Roles
+
+- **Test Designer** (`atf_test_designer`)
+
+  - Most common role; suitable for app developers and QA testers
+  - Can:
+    - Create, edit, and delete tests and test suites
+    - Add test steps using predefined configurations
+    - Run tests and view results
+    - View system properties (read-only)
+  - Cannot:
+    - Create or edit test step configurations
+  - Skills: Low-code/no-code experience; debugging familiarity helpful
+
+- **Test Administrator** (`atf_test_admin`)
+
+  - Manages system-level ATF configuration and client test runners
+  - Can:
+    - Do everything a Test Designer can
+    - Configure ATF system properties
+    - Create and manage test step configurations using scripts
+    - Maintain test result retention and client test runners
+    - Support complex test failures and environment management
+  - Skills: Advanced scripting/programming
+
+- **Web Service Tester** (`atf_ws_designer`)
+  - Specializes in web service test development (REST/SOAP)
+  - Can:
+    - Do everything a Test Designer can
+    - Create tests for APIs and integrations
+    - Support advanced debugging involving integration logic
+  - Skills: Advanced scripting and API knowledge
+
+#### ATF Properties
+
+- **ATF System Properties Overview**
+
+  - Configured by ATF Test Administrators to control test execution, scheduling, screenshots, runner behavior, and more.
+  - Navigate to: **Automated Test Framework > Administration > Properties**
+
+- **Test Execution Controls**
+
+  - `Enable test/test suite execution`: Allows tests/suites to run on the instance (disabled by default).
+  - `Enable scheduled test suite execution`: Enables scheduling (should remain disabled on PROD).
+
+- **Debugging**
+
+  - `sn_atf.debug`: Enables enhanced logs and a Debug Info tab in the client test runner.
+
+- **Screenshot Settings**
+
+  - `sn_atf.screenshots.capture`: Capture options (all, failures only, or none).
+  - `sn_atf.screenshots.use_glide_screenshot`: High-fidelity screenshots (default: true for new instances).
+  - `sn_atf.screenshots.capture_full_page`: Full-page capture (performance impact).
+  - `sn_atf.screenshots.timeout`, `height`, `width`: Control screenshot performance and dimensions.
+
+- **Custom UI Testing**
+
+  - `sn_atf.custom_ui.capture_all_page_data`: Ensures up-to-date data during custom UI test steps by refreshing the page.
+
+- **Client Test Runner Settings**
+
+  - `sn_atf.runner.heartbeat_interval`: Time between client runner check-ins.
+  - `sn_atf.runner.timeout`: Time before a runner is marked offline.
+  - `sn_atf.runner.retention_interval`: Time before offline runners are deleted.
+
+- **Reporting**
+
+  - `sn_atf.max_suite_results`: Sets max results in the test suite aging report.
+  - Email formatting options for result summaries: text content and color coding for pass/fail statuses.
+
+- **Headless Client Test Runners (Docker)**
+
+  - Properties prefixed with `sn_atf.headless.*` configure test runner containers for UI testing without a visible browser.
+  - Includes username/password credentials, Docker image, browser/OS settings, and login UI field IDs.
+
+- **Admin Tips**
+
+  - Property changes apply only to new test runners.
+  - Always select **Save** to apply changes in the Properties form.
+
+- **Reference**
+  - [ATF System Properties – ServiceNow Docs](https://docs.servicenow.com/csh?topicname=atf-admin-properties.html&version=latest)
+
+#### Test Runner Options
+
+- **Overview**
+
+  - There are three types of ATF test runners:
+    - **Cloud Runner** – runs tests on ServiceNow-hosted infrastructure
+    - **Client Test Runner** – runs tests in a browser window on the local machine
+    - **Headless Browser** – runs UI tests without a visible browser; used behind firewalls
+
+- **Cloud Runner**
+
+  - Introduced in the Tokyo release
+  - Enables background execution of UI tests using ServiceNow’s cloud resources
+  - Best for freeing up local machines during test execution
+  - **Not recommended** for sensitive or confidential environments
+  - Requires installation from the [ServiceNow Store](https://store.servicenow.com/store/app/e4292f6e1be06a50a85b16db234bcbc3)
+
+- **Client Test Runner**
+
+  - Original test runner method
+  - Recommended for:
+    - On-prem data privacy requirements
+    - Step-by-step test observation
+    - Specific browser testing scenarios
+  - Types:
+    - **Manual Client Test Runner**: launched via _Run > Client Test Runner_ (hold `Shift`)
+    - **Scheduled Client Test Runner**: launched via _Run > Scheduled Client Test Runner_ (hold `Shift`)
+  - Environment is based on the browser/OS where it is launched
+  - Tips for running scheduled client test runners:
+    - Launch in a separate window
+    - Disable sleep mode and screen saver
+    - Ensure system remains awake and powered on
+    - Maintain 100% browser zoom for best screenshots
+    - Prefer virtual machines for security and availability
+
+- **Headless Browser**
+
+  - Runs UI tests without an open browser window
+  - Ideal for automated, behind-the-firewall execution
+  - Requires configuration via `sn_atf.headless.*` system properties
+  - Uses Docker containers and login credentials to execute UI tests securely
+
+- **Test Queue Monitoring**
+
+  - Use these modules to monitor test and suite execution:
+    - _Run > Active Manual Test Runners_
+    - _Run > Active Scheduled Test Runners_
+    - _Run > Waiting/Running Test Runs_
+    - _Run > Waiting/Running Suite Runs_
+
+- **Reference Links**
+  - [Cloud Runner App – ServiceNow Store](https://store.servicenow.com/store/app/e4292f6e1be06a50a85b16db234bcbc3)
+  - [Client and Scheduled Test Runners](https://docs.servicenow.com/csh?topicname=atf-test-runners.html&version=latest)
+  - [ATF Headless Browser](https://docs.servicenow.com/csh?topicname=atf-headless-browser.html&version=latest)
+
+#### Test Result Retention Policies
+
+- **Retention Strategy Options**
+
+  - Accumulated ATF results can be managed through:
+    - Importing results into production via Import Sets
+    - Using Data Preservers in sub-production to protect during cloning
+    - Allowing automatic deletion after 30 days unless flagged for retention
+
+- **Importing Results into Production**
+
+  - Use [Import Sets](https://docs.servicenow.com/csh?topicname=import-sets-landing-page.html&version=latest) to move test data into production
+  - Requires mapping external data into ATF result tables
+
+- **Preserving Results in Sub-Prod**
+
+  - Define [Data Preservers](https://docs.servicenow.com/csh?topicname=data-preservation.html&version=latest) to prevent overwriting during instance clones
+  - Helps keep test history intact for UAT or development tracking
+
+- **Automatic Deletion**
+  - Default retention: 30 days for test and test suite result records
+  - To keep specific results:
+    - Open result record and check `Retain indefinitely`
+  - Retention window can be modified through table cleanup policies
+    - [Modify cleanup configuration](https://docs.servicenow.com/csh?topicname=atf-edit-table-cleanup.html&version=latest)
+    - Recommended only for experienced system administrators
+
+#### Migrate ATF Development
+
+- **Migration Workflow**
+
+  - Develop ATF objects in DEV
+  - Migrate to TEST
+  - Run tests in TEST
+  - Migrate to PROD
+  - Clone PROD back to TEST and DEV
+  - Re-run ATF after upgrade in DEV
+  - Use update sets (name them clearly with "ATF" included)
+
+- **User and Group Sys_ID Consistency**
+
+  - Tests often rely on users/groups (e.g., Impersonate, Assignment Group)
+  - Sys_IDs must match across instances to prevent test failures
+  - ServiceNow does not migrate users/groups automatically
+
+- **Checklist for Consistent User References**
+
+  - Create reference users/groups in PROD
+  - Match test user group assignments to real user roles
+  - Create an "ATF Test Users" group and include all test users/groups
+  - Clone PROD to sub-prod to maintain sys_id consistency
+
+- **Options to Avoid Sys_ID Dependencies**
+
+  - Use **Create a User** test step configuration (preferred)
+  - Build a custom test step to create temporary users
+  - Dynamically query a user at test runtime
+
+- **Post-Clone Setup**
+
+  - Clone-inherited test users will be inactive
+  - Use post-clone scripts to automatically activate test users/groups
+
+- **Data Preservation**
+  - Avoid overwriting ATF development objects during clones
+  - Use data preservers to protect critical ATF test data
+
+#### Create Test Templates
+
+- **Purpose**
+
+  - Test templates group common test step configurations for reuse.
+  - Only **ATF Test Administrators** can create templates.
+  - Test Designers can add templates to tests and configure steps as needed.
+
+- **Use Cases**
+
+  - Common sequences (e.g., approval simulation, form entry, field validation).
+  - Steps are unconfigured—input values must be added after insertion.
+  - For pre-configured steps, use a sample test instead.
+
+- **How to Create a Test Template**
+
+  - Set application scope (using picker or system settings).
+  - Go to: `Automated Test Framework > Administration > Test Templates`
+  - Select **New**.
+  - Enter a **Name** and (optional) **Description**.
+  - Add **Test Step Configurations** in desired order using the lookup icon.
+  - Submit the form to save the template.
+
+- **How to Use a Test Template**
+
+  - Test Designers select **Add Test Template** from a test.
+  - Select a template and click **Add**.
+  - Test step configurations are copied into the test as editable test steps.
+  - Instructions for configuring the steps are auto-appended to the test description.
+
+- **Additional Guidance**
+  - Templates are not pre-filled with values—use test samples if needed.
+  - more about [creating tests](#create-tests)
+  - [lab Create a test template](#activity-2---create-a-test-template-atf-administration)
+
+#### Custom Test Step Configurations
+
+- Custom test step configurations allow Test Administrators to define reusable server-side logic for ATF.
+- Only available for **server-side** actions — not UI interactions.
+- Created via: **Automated Test Framework > Administration > Step Configurations**
+
+**Configuration involves:**
+
+- Completing the initial form (Name, Category, Class type, Description).
+- Writing two scripts:
+  - **Description generation script**: dynamically defines the step description visible in the test.
+    - [Learn more](https://docs.servicenow.com/csh?topicname=atf-config-desc-script.html&version=latest)
+  - **Step execution script**: performs the actual server-side logic during the test run.
+    - [Learn more](https://docs.servicenow.com/csh?topicname=atf-config-script.html&version=latest)
+- Adding input and output variables that pass data into and out of the test step.
+
+**Best Practices:**
+
+- Use descriptive names and clear instructions for reuse by Test Designers.
+- Consider skipping script writing initially and defining input/output variables first.
+- Modify the layout via **Edit Variables Layout** for better test step configuration UI.
+- Good use cases include:
+  - Generating dynamic data
+  - Setting time/date formats
+  - Getting a random user or approver
+  - Verifying emails or approvals
+  - Creating workflows like "Approve all Approvals"
+
+**Run Server Side Script vs Custom Step Config:**
+
+- _Run Server Side Script_: ad-hoc, one-off use; not reusable across tests.
+- _Custom Step Configuration_: reusable, scripted by Test Admins, visible to all designers.
+
+**Example to review in PDI:**
+
+- `Custom Scripted StepConfig` (available in the instance)
+
+**More inspiration:**
+
+- [Now Community: Reduce ATF maintenance with custom steps](https://community.servicenow.com/community?id=community_blog&sys_id=ec74896fdb3d9010d5c4d9d9689619ff)
