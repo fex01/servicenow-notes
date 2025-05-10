@@ -47,6 +47,22 @@
 
 ## Portals & Workspaces
 
+### CSM Portal
+
+### Employee Center
+
+### Service Operations Workspace
+
+### Now Mobile
+
+### Knowledge Management Service Portal
+
+#### Configure the Knowledge Homepage
+
+#### Configure the Knowledge Search Results Page
+
+#### Configure the Knowledge Article View Page #### Integrate KM Portal with Existing Portals
+
 ## Application Configuration
 
 ### Guided Setup
@@ -205,9 +221,18 @@
     - Approve/edit assigned articles
     - Self-assign feedback tasks
 - KCS Roles (see also [Knowledge-Centered Service](#knowledge-centered-service-kcs))
-  - `kcs_contributor`
-  - `kcs_publisher`
   - `kcs_candidate`
+    - Learner or junior contributor
+    - Cannot publish externally
+    - Articles default to **Not Validated**
+  - `kcs_contributor`
+    - Can create and validate articles
+    - No coach review required
+    - Articles may be **Validated**
+  - `kcs_publisher`
+    - Trusted expert
+    - May publish externally without review
+    - Articles may be **Validated**
 
 ### Ownership Groups
 
@@ -495,17 +520,139 @@ When designing your Knowledge Management (KM) implementation, consider your plat
 ## Knowledge-Centered Service (KCS)
 
 - **Verified KCS v6**
+
   - Article Quality Reviews
     - Pre-defined or custom questionnaires per KB
   - Feedback Management
-    - Report gaps and track feedback through revisions
+    - Report gaps and track feedback through revisions  
+      ↳ See [Feedback & Metrics](#feedback--metrics)
   - In-Context Knowledge Capture
-    - Auto-fill article fields from cases
+    - Auto-fill article fields from cases and incidents  
+      ↳ See [Configure Case & Incident to Knowledge Properties](#configure-case-and-incident-to-knowledge-properties)
+
+- **Purpose & Methodology**
+
+  - Focuses on real-time creation, reuse, and continuous improvement of knowledge
+  - Encourages knowledge capture during issue resolution—not as a separate initiative
+  - Relies on collaboration, learning incentives, and ongoing content validation
+  - Improves consistency, quality, and findability of knowledge content
+
 - **Benefits**
-  - Reduced resolution and training time
-  - Insights into product/process improvement
+
+  - Increased deflection of incidents and cases
+  - Faster resolution and reduced onboarding time
+  - Higher quality and consistency of knowledge
+  - Cross-team contribution and expanded reuse
+  - Better insights into customer needs and systemic issues
+
 - **Double Loop Process**
-  - ![Solve-Evolve Loop](./attachments/sn-know-solve-evolve.png)
+
+  - **Solve Loop**
+    - Capture and reuse knowledge during daily support interactions
+  - **Evolve Loop**
+    - Assess and improve article quality, structure, and relevance
+  - Together, they form a self-correcting, collaborative system  
+    ![Solve-Evolve Loop](./attachments/sn-know-solve-evolve.png)
+
+### KCS Setup in ServiceNow
+
+- **Configuration via [Guided Setup](#guided-setup)**
+
+  - Enable KCS-specific roles and article state fields  
+    ↳ See [Enable KCS Roles and Article State Fields](#enable-kcs-roles-and-article-state-fields)
+  - Create and assign AQI checklists  
+    ↳ See [Configure and Assign AQI](#configure-and-assign-aqi)
+  - Set up knowledge creation from support tasks  
+    ↳ See [Configure Case & Incident to Knowledge Properties](#configure-case-and-incident-to-knowledge-properties)
+  - Configure feedback management and actionable feedback  
+    ↳ See [Feedback & Metrics](#feedback--metrics)
+
+### Enable KCS Roles and Article State Fields
+
+- **Plugin Activation**
+
+  - Plugin: `Knowledge Management KCS Capabilities` (`com.snc.knowledge_kcs_capabilities`)
+  - Enables KCS-specific roles and metadata fields on knowledge articles
+  - Activated via [Guided Setup](#guided-setup)
+
+- **KCS Roles**
+
+  - Adds KCS-specific roles:
+    - `kcs_candidate`
+    - `kcs_contributor`
+    - `kcs_publisher`
+  - See [Personas & Roles](#personas--roles) for detailed permissions
+
+- **Article Fields**
+
+  - **Confidence**
+
+    - Indicates article maturity and author trust level
+    - Automatically set based on article state and author role:
+      - _Work in Progress_ (Draft)
+      - _Not Validated_ (e.g. `kcs_candidate`)
+      - _Validated_ (e.g. `kcs_contributor`, `kcs_publisher`)
+      - _Archived_ (Retired)
+
+  - **Governance**
+    - Defines contribution model:
+      - _Experience Based_: Open and flexible
+      - _Compliance Based_: Restricted for regulatory content
+    - Editable by users with contribute access
+
+### Configure and Assign AQI
+
+- **Plugin Requirement**
+
+  - Requires `Knowledge Management Advanced`  
+    ↳ See [Additional Plugins (Common & Recommended)](#additional-plugins-common--recommended)
+
+- **AQI Checklist**
+
+  - Used by Knowledge Coaches to assess quality of published articles
+  - Based on KCS-aligned criteria (true/false questions with weighted values)
+  - Must total 100 points
+  - Default checklist can be customized or replaced
+
+- **Assignment**
+
+  - Assigned at the **knowledge base** level (not per article)
+  - Can be unique or shared across KBs
+  - Navigate to: `All > Knowledge > Administration > Knowledge Bases`
+
+- **Review and Scoring**
+  - Executed from the article form (post-publish)
+  - Results are immutable after submission
+  - Scoring reflects cumulative weight of passed checks  
+    ↳ See [Feedback & Metrics](#feedback--metrics)
+
+### Configure Case and Incident to Knowledge Properties
+
+- **Purpose**
+
+  - Enables real-time article creation directly from support tasks
+  - Templates auto-populate from case/incident fields
+
+- **Case to Article** _(Customer Service Management)_
+
+  - Enable property: `KCS for Customer Service Management` → `true`
+  - Activate template: **KCS Article**  
+    ↳ `All > Knowledge > Administration > Article Templates`
+  - Mapped fields:
+    - _Short Description_, _Issue_, _Cause_, _Resolution_, _Source Task_
+
+- **Incident to Article** _(IT Service Management)_
+
+  - Activate plugin: `KCS Integration for Incident Management` (`com.snc.incident.knowledge`)
+  - Templates: **Incident KCS Article**, **Incident-KCS Article-HTML**  
+    ↳ See [Article Templates](#article-templates)
+  - Mapped fields:
+    - _Short Description_, _Issue_, _Resolution_, _Source Task_
+
+- **Notes**
+  - Articles are created in **Draft** state
+  - Source field mapping must be correct for auto-fill to work
+  - Final content should be reviewed before publishing
 
 ---
 
@@ -703,7 +850,7 @@ When designing your Knowledge Management (KM) implementation, consider your plat
   - Hide or customize KB/category breadcrumb display
   - Set custom separator characters
 
-### Configure the Knowledge Article View Page
+#### Configure the Knowledge Article View Page
 
 - **Overview**
 
@@ -925,52 +1072,86 @@ When designing your Knowledge Management (KM) implementation, consider your plat
 
 - **User Feedback Options**
 
-  - View/add comments (KB level)
-  - Flag as inappropriate (contributor only)
-  - Rate (1–5 stars)
-  - Helpful/Not Helpful toggle
+  - Available via portal, mobile, or platform views:
+    - Comments (if enabled)
+    - Helpful / Not Helpful toggle
+    - Star rating (1–5)
+    - Flag as incorrect or inappropriate (requires contributor role)
 
 - **Feedback Records**
 
-  - Created for each user action
-  - Visible to KB managers/admins
+  - All feedback actions create a record in the `kb_feedback` table
+  - Fields captured:
+    - User action (rating, flag, etc.)
+    - Comments and feedback type
+    - Optional: **Work notes** for internal tracking by knowledge managers
+  - Feedback records are visible to knowledge managers and `knowledge_admin`  
+    ↳ See [Personas & Roles](#personas--roles)
 
 - **Actionable Feedback**
 
-  - Triggers tasks when flagged or rated poorly
-  - Found at: All > Knowledge > Feedback Management > My Assigned Tasks
+  - Automatically generates **Knowledge Feedback Tasks** for negative input
+  - Controlled via [Knowledge Properties](#knowledge-properties) → _Actionable Feedback Properties_
+  - Typical triggers:
+    - Article flagged
+    - Marked "Not Helpful"
+    - Rated 3 stars or below
+  - Tasks appear under:  
+    `All > Knowledge > Feedback Management > My Assigned Tasks`
+  - Feedback is considered resolved when the **Flagged** field is cleared  
+    → This sets a hidden `Resolved = true` field (used for tracking/reporting)
+
+- **Feedback Configuration**
+
+  - Actionable feedback must be explicitly enabled by an admin
+  - Configuration includes:
+    - Thresholds for triggering tasks
+    - Assignment logic (e.g., group vs individual)
+  - Customization is available through [Knowledge Properties](#knowledge-properties)
 
 - **Article Versioning**
 
-  - Versions tab
-  - Major = Published
-  - Minor = Unpublished
-  - Compare via "Actions > Compare"
+  - Versions tracked via the **Versions** tab on the article record
+  - **Major Revision**: for published content updates
+  - **Minor Revision**: for edits to drafts or scheduled content
+  - Compare versions using:  
+    `Actions > Compare` (select two versions from the list)
 
 - **Article Quality Index (AQI)**
 
-  - Checklist to enforce standards
-  - Customizable
-  - Results are immutable after submission
-  - Score shown as sum of passed checks
-  - Example checks:
-    - Accuracy
-    - Relevance
-    - Completeness
-    - Metadata and formatting
-    - User access/security
+  - Structured quality checklist based on [KCS standards](#knowledge-centered-service-kcs)
+  - Reviews conducted by Knowledge Coaches  
+    ↳ See [Configure and Assign AQI](#configure-and-assign-aqi)
+  - Immutable once submitted; scored out of 100
+  - Example checklist items:
+    - Accuracy, relevance, completeness
+    - Metadata, formatting, access control
 
-- **Dashboard Metrics (All > Knowledge > Administration > Overview)**
+- **Dashboard Metrics**  
+  `All > Knowledge > Administration > Overview`
+
   - **Lifecycle**
-    - Articles in review, draft, or published
-    - Aging reviews and creation trends
+
+    - Articles by workflow state: Draft, Review, Published, Retired
+    - Articles pending review or aging in draft
+    - Creation and update trends
+
   - **Feedback**
-    - Comments, flags, ratings, trends
+
+    - Comments, flags, star ratings, "Not Helpful" trends
+    - Average article rating
+
   - **Usage**
-    - Views, attachments, CTR
-    - Trends by user, article, or time
+
+    - View counts, attachments, click-through rates
+    - Monthly usage trends by user, article, or group
+
   - **Authors**
-    - Monthly views/creations per author
+
+    - Article views and contributions per author
+    - Monthly author activity summaries
+
   - **Content Quality**
-    - AQI scores
-    - % flagged, outdated, inactive, unpublished
+    - Average AQI score
+    - % of articles flagged, outdated, or inactive
+    - Articles older than 1 year or unpublished
