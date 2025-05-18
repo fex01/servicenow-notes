@@ -1155,3 +1155,96 @@ When designing your Knowledge Management (KM) implementation, consider your plat
     - Average AQI score
     - % of articles flagged, outdated, or inactive
     - Articles older than 1 year or unpublished
+
+- **Usage Logs**
+
+  - Track user interaction with knowledge content:
+    - Views, searches, search locations, and usage confirmation
+  - **Knowledge Use Records** (`kb_use`)
+    - Stores article view activity per user
+    - Includes:
+      - Article number
+      - User
+      - View timestamp
+      - Article usage confirmation
+    - Navigate to: `All > Knowledge > Administration > View Log`
+  - **Knowledge Search Records** (`kb_knowledge_search`)
+    - Stores search activity per user
+    - Includes:
+      - Search terms
+      - Search source (e.g., portal, mobile)
+      - User domain
+      - Number of results returned
+    - Navigate to: `All > Knowledge > Administration > Search Log`
+
+### Performance Analytics
+
+- **Purpose**
+
+  - Track, aggregate, and visualize knowledge management data trends
+  - Assess article performance, effectiveness, and opportunities for improvement
+
+- **Prerequisites**
+
+  - Requires plugin: `Performance Analytics - Content Pack - Knowledge Management` (`com.snc.pa.knowledge_v2`)
+  - Available with ServiceNow Professional or Enterprise subscriptions  
+    ↳ See [Optional Plugins (May Require Additional Licensing)](#optional-plugins-may-require-additional-licensing)
+
+- **Indicators and Indicator Sources**
+
+  - Indicators measure and track specific KPIs over time (e.g., article views, feedback ratings)
+  - Indicator sources define the underlying data set (e.g., knowledge articles, feedback records)
+    - Example tables: `kb_knowledge`, `kb_feedback`
+  - Default indicator sources provided by the plugin; additional sources can be created:
+    - Navigate: `Performance Analytics > Indicator Sources`
+    - Roles required: `admin`, `pa_admin`, or `pa_data_collector`
+    - Avoid duplicate sources; changing later affects existing data
+    - [Indicator Sources Documentation](https://docs.servicenow.com/csh?version=latest&topicname=c_IndicatorSources)
+  - Indicators can use shared sources for consistency and optimized data collection
+
+- **Key Indicator Elements**
+
+  - **Frequency**: How often indicators are displayed (Daily, Weekly, Monthly); independent from data collection schedule
+  - **Direction**: Improvement direction (Minimize or Maximize)
+  - **Unit**: Measurement unit (Number, %, Days, $, etc.)
+  - **Aggregate**: Calculation method (Count, Sum, Average, Min, Max, Count distinct)
+  - **Conditions**: Additional filters applied at the indicator level; case-sensitive and complement indicator source conditions
+  - **Breakdowns**: Group or filter indicator scores by specific attributes (e.g., Category, Priority) for detailed analysis
+
+- **Breakdowns and Breakdown Sources**
+
+  - Breakdowns group or filter indicator scores by attributes (e.g., priority, category)
+    - [Breakdowns Documentation](https://docs.servicenow.com/csh?version=latest&topicname=c_CreatingBreakdowns)
+  - Breakdown sources specify the data available for breakdown elements
+    - [Breakdown Sources Documentation](https://docs.servicenow.com/csh?version=latest&topicname=t_DefiningABreakdownSource)
+  - Types:
+    - Automated (dynamic from tables)
+    - Manual (user-defined)
+    - External (SQL or external data sources)
+  - Configure breakdown sources and breakdowns:
+    - Navigate: `Platform Analytics Administration > Breakdown Sources` and `Platform Analytics Administration > Breakdowns`
+
+- **Data Collection**
+
+  - Data collected via scheduled jobs
+  - Historical data collection: run once to populate initial data
+  - Scheduled data collection: automate recurring data updates
+    - Navigate: `Platform Analytics Administration > Data Collector > Jobs`
+    - Roles required: `admin`, `pa_admin`, or `pa_data_collector`
+
+- **Analytics Hub**
+
+  - Displays detailed scores and trends for individual indicators
+  - Publish indicators to Analytics Hub:
+    - Open indicator record → Access Control tab → Set `Publish on Analytics Hub` = `true`
+    - Navigate: `Platform Analytics Administration > Analytics Hub`
+
+- **Dashboards**
+  - Interactive, actionable data visualizations on a single screen
+  - Default KM Dashboard (provided by content pack) includes tabs:
+    - Content Usage (effectiveness of published content)
+    - Content Governance (process adherence)
+    - Content Quality (AQI scores, feedback trends)
+  - Access and manage dashboards:
+    - Navigate: `Platform Analytics Administration > Usage and governance > Dashboards`
+  - [Dashboards Documentation](https://docs.servicenow.com/csh?version=latest&topicname=dashboards-landing-page)
