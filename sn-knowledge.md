@@ -93,6 +93,7 @@
 
 - [Knowledge Management Reference Docs](https://docs.servicenow.com/csh?topicname=knowledge-management-reference.html&version=latest)
 - [Translation Management](https://docs.servicenow.com/csh?topicname=translation-management.html&version=latest)
+- [Knowledge Properties](https://docs.servicenow.com/csh?version=latest&topicname=r_KnowledgeProperties)
 
 ---
 
@@ -117,8 +118,6 @@
 - [KCS v6 Practices Guide (Consortium for Service Innovation)](https://library.serviceinnovation.org/KCS/KCS_v6/KCS_v6_Practices_Guide)
 
 ---
-
-### 🧪 Labs
 
 ## Essential Concepts
 
@@ -1066,6 +1065,71 @@ When designing your Knowledge Management (KM) implementation, consider your plat
     - Once plugins are activated, mark the task as complete
   - ↳ See [Guided Setup](#guided-setup)
 
+### Translation Management
+
+- **Overview**
+
+  - Enables translation workflows for published articles
+  - Supports manual and machine translation
+  - Auto-generates translation tasks for configured languages and versions
+
+- **Requirements**
+
+  - [Plugins](#plugins):
+    - `Knowledge Management Advanced`
+    - `I18N: Knowledge Management Internationalization Plugin v2`
+    - Language-specific internationalization plugins
+  - Enable via system property: `glide.knowman.translation.enable_translation_task = true`
+
+- **Translation Workflow**
+
+  - **Create Article**: Author publishes in a base language
+  - **Translation Tasks**:
+    - Created automatically per configured language
+    - Also generated for new versions of translated articles
+  - **Translate Article**:
+    - Manual: Translators edit assigned tasks
+    - Machine: Optional integration with translation providers
+
+- **Knowledge Base Setup**
+
+  - Access: `All > Knowledge > Administration > Knowledge Bases`
+  - Configure per KB:
+    - **Languages**: List of supported article languages
+    - **Auto-create translation tasks**: Enable for automatic task creation
+
+- **Task Assignment Rules**
+  - Assign to user/group based on KB, language, or other rules
+  - Defined via standard Assignment Rules engine: `All > Routing and Assignment > Assignment Rule`
+    - create rule for table `[kb_translation_task]`
+
+---
+
+### Machine Translation
+
+- **Purpose**: Translate text automatically via integrated translation services
+- **Plugin**: `Dynamic Translation` (`com.glide.dynamic_translation`)
+- **Supported Providers**: Microsoft, IBM, Google, others
+
+- **Access**: `All > Dynamic Translation > Translator Configurations`
+
+  - requires active plugin
+
+- **Setup**
+  - Create translation **connections**
+  - Enter API credentials
+  - Set **default** translator for:
+    - Detection
+    - Translation
+- **Features**
+
+  - Real-time field translation (forms, activity streams)
+  - Use via Dynamic Translation API
+  - Auto-detect source language
+
+- **Reference**
+  - [Dynamic Translation – ServiceNow Docs](https://docs.servicenow.com/csh?version=latest&topicname=dynamic-translation-overview)
+
 ---
 
 ## Feedback & Metrics
@@ -1248,3 +1312,124 @@ When designing your Knowledge Management (KM) implementation, consider your plat
   - Access and manage dashboards:
     - Navigate: `Platform Analytics Administration > Usage and governance > Dashboards`
   - [Dashboards Documentation](https://docs.servicenow.com/csh?version=latest&topicname=dashboards-landing-page)
+
+## Knowledge Search
+
+- search via:
+  - **Knowledge Service Portal**
+  - **Knowledge homepage**
+  - cases or incidents
+
+### Knowledge Search Properties
+
+- **Access**: `All > Knowledge > Administration > Properties`, section _Knowledge Search Properties_
+- **Purpose**: Control how search results appear to end users
+- **Key Options**:
+
+  - **Sort Order**: Relevancy, views, last modified, etc.
+  - **Displayed Attributes**:
+    - Knowledge Base name
+    - Article author
+    - Number of views
+    - Last modified date
+    - Published date (optional)
+    - Knowledge category (with hierarchy)
+    - Average star rating
+  - **Attachments**: Show/hide in search results
+  - **Multi-language Search**: Enable support for multilingual articles  
+    ↳ See [Internationalization & Translation](#internationalization--translation)
+
+- **Reference**: [Knowledge Properties – ServiceNow Docs](https://docs.servicenow.com/csh?version=latest&topicname=r_KnowledgeProperties)
+
+### Knowledge Search Synonyms
+
+- **Access**: `All > System Definition > Text Index Synonym Dictionaries`
+- **Purpose**: Improve search coverage by treating related terms as equivalent
+- **Example**: Synonym set like `vacation, holiday, paid time off` ensures matching articles regardless of phrasing
+- **Configuration Steps**:
+  - Create or modify a **Synonym Dictionary**
+  - Add comma-separated **Synonym Sets**
+  - **Publish** the dictionary to apply system-wide
+- **Applies to**: Global text search, including Knowledge article search
+
+### Knowledge Search SEO
+
+- **Access**: `All > Knowledge > Administration > Article Templates`
+- **Purpose**: Use a defined template field to generate internal SEO tags for knowledge articles
+- **Functionality**:
+  - Define a value in the **SEO Description Tag** field on the article template
+  - When used, articles created from the template automatically include this value as SEO metadata
+- **Effect**: Enhances article discoverability within internal platform search
+- **Note**: SEO content must be defined at the template level and applies to all derived articles
+
+### Knowledge Search Stop Words
+
+- **Access**: `All > System Definition > Text Index Stop Words`
+- **Purpose**: Improve search precision by removing non-essential terms from queries
+- **Functionality**:
+  - Define stop words (e.g., articles, pronouns, prepositions)
+  - Add or deactivate entries in stop word dictionaries
+- **Example**:
+  - Query: "upgrade my laptop"
+  - If "my" is a stop word, the effective search becomes: "upgrade laptop"
+
+### Knowledge Search Match Rules
+
+- **Access**: `All > System Definition > Text Index Configurations` → open `kb_knowledge` record
+
+- **Inverse Document Frequency (IDF)**
+
+  - Boosts relevance for terms frequent in an article but rare across the knowledge base
+  - Helps highlight articles with contextually strong matches
+  - Enabled by default on new/z-booted instances
+
+- **Partial Match Rules**
+
+  - Control how many terms from a multi-word query must match
+  - Helps narrow or broaden search result sets
+  - **Supported Formats**:
+    - `3`: At least 3 terms must match
+    - `-2`: Total terms minus 2 must match
+    - `75%`: 75% of terms must match (rounded down)
+    - `-25%`: Total terms minus 25% must match
+    - `3<70%`: All terms required if ≤3; else 70% match
+    - `3<-25%, 9<-5`: Tiered match logic for increasing term count
+
+- **Query Mode Options**
+  - `AND`: All terms must match
+  - `OR`: Any one term may match
+  - `AND_OR`: Match all if possible; fallback to any
+  - `DEFAULT`: Uses table default (usually `AND`)
+
+### Knowledge Search – Contextual
+
+- **Purpose**: Delivers relevant knowledge, catalog items, and support content based on field-level input in forms and record producers
+
+- **Use Cases**
+
+  - **Record Producers**: Prevent unnecessary tickets by surfacing helpful knowledge or actions before submission
+  - **Incident & Case Forms**: Agents see suggested articles to speed up resolution
+  - **Email Notifications**: Embed related content so users can self-solve before replying
+
+- **Examples**
+
+  - Agent working an Incident sees relevant KBs and catalog items directly from the form
+  - User submitting a case via Service Portal gets article suggestions that may resolve the issue pre-submission
+
+- [**Required Plugins**](#plugins)
+
+  - **Incident**: `Knowledge Management V3` (`com.snc.knowledge3`)
+  - **Case (CSM)**: `Customer Service` (`com.sn_customerservice`) + `Knowledge Management V3`
+  - **HR Case**: `Human Resources Core` (`com.sn_hr_core`) + `Knowledge Management V3`
+
+- **Configuration**
+
+  - **Access**:
+    - Table: `All > Contextual Search > Table Configurations`
+    - Record Producer: `All > Contextual Search > Record Producer Configurations`
+  - **Options**:
+    - Define source fields used for context (e.g., short description, category)
+    - Set number of results to display
+
+- **Reference**
+  - [Contextual Search – ServiceNow Docs](https://docs.servicenow.com/csh?version=latest&topicname=c_ContextualSearch)
