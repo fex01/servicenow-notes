@@ -1,27 +1,10 @@
 # Git: Source Control & Collaborative Development
 
-## TODO
-
-- [ ] Add links to ServiceNow Documentation and Community discussions
-- [ ] Clarify edge cases for stashing and conflict resolution workflows
-
 ## Resources
 
 ### 📘 Courses
 
-- [Source Control Fundamentals](https://learning.servicenow.com/lxp/en/now-platform/source-control-fundamentals?id=learning_course_prev&course_id=e55406cc47fa7954db63fb25126d43dc)
-
-### 📄 ServiceNow Documentation
-
--
-
-### 🧠 Community
-
-- TBD
-
-### 📚 Standards
-
--
+- [x] [Source Control Fundamentals](https://learning.servicenow.com/lxp/en/now-platform/source-control-fundamentals?id=learning_course_prev&course_id=e55406cc47fa7954db63fb25126d43dc)
 
 ## Content
 
