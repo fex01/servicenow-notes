@@ -1,206 +1,136 @@
-# ServiceNow Reports Reference Notes
+# ServiceNow Reports - Report Types
 
 ## TODO
 
-- [ ] Add content for Lesson 5
-- [ ] Add specific links and resources
-- [ ] Cross-reference related sections
+* [ ] Add content for hands-on exercises
+* [ ] Add specific links and cross-references
 
 ---
 
-## Table of Contents
+## Summary Reports - Bars and Columns
 
-- [Report Fundamentals](#report-fundamentals)
+* **Purpose:** Compare grouped records visually.
+* **Use Cases:** Assignment load by assignee, incidents by priority.
+* **Key features:**
 
-  - [Overview](#overview)
-  - [Report Designer](#report-designer)
-  - [Analytics Q\&A](#analytics-qa)
-  - [Report Sources](#report-sources)
+  * **Group by:** Categorize records by primary attribute.
+  * **Stack by:** Further categorizes data within each bar.
 
-- [Labs](#labs)
+    * Using both Stack by and Group by categorizes data by two attributes simultaneously.
+  * **Additional group by:** Enables dynamic data grouping with a dropdown to select alternative criteria.
+  * **Aggregation:** Count (default), Average, Sum, Min, Max, Standard Deviation.
+  * **Formatting:** Custom numerical/date labels on axes.
+  * **Data table:** Optional detailed view below chart.
+  * **Max number of groups:** Limits number of bars; excess data grouped as "Other" if "Show Other" is checked.
+* **Quick creation methods:**
 
-  - [Lab 1.1: List Report](#lab-11-list-report)
-  - [Lab 1.2: Report Sources](#lab-12-report-sources)
-  - [Lab 1.3: External Data Import](#lab-13-external-data-import)
-
----
-
-## Report Fundamentals
-
-### Overview
-
-- Reports visualize real-time business metrics.
-- Report types based on purpose:
-
-  - Comparison
-  - Distribution
-  - Relationship
-  - Composition
-  - Current State
-
-- Navigate to **Reports > View/Run** to explore report types.
-- Reports tabs:
-
-  - **My Reports**: Created by the user.
-  - **Group, Global, All**: Authorized reports.
-
-- **report_user** role required to access Reports application.
-- Reports can be combined onto dashboards for faster decisions.
-- Dashboard widgets examples:
-
-  - **Single Score**: Total incidents overdue.
-  - **Pie Chart**: Incidents by state.
-  - **Time Series (Area Chart)**: Incident volume over time.
-  - **Heatmap**: Incidents by priority and state.
-
-- Dashboards can be viewed by any user if shared.
+  * Analytics Q\&A: Queries like "incidents by Priority".
+  * List view: Select field > Bar Chart option.
 
 ---
 
-### Report Designer
+## Summary Reports - Pies and Scores
 
-- Guided, step-by-step report creation tool.
-- Report creation stages:
+* **Purpose:** Visualize proportions relative to a whole.
+* **Use Cases:** Incident priority distribution, changes by category.
+* **Key features:**
 
-  1. **Data Phase**: Select table containing data.
-  2. **Type Phase**: Choose visualization type:
+  * **Group by / Additional group by:** Dynamic attribute comparisons.
+  * **Aggregation:** Count (default), Average, Sum, Count Distinct.
+  * **Single Score Reports:** Highlight critical metrics (e.g., open incidents).
 
-     - Pie/Bar charts: Comparisons
-     - Time Series: Historical trends
-     - Single Score: KPIs
-     - List: Spreadsheet-like view
+    * Customizable conditions and aggregations.
+* **Quick creation methods:**
 
-  3. **Configure Phase**: Select attributes to group or aggregate data.
-  4. **Style Phase**: Customize visual appearance (size, colors, fonts).
-
-- **Condition Builder** filters data during report creation.
-- Example: Creating List Report
-
-  1. Select table (Incident).
-  2. Filter data (e.g., Active=true).
-  3. Choose type (List).
-  4. Group by attributes (State).
-  5. Style report (title, alignment, font).
-  6. Save and share reports.
-
-- Preview reports anytime with **Run** button.
+  * Analytics Q\&A: Queries like "problems by Priority as pie".
+  * List view: Select field > Pie Chart option.
 
 ---
 
-### Analytics Q\&A
+## Trend Reports - Time Series
 
-- Converts natural language queries into report definitions.
-- Accessible from any list or Data tab in Report Designer.
-- Automatically suggests recent queries and table/column matches.
-- Example Queries:
+* **Purpose:** Historical trend visualization.
+* **Use Cases:** Daily created incidents, monthly resolved incidents.
+* **Key features:**
 
-  - **Single Score**: Keywords (Total, Count, Avg., Min., Max.)
+  * **Trend by:** Date attribute for timeline.
+  * **Frequency (Per):** Daily, Weekly, Monthly.
+  * **Group by:** Separate trends by additional attribute.
+  * **Aggregation:** Count, Average, Sum, Standard Deviation.
+  * **Visualization types:** Column, Line, Area, Spline, Step Line.
+* **Quick creation methods:**
 
-    - e.g., "count of incidents assigned to Eduardo"
-
-  - **Historical Trend**: Keywords (daily, monthly, quarterly, yearly)
-
-    - e.g., "monthly average of business duration for incidents"
-
-  - **Bar Chart**: Keyword (By)
-
-    - e.g., "number of open incidents by category"
-
-  - **Dates/List**: Keywords (today, last week, etc.)
-
-    - e.g., "incidents updated last week"
-
-  - **Specify Type**: Force visualization type ("as list", "as bar chart", "as pie chart")
-
-    - e.g., "problems by priority as pie chart"
-
-- Requires activation of Natural Language Query (NLQ) feature by System Administrator.
+  * Analytics Q\&A: Queries like "incidents resolved monthly".
 
 ---
 
-### Report Sources
+## Multidimensional Report Examples
 
-- Defines data origin for reports (table + conditions).
-- Three report source types:
+* **Purpose:** Visualize data across multiple dimensions.
+* **Types:**
 
-#### Table (Most Common)
-
-- Select non-system tables directly.
-- Users require table ACL permissions.
-
-#### Data Source
-
-- Predefined reusable filter conditions.
-- Created by Report Administrators (`report_admin` role).
-- Example steps:
-
-  - Choose existing Data Source (e.g., Incidents.Open: Active=true).
-  - Create new Data Source via UI Action:
-
-    1. Define filter (e.g., Priority = High/Critical).
-    2. Save as new Data Source.
-
-  - Leverage existing Data Source directly in reports.
-
-#### External Data Import
-
-- Import Excel data into temporary ServiceNow table.
-- Import file requirements:
-
-  - First row: Column names.
-  - Max size: 2 MB; max columns: 25.
-  - Expiration & visibility required.
-
-- Expiration options: 1-2 weeks, 1-3-6 months, 1 year.
-- Visibility options: Only me, Everyone, specific Users/Groups/Roles.
-- Reports automatically deleted post-expiration.
+  * **Bubble Charts:** Compare multiple dimensions visually.
+  * **Heatmaps:** Matrix visualization to identify patterns quickly.
+  * **Multilevel Pivot Tables:** Data breakdown by multiple attributes (e.g., incidents by impact and priority).
 
 ---
 
 ## Labs
 
-### Lab 1.1: List Report
+### Lab 2.1: Summary Reports – Bars and Columns
 
-**Goal:** Create and verify a list report using Report Designer and Analytics Q\&A.
+**Goal:** Create and configure a Bar report with grouping, stacking, aggregation, and formatting.
 
-### Lab 1.2: Report Sources
+* **Steps:**
 
-**Goal:** Create reports using existing and newly defined data sources.
+  1. Navigate to Reports > Create New.
+  2. Data Tab: Define report (Name: Open Incidents by Priority, Table: Incident).
+  3. Type Tab: Select Bar visualization.
+  4. Configure Tab: Group by Priority.
+  5. Run and Save.
+  6. Add Stack by Assignment Group, update title.
+  7. Run, Insert, and Stay.
+  8. Add Additional group by Impact, update title.
+  9. Apply Aggregation (Average Business Duration), update title.
+  10. Set Value Formatting to d/h/m/s and max duration to Hour.
+  11. Display data table, Run and Save.
 
-### Lab 1.3: External Data Import
+### Lab 2.2: Summary Reports – Pies and Scores
 
-**Goal:** Use external data (Excel file) to create a ServiceNow report.
+**Goal:** Create Pie and Single Score reports with enhanced grouping, aggregation, and filters.
 
-**Detailed Steps:**
+* **Steps:**
 
-- **Section A:** Validate Excel file requirements:
+  1. Navigate to Reports > Create New.
+  2. Data Tab: Define report (Name: All Problems by Priority as Pie, Table: Problem).
+  3. Type Tab: Select Pie visualization.
+  4. Configure Tab: Group by Priority, Run and Save.
+  5. Add Additional group by Resolution Code, update title.
+  6. Run, Insert, and Stay.
+  7. Create Single Score report (Name: Open Incidents, Table: Incident).
+  8. Type Tab: Select Single Score visualization.
+  9. Condition builder: Active=True, Priority=Critical.
+  10. Configure Tab: Aggregate by Sum (Business Duration).
+  11. Run and Save.
 
-  - Extension: `.xlsx`
-  - First worksheet only
-  - First row: Column names
-  - File size: < 2 MB
-  - Rows: < 10,000
-  - Columns: < 25
+### Lab 2.3: Trend Reports – Time Series
 
-- **Section B:** Create report from external data:
+**Goal:** Create various Time Series reports to analyze trends in incident creation, closure, resolution, and business duration.
 
-  1. Navigate to **Reports > Create New**.
-  2. Data Tab:
+* **Steps:**
 
-     - Name: `Outages by Root Cause`
-     - Source type: `External import`
-     - Upload external file
-     - External source properties:
+  1. Navigate to Reports > Create New.
+  2. Data Tab: Define report (Name: Incidents Created Daily, Table: Incident).
+  3. Type Tab: Select Column visualization (Time Series).
+  4. Configure Tab: Trend by Created date, frequency Date.
+  5. Run and Save.
+  6. Modify report: Trend by Closed date, frequency Week, update title.
+  7. Run, Insert, and Stay.
+  8. Modify report: Trend by Resolved date, frequency Month, update title.
+  9. Run, Insert.
+  10. New report: Business Duration of Closed Incidents, Avg aggregation, Trend by Closed date, frequency Date.
+  11. Run and Save.
+  12. Modify report: Max aggregation, update title.
+  13. Run, Insert.
 
-       - Name: `System Outages`
-       - Expire: `1 Month (30 days)`
-       - Visible to: `Everyone`
-
-  3. Select visualization type: `Bar`
-  4. Configure report:
-
-     - Group by: `Root Cause`
-     - Aggregation: `Count`
-
-  5. Run, preview, analyze results.
-  6. Save report.
+---
