@@ -16,6 +16,7 @@
 ### Links
 
 - [Docs](https://docs.servicenow.com/)
+  - [CI relationships in the CMDB](https://docs.servicenow.com/csh?topicname=c_CIRelationships&version=latest)
 - [Developer](http://developer.servicenow.com/)
 - [CSC (Customer Success Center)](https://www.servicenow.com/success.html)
 - [Community](https://www.servicenow.com/community/)

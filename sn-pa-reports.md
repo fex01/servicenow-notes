@@ -1,9 +1,5 @@
 # Reports
 
-## TODO
-
--
-
 ## Resources
 
 ### 📘 Courses
@@ -12,15 +8,7 @@
 
 ### 📄 ServiceNow Documentation
 
--
-
-### 🧠 Community
-
--
-
-### 📚 Standards
-
--
+- [Reporting](https://docs.servicenow.com/csh?topicname=reporting-landing-page&version=latest)
 
 ## Content
 
@@ -223,6 +211,69 @@
   - **Heatmaps:** Matrix visualization to identify patterns quickly.
   - **Multilevel Pivot Tables:** Data breakdown by multiple attributes (e.g., incidents by impact and priority).
 
+## Report Styling and Sharing
+
+### Report Styling
+
+- Styling options vary based on the selected report type (e.g., Bar, Pie, Heatmap).
+- Navigate to **All > Reports > View/Run** and open a report; go to the _Style_ tab.
+- **General settings**:
+  - Select a color palette (e.g., range of blues, default theme).
+  - Adjust chart size to better fit dashboards.
+  - Enable or disable data labels to show values directly in chart elements.
+- **Title settings**:
+  - Title defaults to the report name; can be renamed independently.
+  - Customize title font size, color, and horizontal alignment.
+- **Legend settings**:
+  - Configure vertical and horizontal alignment.
+  - Enable legend border for visual separation.
+- **Bar report styling (Configure tab)**:
+  - _Stacked bars_ display multiple categories per group.
+  - _Max number of groups_ limits visible categories.
+  - _Show Other_ groups overflow categories into an “Other” bar.
+
+### Distribute Reports
+
+- Reports can be shared, scheduled, or exported for wider distribution or dashboard embedding.
+- Navigate to **All > Reports > View/Run** and open a report; click the _Share_ icon to open the Sharing Panel.
+- **Sharing Options:**
+  - _Me_: Visible only to the creator.
+  - _Everyone_: Available to all platform users.
+  - _Groups and Users_: Restrict visibility to selected recipients.
+- **Scheduling:**
+  - Automates recurring email delivery.
+  - Reports are sent as PDF or PNG snapshots.
+  - Includes subject line and message body customization.
+- **Add to Dashboard:**
+  - Integrates a report widget into existing dashboards.
+  - Users see real-time data if the report is shared with them.
+- **Export to PDF:**
+  - Generates a formatted PDF for offline or external use.
+  - Allows orientation and delivery method configuration.
+- **Publish:**
+  - Generates a public shareable link.
+  - ⚠️ Must enable `glide.report.published_reports.enabled` property.
+  - _Unpublish_ revokes access.
+
+### Working with Dashboards
+
+- Dashboards consolidate multiple visual reports into a single shared view for performance monitoring.
+- Navigate to **Self-Service > Dashboards** to view or create dashboards.
+  - Users with any role can create dashboards using the _New_ button.
+- **Adding Reports:**
+  - Add existing reports from a widget selector.
+  - Add from Report Designer via _Share > Add to Dashboard_.
+  - Create new reports directly from dashboard widget configuration.
+- **Styling and Layout:**
+  - _Configuration tab_ provides layout templates.
+  - Widgets can be resized and repositioned manually.
+- **Sharing and Permissions:**
+  - Dashboards can be shared with users, groups, or roles.
+  - Permission levels:
+    - **Viewer:** Can see shared dashboards; requires report access to see data.
+    - **Editor:** Can edit dashboard layout; cannot share unless owner.
+    - **Owner:** Full control over sharing, editing, and layout.
+
 ## Labs
 
 ### Lab 1.1: List Report
@@ -387,3 +438,234 @@
   13. Run, Insert.
 
 ---
+
+### Lab 3.1 - Report Styling
+
+🎯 **Goal**: Use styling configurations to visually enhance reports like Pie, Heatmap, and Bar charts.
+
+- **A. Style a Pie Chart**
+
+  - Navigate to **All > Reports > View/Run**
+  - Search for `Active Incidents by State` and open the report
+  - Go to the _Type_ tab, search `Pie`, and select the Pie chart type
+  - Go to the _Style_ tab
+  - In the General section:
+    - Set `Chart color`: Use color palette
+    - Set palette: `Blues dark to light (3)`
+    - Enable `Display data labels`
+    - Set `Chart size`: Medium
+    - Set `Decimal precision`: `2`
+  - In the Title section:
+    - `Show chart title`: `Report only`
+    - `Chart title`: `Active Incidents by State`
+    - `Size`: `26 px`
+    - `Color`: `LimeGreen`
+    - `Horizontal alignment`: `Center`
+    - `Vertical alignment`: `Top`
+  - In the Legend section:
+    - Enable `Show legend`
+    - Set `Horizontal alignment`: `Center`
+    - Set `Vertical alignment`: `Bottom`
+    - Enable `Show legend border`
+    - Enable `Left align legend text`
+  - Click _Run_
+  - Save the report
+
+- **B. Style a Heatmap**
+
+  - Navigate to **All > Reports > View/Run**
+  - Search for `Incident by Priority and State` and open the report
+  - Go to the _Style_ tab
+  - In the General section:
+    - Enable `Use heatmap colors`
+    - `Color for high scores`: `LimeGreen`
+    - `Color for low scores`: `MidnightBlue`
+    - Enable `Display data labels`
+    - Set `Chart size`: `Large`
+    - Set `Decimal precision`: `2`
+  - In the Title section:
+    - `Show chart title`: `Report only`
+    - `Chart title`: `Incident Counts by Priority and State`
+    - `Size`: `20 px`
+    - `Color`: `DarkBlue`
+    - `Horizontal alignment`: `Center`
+    - `Vertical alignment`: `Top`
+  - In the Legend section:
+    - Enable `Show legend`
+    - Set `Horizontal alignment`: `Right`
+    - Set `Vertical alignment`: `Middle`
+    - Enable `Show legend border`
+    - Enable `Left align legend text`
+  - Click _Run_
+  - Save the report
+
+- **C. Style a Bar Chart**
+  - Navigate to **All > Reports > View/Run**
+  - Search for `Open Incidents by Priority` and open the report
+  - In the _Configure_ tab:
+    - Set `Stack by`: `Category`
+    - Enable `Grouped bars`
+    - Disable `Display data table`
+    - Disable `Show other`
+  - In the _Style_ tab, General section:
+    - `Chart color`: Use color palette
+    - `Set palette`: `Default UI14`
+    - Enable `Display data labels`
+    - `Chart size`: Medium
+    - `Decimal precision`: `2`
+  - In the Title section:
+    - `Chart title`: `Open Incidents by Priority`
+    - `Size`: `20 px`
+    - `Color`: `Green`
+    - `Horizontal alignment`: `Center`
+    - `Vertical alignment`: `Top`
+  - In the Legend section:
+    - Enable `Show legend`
+    - `Horizontal alignment`: `Center`
+    - `Vertical alignment`: `Bottom`
+    - Enable `Show legend border`
+    - Enable `Left align legend text`
+  - In the Axis section:
+    - X-axis:
+      - `Title`: `Priority`
+      - `Title size`: `12 px`
+      - Enable `Title bold`
+      - `X axis label size`: `11 px`
+    - Y-axis:
+      - `Title`: `Incident Count`
+      - `Title size`: `12 px`
+      - Enable `Title bold`
+      - Enable `Display Grid`
+      - `Y axis label size`: `11 px`
+  - Click _Run_
+  - In _Configure_ tab again:
+    - Set `Stacked bars`: Enable
+    - Ensure `Stack by`: `Category`
+  - Click _Run_
+  - Save the report
+
+### Lab 3.2 - Distribute the Reports
+
+🎯 **Goal**: Practice multiple options to share and distribute reports including sharing, scheduling, exporting, and publishing.
+
+- **A. Share a Report**
+
+  - Navigate to **All > Reports > Create New**
+  - In the Data tab:
+    - `Name`: `All Incidents by Location`
+    - `Source type`: `Table`
+    - `Table`: `Incident`
+  - Go to the _Type_ tab, select `Bar` chart
+  - Go to the _Configure_ tab, set `Group by`: `Location`
+  - Click the _Share_ icon to open the sharing panel
+  - Click _Share_ and confirm with _Save and Continue_
+  - Select `Groups and Users`
+  - Click _Add User_ icon
+  - Add user `Don Goodliffe`
+  - Click _OK_
+  - Save the report
+  - Impersonate `Don Goodliffe`
+    - Navigate to **All > Reports > View/Run**
+    - Select _Group_ section and verify report appears
+  - End impersonation
+
+- **B. Schedule a Report**
+
+  - Navigate to **All > Reports > View/Run**
+  - Open the `All Incidents by Location` report
+  - From the sharing panel, click _Schedule_
+  - Configure:
+    - `Email`: `don.goodliffe@example.com`
+    - `Subject`: `All Incidents by Location Report`
+    - `Message`: `Hello Don, Here are the incident counts categorized as per different locations.`
+  - Click _Submit_
+
+- **C. Add a Report to the Dashboard**
+
+  - Open the report and click the _Share_ icon
+  - Click _Add to Dashboard_
+  - Set:
+    - `Dashboard`: `Incident Management`
+    - `Tab`: `Incident Open`
+  - Click _Add_ (not _Add here_)
+  - Confirm report appears on the selected dashboard tab
+
+- **D. Export a Report to PDF**
+
+  - Navigate to **All > Reports > View/Run**
+  - Open the `All Incidents by Location` report
+  - From the sharing panel, click _Export to PDF_
+  - Set:
+    - `Orientation`: `Landscape`
+    - `Delivery`: `Generate now`
+  - Click _Export_
+  - When complete, click _Download_
+
+- **E. Publish a Report**
+  - Navigate to **sys_properties.list**
+  - Search for `glide.report.published_reports.enabled`
+  - Set `Value`: `true`, click _Update_
+  - Go to **All > Reports > View/Run**
+  - Open the report
+  - Click the _Share_ icon
+  - Click _Publish_
+  - Copy the link using _Copy report link_ icon
+
+### Lab 3.3 - Working with Dashboards
+
+🎯 **Goal**: Create a personal dashboard and add both existing and new reports to it for centralized visualization.
+
+- Steps:
+
+  - **A. Create Personal Dashboard**
+
+    - Navigate to **Self-Service > Dashboards**
+    - Click _Create a dashboard_
+    - Enter `Personal Report Dashboard` in the Name field
+    - Click _Submit_
+
+  - **B. Add Existing Report from Dashboard**
+
+    - Open `Personal Report Dashboard`
+    - Click the _Edit_ icon (pencil)
+    - Click _Add Widget (+)_
+    - Set Widget Category to `Reports`
+    - Type `Incidents by Priority` in the Filter field
+    - Select the report and click _Add_
+    - Verify the report appears in the dashboard layout
+
+  - **C. Add Existing Report from Report Designer**
+
+    - Navigate to **All > Reports > View/Run**
+    - Open `Open Incidents by Priority and Impact`
+    - Click _Sharing_, then click _Add to Dashboard_
+    - Choose `Personal Report Dashboard` in the Dashboard field
+    - Click _Add_
+    - Verify the report appears in the dashboard layout
+
+  - **D. Create and Add New Report from Dashboard**
+
+    - Open `Personal Report Dashboard`
+    - Click _Add Widget (+)_
+    - Set Widget Category to `Reports`
+    - Click _#New Report_, then click _Add_
+    - Click _Click here to configure this reusable widget_
+    - In the Report Designer:
+      - Set Name: `Open Incidents by Category`
+      - Table: `Incident`
+      - Type: `Bar`
+      - Group by: `Category`
+      - Aggregation: `Count`
+    - Click _Run_, then _Save_
+
+  - **E. Share the Dashboard**
+
+    - Click _Sharing_
+    - Add yourself to the Users list
+    - Select permission as `Can edit`
+    - Click _Share_
+
+  - **F. Adjust Dashboard Layout**
+    - Click _Configuration_
+    - Choose desired layout (e.g., Two column, equal width)
+    - Drag widgets to reposition as desired
