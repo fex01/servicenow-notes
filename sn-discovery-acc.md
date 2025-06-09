@@ -56,6 +56,11 @@
   - by default, if Assigned To is not empty, it will not be overwritten
   - sys property `sn_acc_vis_content.set_assigned_to` can be set to `true` to overwrite the Assigned To field
     - define reconciliation rules to set priorities
+- When the ACC gathers data on the client computers, then
+  - the 'assigned to' field of a CI is filled if the user can be matched
+  - the values of the following system properties is adjusted
+  - sn_acc_vis_content.set_assigned_to : true
+  - sn_acc_vis_content.column_name_for_user_mapping : u_entra_samaccountname (to be created)
 
 ### DF: Agent Client Collector for Visibility (ACC-V)
 
