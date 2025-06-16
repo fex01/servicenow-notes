@@ -48,6 +48,12 @@ back to [Asset Management](./sn-asset.md)
 
 ### To Sort
 
+#### Asset Attestation
+
+- [docs: Asset Attestation](https://docs.servicenow.com/csh?version=latest&topicname=asset-attestation-ham)
+  - Asset Attestation task table [sn_itam_common_asset_attestation]
+  - details of the asset to be attested are added to the Attestations for Asset table: [sn_itam_common_attestation_asset_m2m]
+
 #### Company Normalization
 
 - source: [community: Deep Dive Into Normalization Data Services - Company Normalization](https://www.servicenow.com/community/developer-blog/deep-dive-into-normalization-data-services-company-normalization/ba-p/2978302)

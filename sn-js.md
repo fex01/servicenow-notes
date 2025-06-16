@@ -1,7 +1,5 @@
 # Javascript on ServiceNow
 
-## TODO
-
 ## Resources
 
 ### 📘 Courses
