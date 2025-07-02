@@ -660,7 +660,7 @@ Check also [Lab 1](#l1-a-validate-plugins) for plugin validation.
    - **itil**: Handles incident, problem, and change management tasks.
    - **procurement_user**: Manages purchase orders and transfer orders.
 
-### HAM Trustworthy Data - - Tier 1 Capability Blueprint
+### HAM Trustworthy Data - Tier 1 Capability Blueprint
 
 - Importance of Trustworthy Data
   - Good data is essential for effective IT asset management (ITAM).
