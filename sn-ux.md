@@ -6,10 +6,6 @@
 
 - [From the Experts: Welcome to The Value of User Experience (UX)](https://learning.servicenow.com/lxp/en/now-platform/from-the-experts-user-experience-ux-for-servicenow?id=learning_path_prev&path_id=3485e25fc39aa5101ac0f60f05013176)
 
-### 📄 ServiceNow Documentation
-
--
-
 ### 🧠 Community
 
 - [ServiceNow Community – User Experience SIG](https://www.servicenow.com/community/user-experience-special-interest/gh-p/sig-user-experience)
