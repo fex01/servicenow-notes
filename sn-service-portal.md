@@ -7,6 +7,8 @@
 - [x] [Service Portal Fundamentals (Xanadu)](https://learning.servicenow.com/lxp/en/now-platform/service-portal-fundamentals-on-demand?id=learning_course_prev&course_id=46bbccf647435250ac2f89c2e36d437a)
 - [ ] [UI Builder Fundamentals (Yokohama)](https://learning.servicenow.com/lxp/en/now-platform/ui-builder-fundamentals-washington?id=learning_course_prev&course_id=be3c198e97bf5ed4a916b4be2153af4b)
 - [x] [Employee Center Essentials](https://nowlearning.servicenow.com/lxp/en/hr-service-delivery/hr-service-deliveryname?id=learning_course_prev&course_id=167dea289374b5103cc0322d6cba1019)
+- [ ] [AI Search: Indexing (Now Learning)](https://nowlearning.servicenow.com/lxp/en/now-platform/ai-search-indexing?id=learning_course_prev&course_id=beb44c4147cb29142a090dcbd36d435c)
+- [ ] [Hands-on AI Search Lab](https://nowlearning.servicenow.com/lxp/en/now-platform/ai-search-explore-ai-search-with-a-hands-on-lab?id=learning_course_prev&course_id=fa0c0ccdc38f29545922751ce001319d)
 
 ### 📄 ServiceNow Documentation
 
@@ -17,19 +19,26 @@
 - [Widget Library](https://docs.servicenow.com/csh?version=latest&topicname=widget-showcase)
 - [General Widget Guidelines](https://docs.servicenow.com/csh?version=latest&topicname=general-guidelines-developing-widgets)
 - [Developer Share Projects](https://developer.servicenow.com/connect.do#!/share/contents?category=Service_Portal_Widgets&page=1)
+- [Mega Menu](https://docs.servicenow.com/csh?version=latest&topicname=config-mega-menu)
+- [Global Header Options](https://docs.servicenow.com/csh?version=latest&topicname=config-global-header-components)
+- [Docs: AI Search](https://docs.servicenow.com/csh?version=latest&topicname=overview-ais)
+  - [Enable & Configure](https://docs.servicenow.com/csh?version=latest&topicname=ai-search)
 
 ### 🧠 Community
 
 - [Employee Center Community Forum](https://www.servicenow.com/community/employee-center/ct-p/employee-center)
 - [Employee Center Academy Sessions](https://www.servicenow.com/community/employee-center-articles/employee-center-academy-upcoming-recorded-sessions/ta-p/2320507)
 - [Employee Center YouTube Playlist](https://www.youtube.com/playlist?list=PLkGSnjw5y2U5SRs6n1KBRVNzRjJ1ztbjH)
+- [Quick Start Guide](https://www.servicenow.com/community/ai-intelligence-articles/ai-search-quick-start-guide/ta-p/2307562)
+- [Define Searchable Content](https://www.servicenow.com/community/ai-intelligence-articles/define-searchable-content-for-ai-search/ta-p/2307364)
 
-### 📚 Standards
+### 📚 External Resources
 
 - [WCAG 2.1 Standards](https://www.w3.org/WAI/WCAG21/Understanding/intro)
 - CSS Guides
   - [Bootstrap CSS](http://getbootstrap.com/css)
   - [Font Awesome](https://fontawesome.com/)
+- [AI Academy YouTube](https://www.youtube.com/playlist?list=PLkGSnjw5y2U407_1UQQaVVrD13-MFi5ia)
 
 ## Service Portal Basics
 
@@ -928,9 +937,261 @@
 
 ## Menus and Navigation
 
+- **What is a Header Menu?**
+
+  - Top-of-page navigation for Service Portal.
+  - Combines:
+    - **Header** (branding/behavior, defined in Theme)
+    - **Main Menu** (navigation items, defined in Portal record)
+
+- **Baseline Example**
+
+  - **Employee Center**: quick links to Requests, Tasks, More Menu, User Menu (profile, impersonate, logout), Shopping Cart, Guided Tours.
+
+- **Config Steps**
+
+  1. Add a **Theme** with a Header.
+  2. Add a **Main Menu** with menu items.
+  3. Result: Together they build the visible Header Menu.
+
+- **Mega Menu**
+
+  - Requires a **Taxonomy**.
+  - Primary navigation for **Employee Center**.
+  - 2D view of topics, includes:
+    - **Taxonomy items**
+    - **Simple links** (manual)
+    - **More drop down** (nested items, JSON config)
+    - **Quick links**
+  - Docs:
+    - [Mega Menu](https://docs.servicenow.com/csh?version=latest&topicname=config-mega-menu)
+    - [Global Header Options](https://docs.servicenow.com/csh?version=latest&topicname=config-global-header-components)
+
+- **Create a New Menu**
+
+  - Go to:
+    - **Portal Tables → Instance with Menu** (via `/sp_config`)
+    - Or **Service Portal → Menus** (All menu)
+  - Click **New**.
+  - Fields:
+    - **Title**
+    - **Additional Options** (JSON) — e.g., enable Shopping Cart, My Requests.
+    - **Application Scope**
+    - **Widget**: must be `Instance with Menu`.
+
+- **Add Menu Items**
+
+  - Use **Menu Items related list**.
+  - Fields:
+    - **Label** — clear name.
+    - **Parent Menu** — if nested.
+    - **Type** — defines what the link opens.
+    - **Order** — 3 digits, lower = leftmost.
+    - **Condition** — server-side logic to show/hide.
+    - **Glyph** — optional icon.
+  - Other fields vary by Type: **Page**, **URL**, **Catalog**, **KB**, **Table**, **Filter**, **Display fields**, etc.
+
+- **Nested Menu Items**
+
+  - Add child items:
+    1. Open parent **Menu Item**.
+    2. Use its **Menu Items related list**.
+    3. Set **Parent Menu Item**.
+
+- **Testing**
+  - Use **Impersonate** to verify conditions.
+  - Example: `My Approvals` visible only for users with `approver_user` role.
+
 ---
 
 ## AI Search Integration
+
+### AI: Overview
+
+**AI Search** delivers a modern, ML-powered search experience in ServiceNow.
+
+- Google-like: smart, intuitive, fast.
+- Replaces or supplements legacy Zing search.
+- Works in Service Portal, Mobile, Virtual Agent, Next Experience.
+
+### AI: Benefits & Key Features
+
+- **Smart**
+  - Machine Learning for relevancy.
+  - Personalizes results using user metadata.
+  - Genius Results (answer cards with actions).
+  - Extracts direct answers from KBs.
+- **Natural**
+  - Natural language queries, synonyms, typos.
+  - Hit highlighting.
+  - Typeahead suggestions.
+  - Tabs & facets for easy filtering.
+- **Easy**
+  - Intuitive configuration.
+  - Strong analytics & dashboards.
+  - Internationalization: supports multiple languages.
+
+### AI: Using AI Search in Portals
+
+- **Employee Center Example**
+  - Recent searches.
+  - Suggestions.
+  - Genius Result cards.
+  - Highlighted keywords.
+  - Filters by tabs & facets.
+- **Resources**
+  - [AI Academy YouTube](https://www.youtube.com/playlist?list=PLkGSnjw5y2U407_1UQQaVVrD13-MFi5ia)
+  - [Docs: AI Search](https://docs.servicenow.com/csh?version=latest&topicname=overview-ais)
+
+### AI: Query Syntax & Behavior
+
+| Pattern              | Meaning                       |
+| -------------------- | ----------------------------- |
+| `office`             | Any record with _office_      |
+| `"microsoft office"` | Exact phrase                  |
+| `A OR B`             | Either term                   |
+| `-B`                 | Exclude term B                |
+| `%`                  | Match any single character    |
+| `*`                  | Match zero or more characters |
+| `***`                | Match all records             |
+
+- **Automatic Resubmit**
+  - If too few results: `AND` → `OR`.
+  - Single-term or long queries (8+ terms) skip this.
+
+### AI: Enabling & Configuring AI Search
+
+- **Default Status**
+  - **Plugin:** `com.glide.ais` → Active by default.
+  - **New Portals:** AI Search on by default.
+  - **Upgrades:** Admin must check **Enable AI Search** in portal record.
+- **Config**
+  - Search Application: controls search behavior.
+  - Search Results Configuration: controls how results display.
+  - Classic Zing remains available.
+- **Key:**
+  - Enabling hides Search Sources related list.
+  - Prepopulates defaults for new/existing portals.
+- docs:
+  - 🔗 [Enable & Configure](https://docs.servicenow.com/csh?version=latest&topicname=ai-search)
+
+### AI: Guided Setup & Process Lifecycle
+
+Use **AI Search > Guided Setup** to configure step-by-step:
+
+1. **Indexed Source:** Tables + child tables made searchable.
+2. **Search Source:** Limits records via filters.
+3. **Search Profile:** Ties sources + dictionaries (synonyms, stop words, typos) + Genius Results + Result Improvements.
+4. **Search Application:** Defines UI behavior → tabs, facets, highlighting, suggestions, post-processors.
+
+### AI: Definitions
+
+- **Synonyms:** Same meaning terms.
+- **Stop Words:** Common words removed.
+- **Typo Handling:** Suggest corrections.
+- **Genius Results:** Top answer cards.
+- **Result Improvements:** Boost/block records by rules.
+- **Auto-suggestions:** Populates field as user types.
+- **Scripted Post Processors:** Adjust final results.
+
+📌 _Tables like `sys_log`, `sys_email`, `sys_audit` can’t be indexed._
+
+### AI: Using Preconfigured Records
+
+Good practice:
+
+- Use prebuilt Search Sources & Profiles.
+- Clone → adjust filters, e.g. align to your **taxonomy**.
+
+**Steps:**
+
+1. `All > AI Search > Search Experience > Search Sources`
+2. Pick Source (e.g. _ESC Portal Catalogs_).
+3. Add Taxonomy filter.
+4. Update.
+5. Repeat for each.
+
+### AI: Search Results Action
+
+**Use:** Define where results redirect + query params.
+
+**Config Path:**  
+`Service Portal > AI Search > Search Results Action`
+
+**Key Fields:**
+
+- Short description.
+- Portals included.
+- AI Search Source.
+- Action name (Navigation only).
+- Order (lower = higher priority).
+- Portal page.
+- Payload Query Params.
+- Additional Params (e.g., `view=sp`).
+
+### AI: Widget Integration
+
+To use different Search Apps/Results Config per widget:
+
+- Set **widget instance options** on:
+  - Homepage Search Widget
+  - Typeahead Search Widget
+  - Catalog Homepage Search Widget
+  - Knowledge Breadcrumbs Widget
+
+**Fix:** For cloned/legacy widgets, run the **Reclassify Search Widgets** fix script if needed.
+
+### AI: Theming
+
+Style AI Search via CSS vars in your **sp_theme** record.
+
+[📚 Theming Reference](https://docs.servicenow.com/csh?version=latest&topicname=ais-sp-css-vars)
+
+### AI: External Content
+
+- **Plugin:** _External Content for AI Search_ (separate license).
+- Use External Content Ingestion REST API.
+- Maps user/group security from source system → Now Platform.
+
+[📚 Indexing External Content](https://docs.servicenow.com/csh?version=latest&topicname=external-content-ais)
+
+### Special Widget: AI Search Assist
+
+Displays top matches inside a record producer as the user types.
+
+- Example: Baseline in **Create Incident**.
+
+### AI: Analytics & Reporting
+
+✅ Install **Advanced AI Search Management Tools** (free from Store).
+
+Provides:
+
+- Dashboards: **Search Profile**, **Search Index**.
+- Trends: usage, query traffic, performance.
+- Search Preview UI: test queries with admin tools.
+
+**Install:**  
+`System Applications > All Available Applications > Obtain from Store`
+
+**Preview Tabs:**
+
+- **Data:** Summary + NLU triggers.
+- **Alert:** Query feedback.
+- **Feedback:** Dictionary, NLU intent, debugging.
+- **Context:** Specify user context.
+- **User:** Test user or locale.
+
+**Dashboards may take ~1 hour to populate.**
+
+### AI: Further Learning
+
+- [AI Search: Indexing (Now Learning)](https://nowlearning.servicenow.com/lxp/en/now-platform/ai-search-indexing?id=learning_course_prev&course_id=beb44c4147cb29142a090dcbd36d435c)
+- [Hands-on Lab](https://nowlearning.servicenow.com/lxp/en/now-platform/ai-search-explore-ai-search-with-a-hands-on-lab?id=learning_course_prev&course_id=fa0c0ccdc38f29545922751ce001319d)
+- [Quick Start Guide](https://www.servicenow.com/community/ai-intelligence-articles/ai-search-quick-start-guide/ta-p/2307562)
+- [Define Searchable Content](https://www.servicenow.com/community/ai-intelligence-articles/define-searchable-content-for-ai-search/ta-p/2307364)
+
+---
 
 ---
 
@@ -1801,3 +2062,182 @@ api.controller = function (spModal) {
 - **H. Test**
   - Refresh `/cdsp`.
   - Click the button, verify modal opens.
+
+---
+
+### Lab 4.1.1 - Create a Header Menu
+
+🎯 **Goal**: Create and configure a new header menu with nested items and add it to the Cloud Dimensions Service Portal.
+
+- **A. Lab Preparation**
+
+  - Navigate to **Survey > View Surveys**.
+  - Open `Customer Satisfaction Survey`.
+  - Select _Assign Survey_.
+  - In the reference field, search `admin` and select `System Administrator`, then select _OK_.
+  - Repeat to assign `Helpdesk Satisfaction Survey` to `System Administrator`.
+
+- **B. Create a New Menu**
+
+  - Navigate to **Service Portal > Menus**.
+  - Select _New_.
+  - Set:
+    - Title: `CD Header Menu`
+    - Widget: `Header Menu`
+  - In _Additional options, JSON format_ paste:
+    - `enable_more_items` will be updated later
+
+```json
+{
+  "enable_cart": {
+    "displayValue": "true",
+    "value": true
+  },
+  "exclude_search_on_homepage": {
+    "displayValue": "true",
+    "value": true
+  },
+  "enable_requests": {
+    "displayValue": "true",
+    "value": true
+  },
+  "enable_tasks": {
+    "displayValue": "false",
+    "value": false
+  },
+  "enable_more_items": {
+    "displayValue": "true",
+    "value": true,
+    "sysId": "[UPDATE THIS VALUE]"
+  }
+}
+```
+
+- Click _Submit_.
+
+- **C. Add the Menu to the Portal**
+
+  - Navigate to **Service Portal > Portals**.
+  - Open the `Cloud Dimensions` portal record.
+  - Set _Main menu_ to `CD Header Menu`.
+  - Click _Update_.
+  - Refresh `/cdsp` and verify the header menu.
+
+- **D. Create a More Menu Item**
+
+  - Navigate to **Service Portal > Menus**.
+  - Open `CD Header Menu`.
+  - In _Menu Items_ related list, select _New_.
+  - Set:
+    - Label: `More`
+    - Type: `URL`
+    - Order: `100`
+  - Click _Submit_.
+  - Right-click the `More` item row and select _Copy sys_id_.
+  - In _Additional options, JSON format_, replace `[UPDATE THIS VALUE]` with the copied `sys_id`.
+  - Click _Save_.
+  - Refresh `/cdsp`. Confirm `More` is not visible (needs at least two nested items).
+  - Open the `More` record.
+  - In _Menu Items_ related list, select _New_.
+  - Set:
+    - Label: `My Surveys`
+    - Type: `Page`
+    - Order: `100`
+    - Page: `my_surveys`
+  - Click _Submit_.
+  - Refresh `/cdsp`. Confirm `My Surveys` appears.
+  - In _Menu Items_ related list, select _New_.
+  - Set:
+    - Label: `My Org Chart`
+    - Type: `Page`
+    - Order: `200`
+    - Page: `my_org_chart`
+  - Click _Submit_.
+
+- **E. Add a Menu Item to the Mega Menu**
+
+  - Return to `CD Header Menu`.
+  - In _Menu Items_ related list, select _New_.
+  - Set:
+    - Label: `Knowledge Base`
+    - Type: `Page`
+    - Page: `kb_home`
+  - Click _Submit_.
+
+- **F. Test**
+  - Refresh `/cdsp`.
+  - Confirm the `More` menu displays with both nested items.
+  - Test both nested items for correct page routing.
+  - Confirm `Knowledge Base` appears on the Mega Menu and opens `kb_home`.
+
+---
+
+### Lab 5.4.1 - Configure AI Search
+
+🎯 **Goal**: Configure AI Search so Cloud Dimensions users can search for US office locations with state-based filtering.
+
+- **A. Review Current Search Results**
+  - Navigate to **AI Search > AI Search Status** and confirm: *AI Search is ready*.
+  - Open `/cdsp` and search `washington` in the Keyword Search field.
+  - Confirm no results are returned.
+
+- **B. Index Existing Source**
+  - Navigate to **AI Search > AI Search Index > Indexed Sources**.
+  - Open the `Location Table` record.
+  - Select _Index All Tables_.
+  - On the Indexed Source History form, right-click the header and select _Reload form_ until *Ingestion State* is `indexed`.
+
+- **C. Create a Search Source**
+  - Navigate to **AI Search > Search Experience > Search Sources**.
+  - Click _New_ and configure:
+    - Name: `US Locations`
+    - Indexed Source: `Location Table`
+    - Conditions:
+      - Country `is` `USA`
+      - AND State / Province `is not empty`
+      - AND Zip / Postal Code `is not empty`
+  - Click _Save_.
+  - Click _Click to preview_.
+  - Verify only US locations with State/Province and Zip/Postal Code appear. Personalize columns as needed.
+
+- **D. Update Default Search Profile**
+  - Navigate to **AI Search > Search Experience > Search Profiles**.
+  - Open `Service Portal Default Search Profile`.
+  - In *Search Sources*, click _Link Existing_.
+  - Link `US Locations`. Click _Submit_.
+  - Click _Publish_.
+
+- **E. Preview Changes**
+  - Navigate to **AI Search > Preview > Search Preview (New)**.
+  - Select `Service Portal Default Search Application`.
+  - Enter `***` and press `<Enter>`.
+  - Click the `Location Table` facet. Confirm only Location Name is shown.
+
+- **F. Add a Field Mapping**
+  - Navigate to **AI Search > AI Search Index > Indexed Sources**.
+  - Open `Location Table`.
+  - In *Field Settings & Mapping*, click _New_:
+    - Attribute: `map_to`
+    - Field: `zip`
+    - Value: `text`
+  - Click _Submit_.
+  - On `Location Table`, select _Index All Tables_.
+  - After indexing, return to **Search Preview (New)**.
+  - Select `Service Portal Default Search Application`, enter `***`, press `<Enter>`.
+  - Click `Location Table` facet and verify both Name and Zip/Postal Code display.
+
+- **G. Add a Facet**
+  - Navigate to **AI Search > Search Experience > Search Applications**.
+  - Open `Service Portal Default Search Application`.
+  - In *Facets*, click _New_:
+    - Name: `State`
+    - Label: `State`
+    - Facet Field: `cmn_location.state`
+    - Type: `Multi Select Or`
+  - Click _Submit_.
+
+- **H. Test**
+  - Return to `/cdsp`.
+  - Search `washington` in the Keyword Search field.
+  - Confirm Location records display.
+  - Use the `State` facet to filter and verify results.
