@@ -176,8 +176,24 @@
 
 ### Organizing Content
 
-- Structure pages and navigation for quick information access.
-- Group related information logically.
-- Use headings, sections, and labels consistently.
-- Apply ServiceNow’s content design standards where available.
-- See: [Organizing Content Practices](https://www.servicenow.com/community/user-experience-special-interest/from-the-experts-what-other-practices-do-you-follow-when/ta-p/2547502)
+- **Introduction**
+  - Good content structures help users find what they need fast — poor structures create friction and complaints.
+  - Taxonomy design must balance user needs with stakeholder goals — no perfect structure, but clear patterns help.
+- **Four leading practices:**
+  - ✅ **Help people be effective** — align content with real user tasks and needs.
+  - ✅ **Strike the right balance** — balance depth vs. breadth so navigation stays clear and practical.
+  - ✅ **Use clear naming** — labels and categories should use plain, intuitive language.
+  - ✅ **Gather continuous feedback** — test and update your structures with real user input.
+- **Common user impediments:**
+  - Ambiguous goals — stakeholder misalignment confuses the structure.
+  - Weak user understanding — assumptions override actual user language.
+  - Overly deep or shallow — complexity or clutter frustrates users.
+  - Impenetrable terms — jargon or acronyms block clarity.
+  - Poor maintenance — old structures don’t evolve with the org.
+- **Practical guidance:**
+  - **Help people be effective:** align taxonomy to real tasks, run card sorts, do contextual inquiry, balance with stakeholder input.
+  - **Strike the right balance:** keep top levels clear (5–7 main groups), refine depth with smart nesting, use user criteria to show relevant content.
+  - **Use clear naming:** avoid jargon, use plain language, speak in users’ language, check for distinct labels.
+  - **Gather continuous feedback:** card sorting, tree testing, user analytics, surveys, usability testing — validate and refine over time.
+- **Resources:**
+  - See Community: [Organizing Content Practices](https://www.servicenow.com/community/user-experience-special-interest/from-the-experts-what-other-practices-do-you-follow-when/ta-p/2547502)

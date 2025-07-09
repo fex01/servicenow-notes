@@ -1,0 +1,1803 @@
+# Service Portal
+
+## Resources
+
+### 📘 Courses
+
+- [x] [Service Portal Fundamentals (Xanadu)](https://learning.servicenow.com/lxp/en/now-platform/service-portal-fundamentals-on-demand?id=learning_course_prev&course_id=46bbccf647435250ac2f89c2e36d437a)
+- [ ] [UI Builder Fundamentals (Yokohama)](https://learning.servicenow.com/lxp/en/now-platform/ui-builder-fundamentals-washington?id=learning_course_prev&course_id=be3c198e97bf5ed4a916b4be2153af4b)
+- [x] [Employee Center Essentials](https://nowlearning.servicenow.com/lxp/en/hr-service-delivery/hr-service-deliveryname?id=learning_course_prev&course_id=167dea289374b5103cc0322d6cba1019)
+
+### 📄 ServiceNow Documentation
+
+- [Employee Center Product Docs](https://docs.servicenow.com/csh?version=latest&topicname=employee-center-landing-page)
+  - [Unified Taxonomy for Employee Center](https://docs.servicenow.com/csh?version=latest&topicname=config-taxonomy)
+- [Accessibility Conformance Report for Service Portal](https://www.servicenow.com/docs/bundle/accessibility/page/administer/accessibility-508-compliance/concept/available-accessibility-conformance-reports.html)
+- [CSS Primer](https://docs.servicenow.com/csh?version=latest&topicname=scss-primer)
+- [Widget Library](https://docs.servicenow.com/csh?version=latest&topicname=widget-showcase)
+- [General Widget Guidelines](https://docs.servicenow.com/csh?version=latest&topicname=general-guidelines-developing-widgets)
+- [Developer Share Projects](https://developer.servicenow.com/connect.do#!/share/contents?category=Service_Portal_Widgets&page=1)
+
+### 🧠 Community
+
+- [Employee Center Community Forum](https://www.servicenow.com/community/employee-center/ct-p/employee-center)
+- [Employee Center Academy Sessions](https://www.servicenow.com/community/employee-center-articles/employee-center-academy-upcoming-recorded-sessions/ta-p/2320507)
+- [Employee Center YouTube Playlist](https://www.youtube.com/playlist?list=PLkGSnjw5y2U5SRs6n1KBRVNzRjJ1ztbjH)
+
+### 📚 Standards
+
+- [WCAG 2.1 Standards](https://www.w3.org/WAI/WCAG21/Understanding/intro)
+- CSS Guides
+  - [Bootstrap CSS](http://getbootstrap.com/css)
+  - [Font Awesome](https://fontawesome.com/)
+
+## Service Portal Basics
+
+### Service Portal Overview
+
+- **Service Portal** is a user-focused alternative interface to the standard ServiceNow UI:
+
+  - Collection of pages for accessing services, tasks, and information.
+  - Visual layer customizing look-and-feel of ServiceNow.
+  - Mobile-friendly, responsive design.
+  - Easy configuration, customization, and extension.
+  - Built with industry-standard technologies.
+
+- **Key Features:**
+
+  - Modular, themeable, single-page application.
+  - Highly customizable branding and design.
+  - Supports modern tech stack:
+    - HTML, CSS (SASS/SCSS), Bootstrap, AngularJS, JavaScript.
+
+- **Knowledge Integration:**
+
+  - Built on Knowledge V3 technology.
+  - Supports multiple knowledge bases with distinct workflows.
+  - Flexible, multi-level category structures.
+  - Permissions defined by user criteria per knowledge base/article.
+  - Users can search, sort/filter articles, and provide feedback.
+
+- **Service Catalog Integration:**
+
+  - Supports request items, record producers, and order guides.
+  - Single-page application enhances ease of use.
+  - Fully compatible with client scripts and UI policies.
+
+- **Accessibility (WCAG 2.1 AA compliant):**
+
+  - Improved accessibility for users with visual, cognitive, or mobility impairments.
+  - Accessible baseline portals:
+    - Service Portal (`/sp`)
+    - Knowledge Portal (`/kb`)
+    - Customer Service Portal (`/csm`)
+    - Consumer Service Portal (`/csp`)
+    - Employee Center (`/esc`)
+    - Mobile Experience Portal
+  - Accessibility preferences in core UI do **not** affect Service Portal.
+
+- **Benefits of Service Portal:**
+
+  - Users:
+    - Intuitive, engaging UI.
+    - Quick access to common services and tasks.
+  - Administrators:
+    - Modular UI framework for portals and dashboards.
+    - Easy presentation and management of services.
+    - Platform features: analytics, authentication, presence, search, multi-language, security, web services.
+
+- **Portal Strategy – Single vs. Multiple:**
+
+  - **Single Portal:**
+
+    - Ideal for smaller organizations.
+    - Simplifies URL management and navigation.
+    - Less administrative overhead.
+
+  - **Multiple Portals:**
+    - Suitable for large, multi-departmental organizations.
+    - Useful for governance, distinct branding/theming, confidentiality, or segregating customer vs. employee services.
+    - Multiple designers/admins distribute workload.
+    - Standard platform security ensures user-specific access control.
+
+- **AngularJS Support:**
+
+  - Despite Google's LTS ending in 2021, ServiceNow maintains a supported version of AngularJS.
+  - Customers can safely continue developing and deploying AngularJS-based portals.
+
+- **UI Builder vs. Service Portal:**
+
+  - **Service Portal:**
+
+    - Target: Requesters.
+    - Best for large, enterprise-level portals.
+    - Responsive, pixel-perfect layouts.
+    - Fully supports Service Catalog and public pages.
+    - Compatible with ATF testing.
+    - Built on AngularJS.
+
+  - **UI Builder (Next Experience UI Framework):**
+    - Target: Fulfillers.
+    - Suitable for workspaces, small/departmental portals.
+    - Limited responsiveness and pixel-perfect capabilities.
+    - Minimal support for Service Catalog and public pages.
+    - No migration from Service Portal; new portals must be built from scratch.
+
+- **Recommended Approach:**
+  - Continue using Service Portal for enterprise portals (e.g., Employee Center).
+  - Use UI Builder primarily for creating unique custom applications and departmental portals.
+
+### Plugins and Store Applications
+
+- **Baseline Plugins (No License Required)**
+
+  - **Service Portal for Enterprise Service Management** (_com.glide.service-portal.esm_)
+    - Core plugin to enable Service Portal framework.
+  - **Knowledge Management - Service Portal (`com.snc.knowledge_serviceportal`)**
+    - Required for Knowledge Portal (`/kb`).
+  - **Service Portal User Criteria Support** (_com.glide.service-portal.user-criteria_)
+    - Adds user criteria-based access controls.
+
+- **Optional Plugins (License Required)**
+
+  - **Employee Center Pro (`/esc`)** (_sn_ex_sp_pro_)
+    - Adds ML content targeting, campaigns, communities, virtual agent.
+    - Requires **HRSD Pro**, **HRSD Enterprise**, or equivalent license.
+  - **Customer Service Portal** (_sn_csm_portal_)
+    - B2B customer self-service portal.
+    - Requires **Customer Service Management (CSM)** license.
+  - **Consumer Service Portal** (_sn_csp_portal_)
+    - B2C customer self-service portal.
+    - Requires **Customer Service Management (CSM)** license.
+  - **Communities** (_com.sn_communities_)
+    - Enables discussion forums, community Q&A.
+    - Requires **Customer Service Management (CSM)** or related Community license.
+
+- **Store Applications Commonly Used**
+  - **Baseline (Free):**
+    - Employee Center
+      - Employee Experience Foundation
+      - Employee Center Core
+      - Employee Experience Taxonomy
+    - Advanced AI Search Management Tools
+  - **Subscription Required:**
+    - HR Taxonomy
+    - Legal Counsel Center Classic
+    - Workplace Service Delivery Professional
+
+### Service Portal Development and Administration
+
+- **User Types** (Portal Audiences):
+
+  - **External Users**: No organizational affiliation.
+  - **Customers**: Consume organizational products/services.
+  - **Employees**: Work for the organization.
+  - **Fulfillers**: Employees tasked with resolving assigned records.
+  - **Approvers**: Employees approving records prior to fulfillment.
+
+- **Roles & Permissions**:
+
+  - **admin**:
+
+    - Full system access and can override ACLs.
+    - Can activate plugins (assign with caution).
+
+  - **sp_admin**:
+    - Design, build, manage Service Portals.
+    - Access to Service Portal modules (no Update Set or Studio access).
+
+- **Developer Types**:
+
+  - **No-Code Admins**:
+
+    - Drag-and-drop web dev tasks.
+    - Apply branding via portal interface.
+
+  - **Low-Code Admins**:
+
+    - Modify portal elements, activate plugins, basic configuration.
+    - Familiar with HTML, CSS, Bootstrap.
+
+  - **Pro-Code Developers**:
+    - Create elements using AngularJS, ServiceNow APIs.
+    - Advanced scripting and web technologies (HTML, CSS, JavaScript).
+
+- **Delegated Development**:
+
+  - Allows non-admin developers specific module access (including Designer & Studio).
+  - Access managed via Studio (`File > Manage Developers`).
+  - Non-admin scope limitation: Ensure proper scope selection before accessing `/sp_config` or 404 errors occur.
+  - **Note**: Source control commits may omit certain files.
+
+- **Baseline Elements**:
+
+  - Reusable, modular portal components provided by default:
+    - **Service Portals**: 8+
+    - **Themes**: 10+
+    - **Menus**: 10+
+    - **Pages**: 100+
+    - **Widgets**: 250+
+
+- **Baseline Portals** (Default):
+
+  - **Employee Center (`/esc`)**:
+    - Unified employee portal (knowledge, requests, chat).
+  - **Service Portal (`/sp`)**:
+    - Basic requests, incidents, approvals, status.
+  - **Knowledge Portal (`/kb`)**:
+    - Knowledge base browsing, searching, feedback.
+    - Requires plugin: `com.snc.knowledge_serviceportal`.
+  - **Change Advisory Board Workbench (`/cab`)**:
+    - Manage CAB meetings and change requests.
+
+- **Licensed Portals**:
+
+  - **Employee Center Pro (`/esc`)**:
+    - Advanced features: ML-driven content, communities, virtual agent.
+    - Requires HRSD Pro/Enterprise license or separate subscription.
+  - **Community (`/community`)**:
+    - Collaboration portal for customers, partners, prospects.
+  - **Customer Support (`/csm`)**:
+    - B2B customer interactions and support.
+  - **Customer Service (Consumer Service, `/sp`)**:
+    - B2C customer information/support.
+
+- _All > Service Portal > Properties_ (admin role required):
+
+  - Centralized configuration options:
+    - Default 404 pages, error notifications, max stream entries, message auto-dismiss timing, announcement order.
+    - Enable user criteria for portal access, specify roles to bypass criteria.
+
+- **`/sp_config` Homepage**:
+
+  - Central hub for portal configurations/components.
+  - Access via:
+    - Unified Navigation: `Service Portal > Service Portal Configuration`
+    - URL suffix: `/sp_config`
+  - Menu mimics application navigator, lists/forms mirror core UI functionality.
+
+- **Unsupported Features (not on roadmap)**:
+  - Domain Separation
+  - UI Macros
+  - Formatters
+  - Client UI Actions
+  - Nested Container Catalog Variables
+  - Click-through/pop-up functionality
+
+### Employee Center Portal
+
+- **Overview**
+
+  - **Employee Center**: Modern Service Portal for multi-department service delivery.
+    - Baseline: Free for all customers.
+  - **Employee Center Pro**: Extends Employee Center with employee communication & engagement.
+    - Requires **HRSD Pro**, **HRSD Enterprise**, or separate license.
+
+- **Key Capabilities**
+
+  - **Employee Center**
+    - Report issues, request items/services.
+    - Find service answers, complete to-dos.
+    - Unified experience across departments.
+    - Baseline portal for new instances.
+  - **Employee Center Pro**
+    - Adds news, events, campaigns.
+    - ML-driven personalized content.
+    - Access to cross-enterprise tasks and content.
+
+- **Recommended Practice**
+
+  - New development: Start with **Employee Center** (`/esc`).
+  - Existing `/sp` portal users: Recommended to migrate to `/esc`.
+    - **Migration Steps**:
+      1. Download & activate Employee Center from ServiceNow Store.
+      2. Evaluate & compare `/esc` with current `/sp`.
+      3. Prioritize features to adopt.
+      4. Configure `/esc` with unified taxonomy and content tagging.
+      5. Deactivate `/sp` and update `/esc` suffix to `/sp`.
+      6. Use page route maps to redirect legacy pages.
+      7. Roll out `/esc` (consider staggered deployment).
+
+- **Unified Taxonomy**
+
+  - Organizes content (requests, articles, quick links) across departments.
+  - Drives **Mega Menu** structure.
+  - Baseline taxonomy covers IT, HR, Workplace, Legal, Procurement.
+  - **Three Parts**:
+    1. **Content Taxonomy (Data Model)**: Hierarchical topics.
+    2. **Content Authoring**: Tag/manage content.
+    3. **Mapped Employee Content**: OOB content mapped into taxonomy.
+  - **Docs**: [Unified Taxonomy for Employee Center](https://docs.servicenow.com/csh?version=latest&topicname=config-taxonomy)
+
+- **Home Page Highlights**
+
+  - Uses **Modern Portal Theme**.
+  - **Mega Menu** auto-displays if a taxonomy is linked.
+  - **Popular Topics Widget**: Shows trending topics.
+  - **Dynamic Topic Pages**: Separate pages for each topic.
+  - **Quick Links Widget**: Pin important content.
+  - **Employee Center Footer Widget**: Social links, legal, company info.
+  - **Employee Profile Page**: Displays user info; editable pronouns.
+  - **My Active Items Widget**: User’s open activities.
+  - **My Favorites Widget**: Quick access to saved content.
+  - **Recommended for You Widget**: ML-driven suggestions or popularity-based if ML is not licensed.
+
+- **Topic Pages**
+
+  - **Dynamic Topic Pages**: Auto-created from taxonomy tags.
+  - **Topic Header**: Supports styled banners.
+  - **Subtopics**: Navigation to child topics.
+  - **Unified Browse**: Combines requests/articles for a topic.
+  - Consistent across web & mobile.
+  - Admins can customize layouts.
+
+- **References**
+  - [Employee Center Community Forum](https://www.servicenow.com/community/employee-center/ct-p/employee-center)
+  - [Employee Center Academy Sessions](https://www.servicenow.com/community/employee-center-articles/employee-center-academy-upcoming-recorded-sessions/ta-p/2320507)
+  - [Employee Center YouTube Playlist](https://www.youtube.com/playlist?list=PLkGSnjw5y2U5SRs6n1KBRVNzRjJ1ztbjH)
+  - [Employee Center Product Docs](https://docs.servicenow.com/csh?version=latest&topicname=employee-center-landing-page)
+  - [Now Learning: Employee Center Essentials](https://nowlearning.servicenow.com/lxp/en/hr-service-delivery/hr-service-deliveryname?id=learning_course_prev&course_id=167dea289374b5103cc0322d6cba1019)
+
+---
+
+## Portals and Components
+
+### Service Portals
+
+- **Architecture**
+
+  - Example:
+    - The suffix `/esc` identifies the Portal record that holds:
+      - Theme, homepage, menus.
+      - Logo/Icon.
+      - Knowledge Bases, Catalogs.
+      - Taxonomy.
+      - AI Search and configuration.
+
+- **Portal Record**
+
+  - Behaves as the main configuration for how the portal works.
+  - **Key Fields:**
+    - **Title** — browser tab text.
+    - **URL Suffix** — unique suffix at the end of the URL (e.g., `/esc`).
+    - **Homepage** — page loaded when no page is specified.
+    - **KB Homepage** — page for launching Knowledge Base.
+    - **Login Page** — page for user authentication.
+    - **Logo** — shown in nav bar.
+    - **Icon** — mobile homepage/browser tab icon.
+    - **Default** — one portal can be set as the default (marked with green dot).
+    - **Application** — scope of the portal.
+    - **404 Page** — fallback when a page is not found.
+    - **Catalog Home Page** — landing page for Service Catalog.
+    - **Catalog Category Home Page** — landing for catalog categories.
+    - **Main Menu** — navigation menu for the portal.
+    - **Theme** — styles and widgets collection.
+    - **Quick Start Config** — JSON config for Branding Editor options.
+    - **CSS Variables** — overrides theme-level styles for this portal only.
+    - **Hide Portal Name** — hides portal name in the page title.
+    - **Enable Certificate-Based Authentication** — optional secure login.
+    - **Enable AI Search** — toggle for AI Search.
+    - **Search Application** — configures the search engine/settings.
+    - **Search Results Configuration** — defines search results display.
+
+- **Portal Record Related Lists**
+
+  - **Knowledge Bases**
+    - Select one or more KBs for the portal.
+    - KBs appear on pages like `kb_home`, `kb_view`, or `esc_knowledge_home`.
+    - If none specified, ALL KBs accessible to the user are visible.
+  - **Catalogs**
+    - Select one or more Catalogs to include.
+    - Categories and items appear on pages like `sc_home`, `sc_category`, `esc_sc_category`.
+    - If none specified, ALL Catalogs accessible to the user are visible.
+  - **Taxonomy**
+    - Defines hierarchical topics.
+    - Controls Mega Menu and Topic Pages in Employee Center.
+    - If none specified, no Mega Menu or Topic Pages are shown.
+    - Search results are always based on configured AI Search sources — not just KBs, Catalogs, or Taxonomy.
+
+- **Best Practice**
+  - Always define the homepage, main menu, theme, and suffix to ensure correct display.
+  - Validate search settings, KBs, Catalogs, and Taxonomy to align content and navigation.
+
+### Themes
+
+- **What is a Theme?**
+
+  - Defines consistent branding for a Service Portal.
+  - Controls Header and Footer shown on every page.
+  - Allows more customization than the Branding Editor.
+  - Multiple portals can share the same Theme.
+  - A single portal can only use one Theme.
+
+- **When to Use**
+
+  - Use when Branding Editor limits styling flexibility.
+  - Good for advanced branding and reusability.
+
+- **Create a Theme**
+
+  - Navigate: **All menu → Service Portal → Themes → New**.
+  - Required steps:
+    - Create custom style properties in **CSS variables**.
+    - Identify **Header** and **Footer**.
+    - Save and reuse for multiple portals.
+
+- **Theme Form Fields**
+
+  - **Name** — Theme name.
+  - **Application** — Scope of the Theme.
+  - **Header** — Header to use on all pages.
+  - **Footer** — Footer to use on all pages.
+  - **Fixed header** — Locks header at top.
+  - **Fixed footer** — Locks footer at bottom.
+  - **CSS variables** — Theme-level style definitions.
+    - **Important:** Theme-level CSS variables override Branding Editor variables unless marked with `!default`.
+      - Example: `§navbar-inverse-bg: #293e40 !default;`
+    - Bootstrap defaults apply if no CSS is defined.
+
+- **Style Sheets**
+
+  - Use for additional or external CSS.
+  - Stored in the `[sp_css]` table.
+  - Navigate:
+    - `/sp_config → Portal Tables → Style Sheets → New`
+    - Or: **All menu → Service Portal → CSS → New**
+  - **Style Sheet Fields:**
+    - **Name** — Name of CSS Include.
+    - **Application** — Scope.
+    - **CSS** — Paste your style code here.
+  - Style sheets load **after** CSS variables execute.
+    - Variables in `CSS variables` field cannot reference style sheet code.
+
+- **Attach Style Sheets to a Theme**
+
+  - In Theme record, open **CSS Includes** related list.
+  - Select **New**.
+  - Complete form:
+    - **Name** — Name of CSS Include.
+    - **Source:**
+      - **Style Sheet** — Use existing `[sp_css]` record.
+      - **URL** — External CSS file link.
+    - **Lazy Load:** Load asynchronously for performance. Must be the same for all includes in a Theme.
+
+- **Add a Custom Font**
+
+  - Three methods:
+    1. Use Google Fonts.
+    2. Encode font with base64 in CSS Include.
+    3. Upload font files as attachments to CSS Includes.
+  - **Google Fonts Example:**
+
+    - Copy the Google Fonts URL.
+    - Add a new CSS Include → Source: URL → Paste URL.
+    - Reference the font in your CSS:
+
+      ```css
+      h1 {
+        font-family: "Lobster", cursive;
+      }
+      ```
+
+- **UI Scripts**
+
+  - Use to add internal or external JavaScript.
+  - Navigate: **All menu → System UI → UI Scripts → New**
+  - **UI Script Fields:**
+    - **Script Name** — Unique name.
+    - **API Name** — Full API name.
+    - **UI Type** — `All` or `Mobile/Service Portal` only.
+    - **Application** — Scope.
+    - **Active** — Must be active to run.
+    - **Description** — Purpose of script.
+    - **Script** — Client-side JavaScript.
+
+- **Attach JavaScript to a Theme**
+  - In Theme, open **JS Includes** related list.
+  - Select **New**.
+  - Complete:
+    - **Display Name** — Name of JS Include.
+    - **Source:**
+      - **UI Script** — Internal ServiceNow record.
+      - **URL** — External JS file.
+    - **Application** — Scope.
+    - **Package:** Auto-populated with Service Portal package.
+
+#### Introduction to CSS
+
+- **Selector:** Defines what HTML to style (`h2`).
+- **Declaration:** Defines the property and value (`color: gray;`).
+- **Declaration Block:** One or more declarations.
+- Example:
+
+  ```css
+  h2 {
+    color: gray;
+    text-decoration: none;
+  }
+  ```
+
+- Write once, reuse across pages.
+- Use Service Portal SCSS Primer: [SCSS Primer](https://docs.servicenow.com/csh?version=latest&topicname=scss-primer)
+- Reference Bootstrap and Font Awesome:
+  - [Bootstrap CSS](http://getbootstrap.com/css)
+  - [Font Awesome](https://fontawesome.com/)
+
+### Pages
+
+- **What is a Page?**
+
+  - A reusable, unique piece of Service Portal content with its own **URL**.
+  - Uses **containers**, **rows**, **columns**, and **widgets** to display content.
+  - Styled by the portal’s **Theme**.
+  - Fully mobile-optimized using Bootstrap’s grid.
+
+- **Key Principles**
+
+  - Pages are **independent** — not owned by a portal but styled by it.
+  - **Reusable** — changes apply everywhere the Page is used.
+  - Keep each Page focused on **one clear purpose**.
+  - Use baseline Pages when possible — over 100 provided.
+
+- **Create a Page**
+
+  - Go to **/sp_config → Designer**.
+  - Select **Add a new Page**.
+  - Enter:
+    - **Title** — friendly name.
+    - **Page ID** — unique, no spaces/special chars.
+  - Creates a record in `[sp_page]`.
+
+- **Access Syntax**
+
+  - `/sp` → portal homepage.
+  - `/esc.do?id={Page ID}` → direct link.
+  - `/nav_to.do?uri={Portal URL suffix}` → homepage in platform view.
+  - Note: `index` is reserved — use with a prefix/suffix if needed.
+
+- **Using the Designer**
+
+  - Drag/drop:
+    - **Containers** → top-level sections.
+    - **Rows** → divide containers horizontally.
+    - **Columns** → divide rows vertically.
+    - **Widgets** → dropped inside columns.
+  - Changes auto-save.
+  - Icons for Add/Delete/Modify.
+  - Widgets show edit/delete icons.
+  - Preview in:
+    - Desktop / Tablet / Mobile.
+  - Always test on a real device.
+
+- **Bootstrap**
+
+  - Built on Bootstrap’s **12-column grid**:
+    - Mobile-first, responsive.
+    - Columns can be grouped (e.g., 3/6/3).
+    - More than 12 columns = columns stack.
+    - [Bootstrap 3.3 Docs](https://getbootstrap.com/docs/3.3/)
+
+- **Containers**
+
+  - First container auto-added.
+  - Add more:
+    - Drag from **Element Selector**.
+    - Or click **Add (+)** in canvas.
+  - Stored in `[sp_container]`.
+
+- **Rows & Columns**
+
+  - Add rows inside containers:
+    1. Use blue icon.
+    2. Or drag from selector.
+  - Add columns inside rows.
+  - Stored in `[sp_row]` and `[sp_column]`.
+
+- **Element Selector**
+
+  - Layouts, Widgets, Pages tabs.
+  - Use **Filter Widget** or **Filter Page** to find items quickly.
+
+- **Page Properties**
+
+  - Access:
+    - Designer → **Page** button.
+    - `/sp_config` → **Pages**.
+    - **All menu → Service Portal → Pages**.
+  - Fields:
+    - **Title**, **ID**, **Application**.
+    - **Public** — no login required.
+    - **Draft** — only admins see it.
+    - **Roles** — restricts access.
+    - **Short Description**.
+    - **Page Specific CSS** — overrides Theme/Portal CSS.
+
+- **Page Editor**
+
+  - Visual map view.
+  - Access from `/sp_config`.
+  - Steps:
+    1. Select Page.
+    2. Click an element.
+    3. Edit.
+    4. Save.
+  - No built-in preview — open the Page live in another tab.
+
+- **Set Default Pages**
+
+  - Configure in Portal record:
+    - Homepage
+    - KB Homepage
+    - Login Page
+    - 404 Page
+    - Catalog Homepage
+    - Catalog Category Homepage
+
+- **Clone a Page**
+  - Speeds up layout reuse.
+  - Cloned Page keeps containers, rows, columns.
+  - New Widget Instances created.
+  - Clone from `[sp_page]` form or Page Editor.
+
+### Branding Editor
+
+- **Branding Editor Purpose**
+
+  - No-code tool for quickly customizing Service Portals.
+  - Adjust titles, logos, colors, and themes without scripting.
+  - Preview changes in real time on the live canvas.
+  - Ideal for no-code admins wanting fast, safe visual updates.
+
+- **How to Access**
+
+  - Open `/sp_config` homepage.
+  - Select **Branding Editor** to launch configuration.
+
+- **Important Behavior**
+
+  - Changes only affect the display of the selected Portal.
+  - Changes auto-save when you close the editor or reload the page.
+  - Use **Reset Changes** to discard edits and restore previous state.
+
+- **Configuration Options**
+
+  - **Quick Setup Tab**
+
+    - Title
+    - Logo
+    - Tag Line (appears in Homepage Search Widget)
+    - Background Image
+
+  - **Theme Colors Tab**
+
+    - Navbar: Header bar colors.
+    - Brand: Page elements and display colors.
+    - Text: Text color on all pages.
+    - Tag Line color
+    - Homepage background color
+
+  - **Canvas**
+    - Shows real-time preview as changes are made.
+
+- **Add Quick Setup for New Portals**
+
+  - By default, new Portals have no Tag Line or Background Image fields linked.
+  - Copy `Quick start config` code from a baseline portal record.
+  - Paste into the new Portal record.
+  - Update `sys_ids` to link:
+    - Tag Line → `[sp_instance]`
+    - Background Image → `[sp_container]`
+
+- **Where Changes Are Stored**
+
+  - Changes may impact:
+    - **Portal `[sp_portal]`**: Logo, CSS variables.
+    - **Widget Instance**: Portal title.
+    - **Container `[sp_container]`**: Background image.
+
+- **Rollback Tip**
+  - To undo changes:
+    - Manually revert the affected records to their previous version.
+    - Use settings from another instance if needed (dev/test/sandbox).
+    - For baseline portals, use a fresh Developer instance as a reference.
+
+---
+
+## Widgets and Widget Development
+
+### Widgets
+
+- **Definition**
+
+  - Reusable, self-contained components for data, actions, or services.
+  - 200+ widgets baseline.
+  - Reusable across multiple pages; each instance can have unique settings.
+
+- **Key Facts**
+
+  - Widgets are secure and modular.
+  - Typical uses: search, lists, forms, links, approvals, static/dynamic content.
+  - See [Widget Library](https://docs.servicenow.com/csh?version=latest&topicname=widget-showcase) for baseline widgets.
+
+- **Examples**
+
+  - **Homepage Search:** Search portal content.
+  - **Simple List:** Dynamic list of records with fields, avatars, actions.
+  - **Icon Link:** Links to pages, URLs, Catalogs, KBs. Customizable icon, style.
+  - **KB Widgets:** KB Categories, KB Most Viewed, KB Top Rated.
+  - **SC Widgets:** SC Categories, SC Catalog Item.
+  - **HTML:** Add text/images with Rich Text Editor or HTML.
+  - **Approvals:** Shows tasks to approve/reject.
+  - **Cool Clocks:** Shows time by time zone (black = PM, white = AM).
+  - **Breadcrumbs:** Shows location path.
+  - **Typeahead Search:** Site-wide quick search.
+
+- **Best Practice**
+
+  - Prefix custom widgets: `KB` for Knowledge, `SC` for Catalog — appear with baseline widgets.
+  - Use Breadcrumbs + Typeahead on all pages except home.
+
+- **How to Add**
+  - Find in **Element Selector** → Filter Widget → drag to column.
+  - Multiple widgets can share a column.
+
+### Widget Instances
+
+- **Definition**
+
+  - A **widget instance** is a unique record created when you drop a widget on a page.
+  - Holds instance-specific settings: title, data source, styling, HTML, etc.
+  - One widget → multiple unique instances → different behavior or appearance.
+
+- **Configure an Instance**
+
+  - In Page Designer, click the widget’s **Edit Options** icon.
+  - Configure options like:
+    - Table
+    - Filter
+    - Display field(s)
+    - Glyph
+    - Bootstrap color
+    - Title / Short description
+  - Behavior is controlled by the base widget’s scripts/templates plus the instance settings.
+
+- **Access a Widget Instance**
+
+  - Open in two ways:
+    1. Use **Open in platform** in the widget’s options menu.
+    2. Go to **Service Portal → Widget Instances** in the All menu.
+  - Records are stored in:
+    - **Instance table**
+    - Or related tables (e.g., Carousel, Simple List) — found via **Portal Tables** on `/sp_config`.
+
+- **Context Menu (Live Page)**
+  - **Ctrl + right-click** a widget to open context menu.
+  - Options:
+    - **Instance Options:** Edit instance properties.
+    - **Instance in Page Editor:** Open in Page Editor.
+    - **Page in Designer:** Open Designer with widget selected.
+    - **Edit Container Background:** Change container.
+    - **Widget Options Schema:** View/add widget properties.
+    - **Widget in Form Modal:** Open widget in modal.
+    - **Widget in Editor:** Open base widget in Widget Editor.
+  - **Tip:** If `Ctrl+right-click` fails, use `Shift+Ctrl+right-click` (older Windows versions).
+
+### Develop Widgets
+
+- **Clone Baseline Widgets**
+
+  - Always review the [Widget Library](https://docs.servicenow.com/csh?version=latest&topicname=widget-showcase) first.
+  - Use baseline widgets when possible — they’re read-only to stay upgrade-safe.
+  - Clone to customize:
+    1. Widget Editor → **Clone** from context menu.
+    2. Widgets Module → **Clone Widget** button.
+  - Changes to a widget apply to **all its instances** — check **Included in Pages** & **Instances** related lists.
+
+- **Widget Editor**
+
+  - Single-page IDE for creating/updating widgets.
+  - Access: `/sp_config` → **Widget Editor** or Widgets menu.
+  - Options:
+    - Create new widget.
+    - Edit existing.
+    - Use **Hello World Example** to learn.
+  - Tips:
+    - Pencil icon in Page Designer opens the Widget Editor.
+    - Use `Ctrl+S` or `Cmd+S` to save.
+    - `Ctrl+A` → Select all, `Shift+Tab` → Format code.
+
+- **Widget Editor Features**
+
+  - **Widget Selector:** Switch templates.
+  - **Show:** Toggle script editors.
+  - **Preview:** See real-time result.
+  - **Context Menu:** Clone, create, edit options schema, mark Public, Open in Platform.
+
+- **Core Technologies**
+
+  - AngularJS 1.5 (ServiceNow maintained)
+  - Bootstrap 3.3.6
+  - JavaScript, Lodash/Underscore
+  - HTML, CSS, SCSS/Sass, Font Awesome
+  - ServiceNow APIs
+
+- **MVC Pattern**
+
+  - **Model:** Data.
+  - **View:** HTML Template.
+  - **Controller:** Client Script.
+
+- **How Widgets Work**
+
+  - **HTML:** Renders the view, binds data.
+  - **Client Script:** Processes/display data, handles input, calls `server.update()`.
+  - **Server Script:** Loads initial data, handles server-side logic.
+  - **CSS/Bootstrap:** Styles.
+  - **Link Function:** Direct DOM manipulation.
+  - **Option Schema:** Defines configurable instance options.
+  - **Dependencies:** Extra JS/CSS files.
+  - **Angular Providers:** Share context, sync widgets.
+
+- **Global Objects**
+
+  - **data:** Server → Client.
+  - **input:** Client → Server.
+  - **options:** Widget instance config (read-only).
+
+- **Widget Execution Flow**
+
+  - **Server Script:**
+    1. Init empty `data` & `input`.
+    2. Load `options`.
+    3. Send `data` JSON to client.
+  - **Client Script:**
+    - Use `c.data` and `c.options`.
+    - Call `c.server.update()` to post back.
+
+- **Option Schema**
+
+  - Use **Edit Option Schema** in Widget Editor or `Ctrl+right-click → Instance Options` on live portal.
+  - Common fields:
+    - **Label, Name** (snake_case), **Type, Hint, Default Value, Form Section**
+  - Syntax:
+    - HTML: `{{:options.title}}`
+    - Client: `c.options.text_color`
+    - Server: `$sp.log(options.text_color)`
+
+- **Five-Step Dev Strategy**
+
+  1. Load server data (Server Script).
+  2. Display data (HTML).
+  3. Accept input (Client Script).
+  4. Process input (Server Script).
+  5. Update view (HTML).
+
+  - Docs: [General Widget Guidelines](https://docs.servicenow.com/csh?version=latest&topicname=general-guidelines-developing-widgets)
+
+- **Share Custom Widgets**
+  - [Developer Share Projects](https://developer.servicenow.com/connect.do#!/share/contents?category=Service_Portal_Widgets&page=1)
+  - Not officially supported — use at your own risk.
+  - Custom widgets may become baseline — keep current.
+
+### Widget Debugging
+
+- **Built-In Debugging**
+
+  - Server-side logs are visible in the **browser JavaScript console**.
+  - Baseline widgets rarely fail — issues usually come from custom widgets.
+
+- **Key Debug Tools**
+
+  - `$scope.data` → Data sent from server.
+  - `$scope` → All controller variables.
+  - `console.log()` → Log to browser console.
+  - `spUtil.addErrorMessage()`, `spUtil.addInfoMessage()`, `spModal.alert` → Client-side alerts.
+  - `gs.log()`, `gs.debug()`, `gs.info()`, `gs.warn()`, `gs.error()` → Server-side logs.
+  - `sp.log()` → Logs server-side output if user has `sp_admin` role.
+  - Review logs: **System Log → Script Log Statements**.
+
+- **Widget Diagnostic Tool**
+
+  - Use **Show Widget Customizations** in widget context menu (`Ctrl+right-click`).
+  - Color codes:
+    - Green → Baseline
+    - Yellow → Cloned
+    - Blue → New
+    - Red → Customized
+  - Click **info icon (i)** to inspect code.
+  - Limitations:
+    - Can’t fix/revert directly — edit in Widget Editor.
+    - Tool stops if you navigate away.
+    - First-level dependencies only — check deeper in widget record.
+    - Not color-blind friendly.
+
+- **Portal Analyzer**
+
+  - Runs on demand — reports on **all widgets** across **all pages**.
+  - Stores:
+    - Page, Page ID
+    - Widget, Widget ID
+    - Status: OOTB, Cloned, Customized, New
+    - Page views, Unique user count
+  - Data: **Service Portal Analyzer table** (`sp_portal_analyzer`).
+  - Each job clears old records first.
+
+- **Tips**
+  - `debugger` command → sets browser breakpoint (Chrome/Firefox).
+  - Stuck dragging widget in Designer? Likely a script error. Check Widget Editor → fix syntax → add debug logs.
+
+## Menus and Navigation
+
+---
+
+## AI Search Integration
+
+---
+
+## Enhancing User Experience
+
+---
+
+## Redirecting Users
+
+---
+
+## Labs
+
+### Lab 1.5.1 - Explore Your Student Instance
+
+🎯 **Goal**: Download required lab files and review Service Portal Knowledge Base articles.
+
+- **A. Prepare for Labs**
+
+  - Navigate to **Self-Service > Knowledge** on the Unified Navigation header.
+  - Select `Class Knowledge Base`.
+  - Select the `LabResources.zip` article to download the file.
+  - Locate `LabResources.zip` on your computer and double-click it to extract the files.
+  - Remember the folder location for uploading images in future labs.
+
+- **B. Review Additional Service Portal Resources**
+  - In `Class Knowledge Base`, review optional articles:
+    - `Service Portal Design` (covers web design techniques and best practices)
+    - `Domain Separation in Service Portal` (explains Domain Separation)
+    - `Configuring Zing Search in Service Portal` (explains classic Zing Search)
+  - Select any article to download for additional learning.
+
+### Lab 1.5.2 - Enable AI Search
+
+🎯 **Goal**: Enable the AI Search engine in your student instance.
+
+- **A. Enable AI Search in Your Instance**
+  - Log out of your instance.
+  - Log in using:
+    - Username: `aislab.admin`
+    - Password: `aislab.admin`
+  - Navigate to **Lab Management > Repair Machine Learning Settings** on the Unified Navigation header.
+  - Click _Reset Machine Learning Settings_ to run the configuration script.
+  - Navigate to **AI Search > AI Search Status** on the Application Navigator.
+  - Confirm the message `AI Search is ready` or `AI Search is enabled` appears.
+  - If no message appears, notify your instructor.
+  - Log out and log back in as the `System Administrator`.
+
+### Lab 1.5.3 - Use the Branding Editor
+
+🎯 **Goal**: Use the Branding Editor to update and reset a Service Portal’s look.
+
+- **A. Update an Existing Portal**
+
+  - Navigate to **Service Portal > Portals** on the Unified Navigation header.
+  - Open the `SPF Demo` record.
+  - Click the _Try it_ button to open `/spfdemo` in a new browser tab.
+  - In the original tab, navigate to **Service Portal > Service Portal Configuration** to launch `/sp_config` in another tab.
+  - Click the _Branding Editor_ tile or select it from the header menu.
+  - Select `SPF Demo` in the _Service Portal_ drop-down.
+  - On the _Quick Setup_ tab:
+    - Replace _Portal title_ with `Cloud Dimensions`.
+    - Upload `cloud_dimensions_logo.png` (from `LabResources.zip`).
+    - Replace _Tag Line_ with `Welcome`.
+    - Set _Tag Line color_ to `#ece5de`.
+    - Upload `cloud_dimensions_header.jpg` as _Background Image_.
+  - On the _Theme Colors_ tab:
+    - _Navbar background_: `#000000`
+    - _Navbar divider_: `#ffffff`
+    - _Navbar link color_: `#ece5de`
+    - _Navbar link hover_: `#2d80c3`
+  - In the `/spfdemo` tab, refresh the page to view changes.
+  - In the `SPF Demo` portal record tab, refresh and confirm new CSS variables.
+
+- **B. Undo the Changes**
+  - Return to the Branding Editor tab.
+  - Click the yellow _Reset Changes_ button.
+  - In the `/spfdemo` tab, refresh and verify original styling restored.
+  - In the `SPF Demo` portal record tab, refresh and verify CSS variables cleared.
+
+---
+
+### Lab 2.2.1 - Create a New Theme and Portal
+
+🎯 **Goal**: Create a Cloud Dimensions theme and apply it to a new Service Portal.
+
+- **A. Bring in External CSS**
+
+  - Navigate to **Service Portal > CSS**.
+  - Click _New_.
+  - Enter `cloud_links.css` for _Name_.
+  - Copy and paste:
+
+    ```css
+    a {
+      color: #2d80c3;
+    }
+    a:visited {
+      color: #2d80c3;
+    }
+    a:hover {
+      color: #ece5de;
+    }
+    ```
+
+    into the _CSS_ field.
+
+  - Click _Submit_.
+
+- **B. Create a New Theme**
+
+  - Navigate to **Service Portal > Themes**.
+  - Click _New_.
+  - Enter `Cloud Dimensions` for _Name_.
+  - Set _Header_ to `Employee Center Header`.
+  - Check _Fixed header_.
+  - Leave _Fixed footer_ unchecked.
+  - Paste the CSS variables into the _CSS variables_ field:
+
+    ```css
+    /* CLOUD DIMENSIONS OFFICIAL COLORS */
+    $cloud-Primary: #2d80c3;
+    $cloud-Secondary: #ebf2f4;
+    $cloud-CloudWhite: #ece5de;
+    $cloud-CloudBlack: #323232;
+    /* ELEMENT SPECIFIC CSS */
+    $sp-tagline-color: $cloud-CloudWhite !default;
+    $navbar-inverse-bg: #000000 !default;
+    $navbar-inverse-link-color: $cloud-CloudWhite !default;
+    $navbar-inverse-link-hover-color: $cloud-Primary !default;
+    $body-bg: $cloud-Secondary !default;
+    ```
+
+  - Click _Save_.
+  - Under _CSS Includes_, click _New_.
+  - Enter `Cloud Links` for _Name_.
+  - Set _Source_ to `Style Sheet`.
+  - Set _Style Sheet_ to `cloud_links.css`.
+  - Click _Submit_.
+
+- **C. Test the Theme**
+
+  - Navigate to **Service Portal > Service Portal Home** and note the current header bar and link hover colors.
+  - Navigate to **Service Portal > Portals**.
+  - Open the `Service Portal` record.
+  - Set _Theme_ to `Cloud Dimensions`.
+  - Click _Update_.
+  - Refresh `/sp` and verify the header bar and navbar link hover colors.
+  - To adjust the Mega Menu bar, open `Cloud Dimensions` theme.
+  - Add:
+
+    ```css
+    $sp-navbar-divider-color: #000000 !default;
+    ```
+
+    to _CSS variables_.
+
+  - Click _Update_.
+  - Refresh `/sp` and confirm the Mega Menu bar is black.
+  - Navigate back to the `Service Portal` record.
+  - Change _Theme_ back to `La Jolla`.
+  - Click _Update_.
+
+- **D. Create a New Portal**
+  - Navigate to **Service Portal > Portals**.
+  - Click _New_.
+  - Enter:
+    - _Title_: `Cloud Dimensions`
+    - _URL suffix_: `cdsp`
+    - _Default_: Checked
+    - _Main menu_: `Employee Center Menu`
+    - _Theme_: `Cloud Dimensions`
+  - Click the _Logo_ field’s link, choose `cloud_dimensions_logo.png` and click _OK_.
+  - Under _Knowledge Bases_, click _Edit_.
+  - Add `IT` and `Human Resources General Knowledge` and click _Save_.
+  - Under _Catalogs_, click _Edit_.
+  - Add `Service Catalog` and `Technical Catalog` and click _Save_.
+  - Under _Taxonomy_, click _Edit_.
+  - Add `Employee Taxonomy` and click _Save_.
+  - Click _Update_ to save the portal.
+
+### Lab 2.2.2 - Include a Custom Font
+
+🎯 **Goal**: Add a Google Font to a Service Portal theme.
+
+- **A. Review the Baseline Font**
+
+  - Navigate to **Service Portal > Service Portal Home** and keep the `/sp` homepage open.
+
+- **B. Select a Google Font**
+
+  - Open [Google Fonts](https://fonts.google.com) in a new tab.
+  - Search for `Lobster` and select it.
+  - Click _Get font_.
+  - Click `<> Get embed code` and copy the stylesheet URL, e.g. `https://fonts.googleapis.com/css2?family=Lobster&display=swap`.
+
+- **C. Link the Google Font to the Theme**
+
+  - Navigate to **Service Portal > Themes**.
+  - Open the `La Jolla` theme.
+  - Under _CSS Includes_, click _New_.
+  - Enter:
+    - _Name_: `Google Font - Lobster`
+    - _Source_: `URL`
+    - _CSS file URL_: Paste the copied URL.
+  - Click _Submit_.
+
+- **D. Reference the Font in CSS**
+
+  - In _CSS variables_ of the `La Jolla` theme, paste:
+
+    ```css
+    h1,
+    h2 {
+      font-family: "Lobster", serif;
+    }
+    ```
+
+  - Click _Update_.
+  - Remove the added code and click _Update_ again to reset.
+
+### Lab 2.3.1 - Create a New Page
+
+🎯 **Goal**: Create a new homepage for the Cloud Dimensions Service Portal and set up its layout.
+
+- **A. Switch Service Portals**
+
+  - Navigate to **Service Portal > Service Portal Configuration** in the Unified Navigation header.
+  - On `/sp_config`, select the _Designer_ tile or _Designer_ on the header bar.
+  - Click the `sp` (or `spfdemo`) link on the header bar.
+  - Select the `Cloud Dimensions (cdsp)` Service Portal file.
+
+- **B. Create the New Page**
+
+  - Click _Add a new Page_.
+  - Set:
+    - _Page title_: `Cloud Dimensions`
+    - _Page ID_: `cd_index`
+  - Click _Submit_.
+
+- **C. Add Containers, Rows, and Columns**
+
+  - Click the blue `+` icon in the middle of the container. If you see a green `+` icon, drag a row with a 12-column span instead.
+  - Add a row with a 12-column span.
+  - Drag a second container below Container 1.
+  - Add a row with two columns `(9 | 3)` to Container 2.
+  - Drag a third container below Container 2.
+  - Add a row with three columns `(4 | 4 | 4)` to Container 3.
+  - Verify the structure matches the design reference.
+
+- **D. Configure Each Container**
+
+  - Select Container 1 so its border turns blue and breadcrumb shows `Container`.
+  - Click the edit (pencil) icon on the header bar.
+  - Set:
+    - _Background color_: `#2d80c3`
+    - _Background image_: `cloud_dimensions_header.jpg`
+    - _Background style_: `Cover`
+  - Click _Save_.
+  - Select Container 2, click the edit icon, set:
+    - _Background color_: `#ffffff`
+  - Click _Save_.
+  - Select Container 3, click the edit icon, set:
+    - _Background color_: `#ebf2f4`
+  - Click _Save_.
+
+- **E. Test Your Work**
+  - Click _Preview_ on the header bar.
+  - Review the Cloud Dimensions homepage layout.
+  - Click _Edit_ to return to the Designer.
+
+### Lab 2.3.2 - Explore Existing Pages
+
+🎯 **Goal**: Explore baseline Service Portal pages and configure the Cloud Dimensions portal to use them.
+
+- **A. Explore Baseline Pages**
+
+  - In the Page Designer, click _Pages_ on the Element Selector.
+  - Enter `User Pro` in the Filter Page search field.
+  - Select `User Profile - user_profile` page.
+  - Click _Preview_ on the header bar.
+  - Use the icons to review rendering for desktop, mobile, and tablet.
+  - Click _Edit_ to return to Designer.
+  - Repeat for:
+    - `Service Portal - landing`
+    - `Catalog Categories - sc_category`
+    - `System Status - services_status`
+  - Preview these baseline pages to add to the Cloud Dimensions portal:
+    - `Catalogs - esc_sc_category`
+    - `Knowledge - esc_knowledge_home`
+    - `Not Found - 404`
+  - Document any additional pages you review.
+
+- **B. Add Existing Pages to the Cloud Dimensions Portal**
+
+  - Click _Portal_ on the header bar.
+  - Update the Cloud Dimensions portal record:
+    - _Homepage_: `cd_index`
+    - _KB home page_: `esc_knowledge_home`
+    - _Login page_: `landing`
+    - _404 page_: `404`
+    - _Catalog home page_: `esc_sc_category`
+  - Click _Save_.
+
+- **C. Test Your Work**
+  - In Core UI, click the System Administrator avatar.
+  - Click _Log out_.
+  - In the same tab, go to `<your_instance>.lab.service-now.com/cdsp`.
+  - Confirm the login page displays.
+  - Log in as System Administrator.
+  - Remove `/cdsp` from the URL to return to Core UI.
+
+---
+
+### Lab 3.2.1 - Add Widgets to a Page
+
+🎯 **Goal**: Add widgets to all containers and columns on the Cloud Dimensions homepage and configure their options.
+
+- **A. Add Widgets to Container 1**
+
+  - In Page Designer with `[cd_index]` open, enter `homepage` in the Filter Widget search.
+  - Drag the `Homepage Search` widget to the only column in Container 1.
+  - Select the Homepage Search widget instance.
+  - Click the edit icon.
+    - _Title_: `How can we help?`
+    - _Placeholder_: `Keyword search`
+  - Click _Save_.
+  - Click _Open in new window_ to launch the live view.
+  - Verify Container 1 displays correctly. Leave the tab open for testing.
+
+- **B. Add Widgets to Container 2**
+
+  - In Page Designer, drag the `Quick Links` widget to the left column of Container 2.
+  - Click the edit icon.
+    - _Card Display Style_: `Thumbnail`
+    - _Card Tile Size_: `Small`
+    - _Card Content Alignment_: `Center`
+    - _Quick Links_: `Request Standing Desk`, `Password reset`, `System status`
+  - Click _Save_.
+  - Refresh `/cdsp` and verify.
+  - Drag an `HTML` widget to the right column of Container 2.
+  - Click the edit icon.
+  - Click the _Source code_ icon `<>`
+  - Paste:
+
+```html
+<h3 style="text-align: center;"><strong>Our Community</strong></h3>
+<p style="text-align: center;">
+  <a
+    title="Connect with Cloud Dimensions team members around the world"
+    href="/community"
+    ><img
+      style="max-width: 75%; max-height: 250px;"
+      src="our_community.png"
+      alt=""
+  /></a>
+</p>
+```
+
+- Save the source and the widget instance.
+- Refresh `/cdsp` and test hover and click on the image.
+
+- **C. Add Widgets to Container 3**
+
+  - Drag the `Approvals` widget to the left column.
+  - Drag the `Simple List` widget below `Approvals` in the left column.
+  - Edit the `Simple List` widget.
+    - _Table_: `Task [task]`
+    - _Display field_: `Number`
+    - _Secondary fields_: `Short description`, `Opened`
+    - _Link to this page_: `form`
+    - _Show even when empty_: `True`
+  - Click _Save_.
+  - Edit the `Simple List` widget again.
+  - Click _Menu_ > _Open in platform_ (opens new tab).
+  - Ensure that you are using the _Default_ view
+  - In Menu > Configure > Form Builder, drag _Order_ under _Title_.
+  - Save and close Form Builder.
+  - Refresh the record form and update:
+    - _Title_: `My Tasks`
+    - _Order_: `200`
+    - _Filter_: `Active | is | true` AND `Assigned to | is (dynamic) | Me`
+  - Click _Update_.
+  - Close the tab. Return to Designer but do NOT save this record again. Click anywhere outside of the form to close without saving.
+  - Impersonate `Don Goodliffe`.
+  - Refresh `/cdsp` and verify Container 3 left column shows tasks.
+  - End impersonation.
+  - Drag the `News Ticker` widget to Container 3’s middle column.
+  - Click the edit icon.
+  - Click _Open in platform_.
+  - Ensure that you are using the _Default_ view
+  - Configure:
+    - _Title_: `Company News`
+    - _Table_: `Knowledge [kb_knowledge]`
+    - _Filter_: `Active | is | true` AND `Topic | is | News`
+    - _Display field_: `Short description`
+  - Click _Update_.
+  - Close the tab. Do not save again in Designer.
+  - Refresh `/cdsp` and verify the News Ticker works.
+  - Drag the `KB Most Viewed` widget to Container 3’s right column.
+  - Click the edit icon.
+    - _Title_: `Most Viewed KB Articles`
+    - _Max Number_: `5`
+  - Click _Save_.
+  - Refresh `/cdsp` and verify KB articles display.
+
+- **D. Adjust Spacing**
+
+  - On `/sp_config`, select the Page Editor or Pages.
+  - Load `[cd_index]` page.
+  - Select `cd_index` node.
+  - In Page Specific CSS, add:
+
+```css
+/*  Removes white space between Header and Container 1  */
+section.page,
+main.body {
+  padding-top: 0px !important;
+}
+
+h3 {
+  color: #323232;
+}
+
+.paddingtop_20 {
+  padding-top: 20px;
+}
+```
+
+- Click _Save_.
+- Select `cd_index > Container 2 > Row 1` node.
+- Add `paddingtop_20` to the _CSS class_.
+- Save.
+- Repeat for `cd_index > Container 3 > Row 1`.
+
+- **E. Test and Verify**
+  - Refresh `/cdsp`.
+  - Verify all widgets display with correct spacing.
+
+### Lab 3.4.1 - Clone an Existing Widget
+
+🎯 **Goal**: Clone and customize the Approvals widget for Cloud Dimensions.
+
+- **A. Clone an Existing Widget**
+
+  - On the `/sp_config` homepage, select the _Widget Editor_ tile or _Widgets_ on the header bar.
+  - Enter `Approvals` in the Select a widget drop-down and select the first result.
+  - Select _Clone "Approvals"_ in the context menu.
+  - Enter `Approvals CD` in the _Widget name_ field.
+  - Click _Submit_.
+  - Load `Approvals CD` from the Widget drop-down.
+
+- **B. Add Configuration Item and Risk Fields**
+
+  - In _Server Script_, insert:
+
+    ```javascript
+    t.cmdb_ci = task.cmdb_ci.getDisplayValue();
+    t.risk = task.risk.getDisplayValue();
+    ```
+
+    unter line 72 `t.short_description = task.short_description.toString();`.
+
+  - In _HTML Template_, insert:
+
+```html
+<div ng-if="approval.task.cmdb_ci">
+  <label>${CI}</label>: {{::approval.task.cmdb_ci}}
+</div>
+<div ng-if="approval.task.risk">
+  <label>${Risk}</label>: {{::approval.task.risk}}
+</div>
+```
+
+under line 33 `<div ng-if="approval.task.approver"><label>${Approver}</label> {{::approval.task.approver}}</div>`.
+
+- Ensure labels on lines 32–44 have colons between label and value.
+- Click _Save_.
+
+- **C. Use the New Widget**
+  - In Page Designer, refresh the `[cd_index]` page.
+  - Drag `Approvals CD` below the existing Approvals widget in Container 3’s left column.
+  - Impersonate `Don Goodliffe` and refresh `/cdsp`.
+  - Verify the widget displays correctly.
+  - End impersonation.
+  - Delete the original Approvals widget in Container 3 using the trash icon.
+  - Confirm deletion and refresh `/cdsp`.
+
+---
+
+### Lab 3.4.2 - Develop a Custom Footer Widget
+
+🎯 **Goal**: Create and apply a custom footer widget for the Cloud Dimensions Service Portal.
+
+- **A. Create a New Widget**
+
+  - On the `/sp_config` homepage, select the _Widget Editor_ tile or _Widgets_ on the header bar.
+  - Click _Create a new widget_.
+  - Enter:
+    - _Widget Name_: `Cloud Dimensions Footer`
+  - Click _Submit_.
+
+- **B. Create and Style the Widget**
+
+  - Replace HTML Template with:
+
+```html
+<div class="footerStyle">
+  <div class="contactIT">
+    <p><strong>CONTACT IT</strong></p>
+    <p>Americas: +1 XXX 555 1234</p>
+    <p>EMEA: +XX 55 555 1234</p>
+    <p>APAC: +XX 55 555 1234</p>
+  </div>
+  <div class="contactSecurity">
+    <p><strong>CONTACT SECURITY</strong></p>
+    <p>Americas: +1 XXX 555 4321</p>
+    <p>EMEA: +XX 55 555 4321</p>
+    <p>APAC: +XX 55 555 4321</p>
+  </div>
+  <div class="copyright">
+    <p>&copy; 2024 ServiceNow Inc. All Rights Reserved</p>
+  </div>
+  <div class="social" id="footer">
+    <a
+      class="fa fa-linkedin"
+      href="https://www.linkedin.com/company/servicenow"
+      target="_blank"
+    ></a>
+    &nbsp;
+    <a
+      class="fa fa-twitter"
+      href="https://www.twitter.com/servicenow"
+      target="_blank"
+    ></a>
+    &nbsp;
+    <a
+      class="fa fa-youtube"
+      href="https://www.youtube.com/servicenowinc"
+      target="_blank"
+    ></a>
+    &nbsp;
+    <a
+      class="fa fa-facebook"
+      href="https://www.facebook.com/servicenow"
+      target="_blank"
+    ></a>
+    &nbsp;
+    <a
+      class="fa fa-instagram"
+      href="https://www.instagram.com/lifeatnow"
+      target="_blank"
+    ></a>
+    &nbsp;
+    <a
+      class="fa fa-power-off"
+      href="https://www.servicenow.com/community/"
+      target="_blank"
+    ></a>
+  </div>
+</div>
+```
+
+- Add to CSS - SCSS:
+
+```scss
+.footerStyle {
+  width: 100%;
+  background-color: #000000;
+  color: $cloud-CloudWhite;
+  text-align: center;
+  font-size: 125%;
+  margin-left: auto;
+  margin-right: auto;
+  padding-top: 25px;
+}
+.contactIT,
+.contactSecurity {
+  width: 275px;
+  display: inline-block;
+  text-align: left;
+  vertical-align: top;
+}
+.copyright {
+  width: 400px;
+  display: inline-block;
+  text-align: left;
+  vertical-align: top;
+}
+.social {
+  display: inline-block;
+  text-align: left;
+  vertical-align: top;
+  font-size: 150%;
+}
+```
+
+- Mark the widget as _Public_ using the context menu.
+- Click _Save_.
+
+- **C. Identify the Widget as a Footer**
+
+  - Click the ServiceNow logo to close Widget Editor.
+  - Navigate to **Service Portal > Widgets**.
+  - Locate `Cloud Dimensions Footer`.
+  - Add the _Class_ column in list view.
+  - Edit _Class_ to `Header | Footer`.
+  - Save the update.
+
+- **D. Add the Footer to the Theme**
+  - Navigate to **Service Portal > Themes**.
+  - Open the `Cloud Dimensions` theme.
+  - Set _Footer_ to `Cloud Dimensions Footer`.
+  - Click _Update_.
+  - Refresh `/cdsp` and test while logged out.
+  - Verify the footer displays on the landing page.
+
+---
+
+### Lab 3.4.3 - Develop a Custom Widget with Options
+
+🎯 **Goal**: Create a Support Contacts widget with configurable options.
+
+- **A. Create a New Widget**
+
+  - On the `/sp_config` homepage, select the _Widget Editor_ or _Widgets_.
+  - Click _Create a new widget_.
+  - Enter:
+    - _Widget Name_: `Support Contacts`
+    - _Create test page_: `True`
+  - Click _Submit_.
+
+- **B. Add Options**
+
+  - Click _Menu_ > _Edit option schema_.
+  - Add 5 options:
+    - Label: `Title`  
+      Type: `string`  
+      Form section: `Presentation`
+    - Label: `Daytime phone`  
+      Type: `string`  
+      Form section: `Data`
+    - Label: `Emergency phone`  
+      Type: `string`  
+      Form section: `Data`
+    - Label: `KB URL`  
+      Type: `string`  
+      Form section: `Data`
+    - Label: `KB Title`  
+      Type: `string`  
+      Form section: `Data`
+  - Save.
+
+- **C. Add Display HTML and Style**
+
+  - Replace HTML Template:
+
+```html
+<form class="form-horizontal">
+  <h3 class="text-primary">{{::c.options.title}}</h3>
+  <div class="contact-row">
+    <div class="label-left">${Safety and Security - During Business Hours}</div>
+    <div class="label-right">
+      <a href="tel:{{c.options.daytime_phone}}"
+        >{{::c.options.daytime_phone}}</a
+      >
+    </div>
+  </div>
+  <div class="contact-row">
+    <div class="label-left">${Safety and Security - After Hours}</div>
+    <div class="label-right">
+      <a href="tel:{{c.options.emergency_phone}}"
+        >{{::c.options.emergency_phone}}</a
+      >
+    </div>
+  </div>
+  <div class="contact-row" ng-if="c.data.show_link">
+    <div class="label-left">${Our Corporate Safety and Security Standards}</div>
+    <div class="label-right">
+      <a href="{{::c.options.kb_url}}" target="_blank"
+        >{{::c.options.kb_title}}</a
+      >
+    </div>
+  </div>
+</form>
+```
+
+- Add to CSS:
+
+```scss
+.contact-row {
+  overflow: auto;
+  padding: 10px;
+  border-bottom: 2px solid #f7f7f7;
+}
+.label-left {
+  float: left;
+  width: 35%;
+  font-weight: bold;
+}
+.label-right {
+  float: right;
+  width: 65%;
+}
+a {
+  color: #000000;
+}
+```
+
+- Click _Save_.
+
+- **D. Add Client Script**
+
+  - Inside the Client Script function (after line 3, before closing bracket):
+
+```javascript
+if (c.options.title == "" || !c.options.title) {
+  c.options.title = "Safety & Security Contacts";
+}
+c.data.show_link = false;
+if (c.options.kb_url && c.options.kb_url != "") {
+  c.data.show_link = true;
+  if (c.options.kb_title == "") {
+    c.options.kb_title = c.options.kb_url;
+  }
+}
+```
+
+- Click _Save_.
+
+- **E. Test**
+  - Visit: `https://<your_instance>.lab.service-now.com/$sp.do?id=support_contacts`
+  - Ctrl + Right-click > _Instance Options_.
+  - Fill fields, Save, verify display.
+
+---
+
+### Lab 3.4.4 - Develop a Modal Widget
+
+🎯 **Goal**: Create a widget to open a KB article inside a modal.
+
+- **A. Add Page-Level CSS**
+
+  - **Purpose**: Add shared CSS once so multiple widgets can reuse the same styles and stay consistent.
+  - Navigate to the **Page Editor**, load `[cd_index]`.
+  - select **cd-index** node
+  - Add below current code in **Page Specific CSS**:
+
+```css
+.cdWidgetTitleBar {
+  background-color: #f5f5f5;
+  border: 1px solid #e6e6e6;
+  border-radius: 5px 5px 0 0;
+  padding: 10px 0 0 15px;
+  font-size: 120%;
+}
+.cdWidgetContentArea {
+  background-color: white;
+  border: 1px solid #d9d9d9;
+  border-radius: 0 0 5px 5px;
+  padding: 15px;
+  margin-bottom: 18px;
+}
+```
+
+- Save.
+
+- **B. Clone KB Article Widget**
+
+  - Open **Widgets**, search `KB Article Page`.
+  - Select _Clone "KB Article Page"_.
+  - Name: `KB Article Modal`. Submit.
+  - Load `KB Article Modal`.
+  - In Server Script, comment lines 6–7 and add below:
+
+```javascript
+articleGR
+  .addQuery("sys_id", input.sys_id)
+  .addOrCondition("number", input.sys_id);
+```
+
+- Save.
+
+- **C. Create Modal Link Widget**
+
+  - Create new widget:
+    - _Name_: `KB Link Modal`
+  - Save.
+
+- **D. Add Options**
+
+  - Edit option schema - add 3 options:
+    - Label: `Title`  
+      Type: `string`  
+      Form section: `Presentation`
+    - Label: `Link Title`  
+      Type: `string`  
+      Form section: `Data`
+    - Label: `KB Article`  
+      Type: `reference`  
+      Ref Table: `Knowledge [kb_knowledge]`  
+      Default value: `KB0000001`
+      Form section: `Data`
+  - Save options and widget.
+
+- **E. Display HTML**
+
+  - Replace HTML:
+
+```html
+<div class="cdWidgetTitleBar">
+  <p>{{::options.title}}</p>
+</div>
+<div class="cdWidgetContentArea">
+  <p>
+    <a
+      class="btn btn-info"
+      href="javascript:void(0);"
+      data-article="{{options.kb_article}}"
+      ng-click="c.openOverlay($event)"
+      >{{::options.link_title}}</a
+    >
+  </p>
+</div>
+```
+
+- **F. Add Client Script**
+
+  - In Client Script (replace existing code):
+
+```javascript
+api.controller = function (spModal) {
+  /* widget controller */
+  var c = this;
+
+  c.openOverlay = function ($event) {
+    //pull data-article attribute from clicked element
+    var articleId = $event.currentTarget.dataset.article;
+
+    //open modal
+    spModal.open({
+      //load our custom kb article widget
+      widget: "kb_article_modal",
+
+      //pass article id to article widget
+      widgetInput: { sys_id: articleId },
+
+      //force modal to large size
+      size: "lg",
+    });
+  };
+};
+```
+
+- Save.
+
+- **G. Add Widget to Page**
+
+  - In Page Designer, refresh `[cd_index]`.
+  - Search `modal` in Filter Widget.
+  - Drag `KB Link Modal` above the KB Most Viewed widget in right column of Container 3.
+  - Edit instance:
+    - _Link Title_: `Recover Deleted Emails`
+    - _KB Article_: `KB0000030`
+    - _Title_: `Service Desk - Top Call This Week`
+  - Save.
+
+- **H. Test**
+  - Refresh `/cdsp`.
+  - Click the button, verify modal opens.
