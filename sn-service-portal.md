@@ -23,6 +23,12 @@
 - [Global Header Options](https://docs.servicenow.com/csh?version=latest&topicname=config-global-header-components)
 - [Docs: AI Search](https://docs.servicenow.com/csh?version=latest&topicname=overview-ais)
   - [Enable & Configure](https://docs.servicenow.com/csh?version=latest&topicname=ai-search)
+- User Experience Analytics (UEA)
+  - [UEA for Service Portal](https://docs.servicenow.com/csh?version=latest&topicname=sp-analytics)
+  - [UEA Product Documentation](https://docs.servicenow.com/csh?version=latest&topicname=user-exp-analytics-landing)
+  - Documentation: [SNAnalytics - Client API](https://docs.servicenow.com/csh?version=latest&topicname=SNAnalyticsClientAPI)
+  - Detailed roles: [UEA Roles Documentation](https://docs.servicenow.com/csh?version=latest&topicname=sp-analytics-roles)
+- [User criteria for Service Portal – Product Docs](https://docs.servicenow.com/csh?version=latest&topicname=user-criteria)
 
 ### 🧠 Community
 
@@ -1193,13 +1199,321 @@ Provides:
 
 ---
 
----
+## SP Extras
 
-## Enhancing User Experience
+### User Experience Analytics (UEA)
 
----
+- User Experience Analytics (UEA) enables visualization and analysis of user interactions within Service Portals.
+- Included baseline with Service Portal (cloud instances only).
+- **Not supported on-premise** instances.
+- Provides dashboards to track Service Portal KPIs and user engagement metrics.
+- Documentation:
+  - [UEA for Service Portal](https://docs.servicenow.com/csh?version=latest&topicname=sp-analytics)
+  - [UEA Product Documentation](https://docs.servicenow.com/csh?version=latest&topicname=user-exp-analytics-landing)
 
-## Redirecting Users
+#### Dashboard Menu Metrics
+
+- **Overview:** Visual summary of KPIs.
+- **Sessions:** User sessions (filterable, drill-down, exportable).
+- **Users:** User list and analytics (filterable, drill-down, exportable).
+- **UI Analysis:** Insights into portal UI interactions.
+- **Analysis:** Usage details, technical info (browser, OS, devices), geography, events, retention.
+- **Funnels:** Custom funnel reports tracking conversion processes.
+- **Cohorts:** Custom cohort reports based on user actions.
+- **Search Analysis:** AI Search usage metrics (requires Advanced AI Search Management Tools plugin).
+
+#### Configuring User Experience Analytics
+
+- **Plugin**: "Service Portal Analytics" active by default.
+- To enable analytics tracking for a portal:
+  - Navigate to **Service Portal > Portals**.
+  - Open portal record.
+  - Click **Create Analytics Settings** (creates record in `sys_analytics_bucket` table).
+- Access analytics dashboard: **User Experience Analytics > Dashboard**.
+- Default tracking applies to **authenticated users only**.
+- To track unauthenticated users:
+  - Navigate to **User Experience Analytics Settings** record.
+  - Select **Enable Unauthenticated User Tracking** checkbox.
+
+#### Baseline UEA Events
+
+- Analytics data helps optimize Service Catalog, Knowledge Base, search, and login tracking.
+- Baseline tracked events:
+  - **Submit Catalog Request**: Tracks submitted catalog item requests (request ID, item count).
+  - **Order Catalog Item**: Tracks ordered catalog items (item name, ID, request ID).
+  - **Submit Record Producer Request**: Tracks submissions via record producers.
+  - **View Knowledge Article**: Tracks viewed articles (name, ID, language).
+  - **Initiate Search**: Tracks search keywords (Faceted and Typeahead widgets).
+  - **Search Result Selected**: Tracks clicks on Faceted search results (click rank, sys_id).
+  - **Successful Login**: Tracks user login events.
+  - **PortalPageLoad**: Tracks visited pages and languages.
+  - **SP File Attach**: Tracks file attachments via upload, clipboard, drag-and-drop.
+- Custom events and user properties supported via **SNAnalytics API**:
+  - Documentation: [SNAnalytics - Client API](https://docs.servicenow.com/csh?version=latest&topicname=SNAnalyticsClientAPI).
+
+#### UEA Roles
+
+- **Portal Analytics Admin** (`portal_analytics_admin`):
+  - Access to Dashboard & Settings modules.
+  - Can create/update UEA settings.
+- **Portal Analytics Viewer** (`portal_analytics_viewer`):
+  - View-only access to Dashboard module.
+- Additional Analytics Roles:
+  - `analytics_admin`, `analytics_viewer`
+  - `mobile_analytics_admin`, `mobile_analytics_viewer`
+  - `web_analytics_admin`, `web_analytics_viewer`
+- Detailed roles: [UEA Roles Documentation](https://docs.servicenow.com/csh?version=latest&topicname=sp-analytics-roles)
+
+#### User Consent Policies
+
+- Configure user consent via: **User Experience Analytics > Consent Policies**.
+- Customizable by geographic location:
+  - US users (default: **No Consent Required**)
+  - EU, EFTA\*, UK users (default: **Explicit Opt-In**)
+  - Other users (default: **Notice**)
+- Consent policy types:
+  - **Explicit Opt-In**: Users explicitly choose to allow tracking.
+  - **Notice**: Users informed of tracking (automatic).
+  - **No Consent Required**: Automatic tracking without user notification.
+  - **Basic Tracking**: Limited user data tracking (hashed IDs, partial session details).
+  - **Disabled**: No analytics tracking.
+- Customizable consent message text via **System UI > Messages**:
+  - Keys:
+    - `glide.analytics.consent.text.notice`
+    - `glide.analytics.consent.text.explicit_opt_in`
+
+#### Enabling/Disabling User Analytics
+
+- Users can toggle analytics tracking via their **Profile > Preferences > User Experience** section.
+
+#### Privacy Notice for Unauthenticated Users
+
+- Optional privacy notice to inform unauthenticated users of tracking:
+  1. Navigate to **All > Service Portal > Announcements**.
+  2. Open inactive record **Privacy Notice**.
+  3. Select **Active** checkbox.
+  4. Edit text in **Summary** (optional).
+  5. Select applicable portal(s) under **Portals** section.
+  - Default setting: shown to unauthenticated users only.
+
+(\*EFTA = European Free Trade Association)
+
+### Announcements
+
+- Announcements broadcast messages to Service Portal users as:
+  - **Banner** (top of portal pages)
+  - **Widget** (using Announcement widget)
+- **Creating Announcements**:
+  - Navigate: **Service Portal > Announcements**
+  - Configure fields:
+    - Name, Title, Summary, Type
+    - Active dates (**From/To**)
+    - Audience (**Public** for unauthenticated users only)
+- **Customizing Display Styles**:
+  - Navigate: Type `announcement_style.list` in the menu filter, press **Enter**
+  - Create new style record with fields:
+    - **Name**
+    - **Background color** (color name or HEX)
+    - **Foreground color** (text color name or HEX)
+    - **Alignment** (horizontal text alignment)
+    - **Application** (scope of style usage)
+  - Banner announcements use the style directly set in the Announcement record.
+  - For Announcement widget instances, enable **Use Display Style** option.
+
+### User Criteria
+
+- **Purpose**:
+
+  - Define access conditions for pages, widgets, widget instances, and search sources.
+  - Replaces role-based access control for Service Portal components (when enabled).
+  - Portal records are only visible if user passes evaluation logic.
+
+- **Evaluation Logic**:
+
+  - User has role in **Override List** → ✅ Pass
+  - Else:
+    - User matches criteria in **Cannot View List** → ❌ Fail
+    - Else:
+      - **No Can View criteria** → ✅ Pass
+      - Else:
+        - User matches criteria in **Can View List** → ✅ Pass
+        - Else → ❌ Fail
+
+- **Enable User Criteria Support**:
+
+  1. Activate plugin: `Service Portal User Criteria Support`
+     - Navigate: **Admin Center > Application Manager**
+     - Search and install the plugin
+  2. Enable system property:
+     - Navigate: **Service Portal > Properties**
+     - Check **Enable use of User Criteria records instead of Roles fields**
+     - Click **Save**
+
+  - When enabled:
+    - Existing **Roles fields** on components are converted into **User Criteria** records
+  - To disable: uncheck the property to revert to role-based access (default)
+
+- **Apply User Criteria to Components**:
+
+  - Use **Can View** and **Cannot View** related lists on:
+    - Page records
+    - Widget records
+    - Widget Instance records
+  - To configure:
+    - Select **New** to create new User Criteria
+    - Select **Edit** to apply existing criteria
+  - In **Page Editor**:
+    1. Load a portal page
+    2. Select a node (Page, Widget, Widget Instance)
+    3. Open **Can View** or **Cannot View** related list
+    4. Select **New**, choose criteria from dropdown
+    5. Click **Save**
+
+- **User Criteria Record Fields**: Name, Users, Groups, Roles, Companies, Locations, Departments
+
+  - **Match All** – require user to meet all conditions (unchecked = match any)
+  - **Advanced** – toggle to enable scripting
+    - **Script** – must return `true` or `false`
+  - **Application** – scope of the record
+  - **Active** – toggle to enable/disable criteria
+
+- **Note**:
+  - User Criteria records must be created/edited via the **Core UI**.
+  - For visual task flow diagrams and evaluation logic, see:  
+    [User criteria for Service Portal – Product Docs](https://docs.servicenow.com/csh?version=latest&topicname=user-criteria)
+
+### Guided Tours
+
+- **Purpose**:
+
+  - Demonstrate navigation and usage of Service Portal pages/features
+  - Tours can span multiple pages
+  - Access via **Tours** menu item in the header (visible only if present)
+
+- **Availability**:
+
+  - Enabled by default
+  - Controlled by system properties:
+    - `com.snc.guided_tours.standard_ui.enable` → Enables for standard UI
+    - `com.snc.guided_tours.sp.enable` → Enables for Service Portal
+  - Check/modify via:
+    1. Enter `sys_properties.list` in the navigator
+    2. Search for `*guided_tours`
+    3. Update values as needed
+
+- **Important Considerations**:
+
+  - Tours menu item only appears if **Header menu** is present
+  - If using **Page Route Maps**, tours may not appear as expected
+  - **IFRAME-based pages** (e.g., Branding Editor) are not supported in Guided Tour Designer
+
+- **Demo Tour: Employee Center Portal**
+
+  1. Navigate to `/esc`
+  2. Click **Tours** in the header menu
+  3. Select **Employee Center Portal**
+  4. Click **Begin Tour**
+  5. Use **Next** to proceed through callouts
+  6. Click **Complete** on final step
+
+- **Creating a Guided Tour**
+
+  - Navigate: **Guided Tour Designer > Create Tour**
+  - Fill form:
+    - **Name** – tour title
+    - **Tour Type** – Standard UI, Service Portal, Workspaces, Custom
+    - **Portal** – name of Service Portal
+    - **Starting Page** – Service Portal page name or form name
+    - **Roles** – All or specific roles allowed to access tour
+  - Click **Create Tour** → Opens in **Draft** status
+
+- **Using Guided Tour Designer**
+
+  1. Click **Create an Introduction** – customize opening text
+  2. Add **Steps**:
+     - Drag callout onto UI element (highlighted in purple)
+     - Enter instructions
+     - Select a **Trigger Type**
+     - Click **Save**
+  3. Click **Create a Conclusion** – customize closing text
+  4. Click **Preview** to test
+  5. Click **Publish** to make it available to users
+
+- **Callout Trigger Types**:
+
+  - **Next Button** – User clicks "Next" in the callout
+  - **Click the Element** – Triggered by clicking the targeted element
+  - **Mouse over the Element** – Triggered by hovering over the element
+  - **Right-click the Element** – Triggered by right-clicking the element
+  - **Press Enter Key** – Triggered when user presses Enter
+  - **Change Element Value** – Triggered by changing the field value and clicking outside
+  - **Press any key** – Triggered by any key press
+  - **Callout Adjustments**:
+    - Use gray icon on top of callout to change arrow direction
+
+## Redirecting in Service Portal
+
+### Page Route Maps
+
+- Use **Page Route Maps** to redirect users from a deprecated page to a replacement without updating hardcoded page IDs in widgets.
+- Reduces maintenance by allowing seamless page replacements.
+- **Example**: `/esc` users routed from `sc_request` to `order_status` via Page Route Map.
+
+**Create a Page Route Map**:
+
+1. Navigate to **Service Portal > Page Route Maps**
+2. Click **New**
+3. Complete the form:
+   - **Source page** (original page)
+   - **Destination page** (new target page)
+4. Click **Submit**
+
+### Redirect unauthenticated users to login page
+
+- Create a **system property** to redirect users to the login page defined in the Default portal:
+  - **Name**: `glide.entry.page.script`
+  - **Type**: `string`
+  - **Value**: `new SPEntryPage().getLoginURL()`
+
+**Steps**:
+
+1. Enter `sys_properties.list` in the navigation filter
+2. Create a new record with values above
+
+- `SPEntryPage.getLoginURL()` locates the login page specified in the Default Service Portal record
+- To customize the behavior:
+  - Clone and modify the `SPEntryPage` Script Include
+  - Update system property to reference the new Script Include
+  - ⚠️ **Modifying baseline Script Includes prevents automatic upgrades**
+
+### Conditionally redirect after login
+
+- Redirect specific users based on role to Service Portal or Core UI:
+  - Create system property:
+    - **Name**: `glide.entry.first.page.script`
+    - **Type**: `string`
+    - **Value**: `new SPEntryPage().getFirstPageURL()`
+
+**Use case**:
+
+- Users with `admin` or `itil` roles → Core UI
+- All others → Service Portal
+
+**Custom logic (example)**:
+
+```javascript
+getFirstPageURL: function () {
+  var session = gs.getSession();
+  var nt = session.getProperty("nav_to");
+  var isServicePortalURL = new GlideSPScriptable().isServicePortalURL(nt);
+  var redirectURL = session.getProperty("login_redirect");
+
+  if ((gs.hasRole("admin") || gs.hasRole("itil")) && !redirectURL && !isServicePortalURL) {
+    return; // Redirect to UI16
+  }
+  // Otherwise redirect to Service Portal
+}
+```
 
 ---
 
@@ -2177,17 +2491,20 @@ api.controller = function (spModal) {
 🎯 **Goal**: Configure AI Search so Cloud Dimensions users can search for US office locations with state-based filtering.
 
 - **A. Review Current Search Results**
-  - Navigate to **AI Search > AI Search Status** and confirm: *AI Search is ready*.
+
+  - Navigate to **AI Search > AI Search Status** and confirm: _AI Search is ready_.
   - Open `/cdsp` and search `washington` in the Keyword Search field.
   - Confirm no results are returned.
 
 - **B. Index Existing Source**
+
   - Navigate to **AI Search > AI Search Index > Indexed Sources**.
   - Open the `Location Table` record.
   - Select _Index All Tables_.
-  - On the Indexed Source History form, right-click the header and select _Reload form_ until *Ingestion State* is `indexed`.
+  - On the Indexed Source History form, right-click the header and select _Reload form_ until _Ingestion State_ is `indexed`.
 
 - **C. Create a Search Source**
+
   - Navigate to **AI Search > Search Experience > Search Sources**.
   - Click _New_ and configure:
     - Name: `US Locations`
@@ -2201,22 +2518,25 @@ api.controller = function (spModal) {
   - Verify only US locations with State/Province and Zip/Postal Code appear. Personalize columns as needed.
 
 - **D. Update Default Search Profile**
+
   - Navigate to **AI Search > Search Experience > Search Profiles**.
   - Open `Service Portal Default Search Profile`.
-  - In *Search Sources*, click _Link Existing_.
+  - In _Search Sources_, click _Link Existing_.
   - Link `US Locations`. Click _Submit_.
   - Click _Publish_.
 
 - **E. Preview Changes**
+
   - Navigate to **AI Search > Preview > Search Preview (New)**.
   - Select `Service Portal Default Search Application`.
   - Enter `***` and press `<Enter>`.
   - Click the `Location Table` facet. Confirm only Location Name is shown.
 
 - **F. Add a Field Mapping**
+
   - Navigate to **AI Search > AI Search Index > Indexed Sources**.
   - Open `Location Table`.
-  - In *Field Settings & Mapping*, click _New_:
+  - In _Field Settings & Mapping_, click _New_:
     - Attribute: `map_to`
     - Field: `zip`
     - Value: `text`
@@ -2227,9 +2547,10 @@ api.controller = function (spModal) {
   - Click `Location Table` facet and verify both Name and Zip/Postal Code display.
 
 - **G. Add a Facet**
+
   - Navigate to **AI Search > Search Experience > Search Applications**.
   - Open `Service Portal Default Search Application`.
-  - In *Facets*, click _New_:
+  - In _Facets_, click _New_:
     - Name: `State`
     - Label: `State`
     - Facet Field: `cmn_location.state`
@@ -2241,3 +2562,371 @@ api.controller = function (spModal) {
   - Search `washington` in the Keyword Search field.
   - Confirm Location records display.
   - Use the `State` facet to filter and verify results.
+
+---
+
+### Lab 6.4.1 - Announcements
+
+🎯 **Goal**: Create and display a styled announcement on the Cloud Dimensions Service Portal.
+
+- **A. Create an Announcement Display Style**
+
+  - Navigate by entering `announcement_style.list` in the Filter navigator.
+  - Select _New_.
+  - Set `Name`: `Cloud Dimensions Corporate`
+  - Set `Background color`: `#208000`
+  - Set `Foreground color`: `#ece5de`
+  - Set `Alignment`: `Left align`
+  - Select _Submit_.
+
+- **B. Create a New Announcement**
+
+  - Navigate to **Service Portal > Announcements**.
+  - Select _New_.
+  - Set `Name`: `Infinity Demo Days`
+  - Check `Active`
+  - Set `Title`: `Infinity is Ready`
+  - Set `From`: [yesterday’s date, current time]
+  - Set `To`: [next Monday, 17:00:00]
+  - Set `Display style`: `Cloud Dimensions Corporate`
+  - Set `Type`: `Banner, Widget`
+  - Set `Glyph`: [any image]
+  - Uncheck `Public`
+  - Set `Summary`:
+
+    ```txt
+    Cloud Dimensions is happy to announce the release of Infinity - our new Portable Holographic Projector (PHP). Join us all day next Monday for live demonstrations in Meeting Room Nova 3 and try the simulator yourself!
+    ```
+
+  - Select _Behavior_ tab:
+    - Set `Click target`: `-- None --`
+    - Set `Dismiss options`: `User can dismiss for current session only`
+  - Select _Portals_ tab:
+    - Insert row: `Cloud Dimensions`
+    - Select green checkmark to save
+  - Select _Submit_.
+
+- **C. Add Announcements Widget to Homepage**
+
+  - Open the **Cloud Dimensions [cd_index]** page in Page Designer.
+  - Drag the **Announcements** widget below the **News Ticker** widget in container 3.
+
+- **D. Test Your Work**
+  - Refresh the live view of `/cdsp`.
+  - Confirm the banner announcement displays.
+  - Confirm the Announcements widget also shows the message.
+  - Click the _X_ on the banner announcement to dismiss.
+  - Refresh `/cdsp` — banner should not reappear.
+  - Ctrl + Right-click the Announcements widget > _Instance Options_.
+  - Check `Use Display Style`.
+  - Select _Save_.
+  - Refresh `/cdsp` — announcement now styled using display style.
+
+### Lab 6.4.2 - Create a Dashboard Page
+
+🎯 **Goal**: Build an ITSM Dashboard with reports and add a role-restricted widget link to the homepage.
+
+- **A. Create a New Page with Breadcrumbs and Search**
+
+  - In Page Designer, select the **Cloud Dimensions** logo to return home.
+  - Create new page:
+    - `Page Title`: `ITSM Dashboard`
+    - `Page ID`: `itsm_dashboard`
+  - Insert a row with 9 | 3 column split into container 1.
+  - Edit left column:
+    - Set `Size-md`: `8`
+    - Add **Breadcrumbs** widget.
+  - Edit right column:
+    - Set `Size-md`: `4`
+
+- **B. Build Container 2**
+
+  - Add new container below container 1.
+  - Insert a single-column (12) row.
+  - Add **HTML** widget.
+  - Edit widget:
+    - Font-size: _Heading 1_
+    - Align: _Center_
+    - Text: `ITSM Dashboard`
+
+- **C. Build Container 3**
+
+  - Add container 3, insert row with 4 | 4 | 4 column split.
+  - Add **Report** widget to each column.
+  - Configure:
+    - Left report: `Open Incidents by Priority`
+    - Middle report: `Open Incidents by Category`
+    - Right report: `Open Incidents by Group`
+
+- **D. Build Container 4**
+
+  - Add container 4 with 6 | 6 column split.
+  - Configure:
+    - Left report: `This Weeks Change Requests by Category`
+    - Right report: `Standard Change success report`
+
+- **E. Style the Page**
+
+  - Navigate to **Page Editor** > load `itsm_dashboard`.
+  - Select the `itsm_dashboard` node.
+  - Paste into _Page Specific CSS_:
+
+```css
+/*  Removes white space between Header and Container 1  */
+section.page,
+main.body {
+  padding-top: 0px !important;
+}
+
+/*  Style the Page  */
+section.page {
+  background-color: black;
+}
+
+/*  Style Heading 1  */
+h1 {
+  color: white;
+}
+
+/*  Borders  */
+.blueTopBorder {
+  border-top: 10px solid blue;
+  margin-top: 20px;
+}
+
+.blueBottomBorder {
+  border-bottom: 10px solid blue;
+  margin-bottom: 20px;
+}
+```
+
+- Save.
+- Apply `blueTopBorder blueBottomBorder` to `Container 2 > Row 1` CSS class
+- Apply `blueBottomBorder` to `Container 4 > Row 1` CSS class
+
+- **F. Create a Widget to Launch the Page**
+
+  - Navigate to **Widget Editor**, select _Create new widget_.
+    - `Widget Name`: `Quick Links ITIL`, _Submit_
+  - In **Server Script** (into the existing function): `data.hasItilRole = gs.hasRole("itil");`
+  - In **HTML Template** (replace existing code):
+
+```html
+<div ng-show="c.data.hasItilRole">
+  <div class="cdWidgetTitleBar">
+    <p>Quick Links</p>
+  </div>
+  <div class="cdWidgetContentArea">
+    <p>
+      <a class="btn btn-info whiteText" href="?id=itsm_dashboard"
+        >ITSM Dashboard</a
+      >
+    </p>
+  </div>
+</div>
+```
+
+- In **CSS - SCSS Editor**:
+
+```css
+.whiteText {
+  color: white;
+}
+```
+
+- Save.
+
+- **G. Add Widget to Homepage**
+  - In Page Designer, load `cd_index`.
+  - Drag **Quick Links ITIL** widget below **KB Link Modal** in container 3 right column.
+  - Refresh `/cdsp`, verify:
+    - Button redirects to ITSM Dashboard.
+    - Impersonate `Abel Tuter` (no `itil` role) — widget is hidden.
+  - End impersonation.
+
+### Lab 6.4.3 - Create a Guided Tour
+
+🎯 **Goal**: Build a guided tour that walks users through resetting a password.
+
+- **A. Create a Guided Tour**
+
+  - Navigate to **Guided Tour Designer > Create Tour**.
+  - Configure:
+    - `Name`: `How to Reset a Password`
+    - `Tour Type`: `Service Portal`
+    - `Portal`: `Cloud Dimensions`
+    - `Starting Page`: `Cloud Dimensions (cd_index)`
+  - Select _Create Tour_.
+
+- **B. Create the Callouts**
+
+  - _Introduction_:
+    - Title: `How to Reset a Password`
+    - Text: `This will guide you through requesting a password reset within the Cloud Dimensions portal.`
+  - Callout 1:
+    - Target: **Password Reset** card
+    - Placement: `Above`
+    - Text: `Click Password reset`
+    - Trigger: `Click`
+  - Click the Password Reset card to continue to form.
+  - Callout 2:
+    - Target: `What application password do you need reset?` field
+    - Placement: `Above`
+    - Text: `Select the application which needs the password reset.`
+    - Trigger: `Next button`
+  - Callout 3:
+    - Target: `How would you like to be contacted?` field
+    - Placement: `Above`
+    - Text: `Select how you would like to be contacted.`
+    - Trigger: `Next button`
+  - Callout 4:
+    - Target: _Submit_ button
+    - Placement: `Below`
+    - Text: `Click to submit the request.`
+    - Trigger: `Click`
+  - Submit sample form data.
+  - _Conclusion_:
+    - Text: `You did it! Your Password reset request has been submitted.`
+
+- **C. Test the Tour**
+
+  - In Guided Tour Designer, click _Preview_.
+  - Step through:
+    - Begin Tour → Click Password Reset
+    - Fill fields → Select SMS → Submit → Complete
+
+- **D. Publish the Tour**
+
+  - Navigate to `/cdsp` in a new tab, verify “You have no tours”.
+  - Return to Guided Tour Designer and click _Publish_.
+  - Confirm.
+
+- **E. Execute the Tour**
+  - Refresh `/cdsp`.
+  - Red dot appears next to _Tours_ in header.
+  - Select _Tours > How to Reset a Password_ to start the tour.
+
+---
+
+### Lab 7.2.1 - Clone the Landing Page
+
+🎯 **Goal**: Clone and customize the baseline login page for the Cloud Dimensions portal.
+
+- **A. Upload the Background Image**
+
+  - Navigate to **System UI > Images**.
+  - Select _New_.
+  - Set `Category`: `Service Portal`
+  - Set `Name`: `sp-landing-cd.svg`
+  - Upload file: `sp-landing-cd.svg` from LabResources.zip
+  - Select _Update_.
+
+- **B. Clone the Baseline Landing Page**
+
+  - Navigate to **/sp_config** > _Page Editor_.
+  - Load the `landing` page.
+  - Select the `landing` node.
+  - Click _Clone Page_.
+  - Type `copy` in the page list, select `copy_of_landing_1`.
+  - Select the `copy_of_landing_1` node.
+  - Set `Title`: `Cloud Dimensions Login Page`
+  - Set `ID`: `landing_cd`
+  - In _Page Specific CSS_:
+    - Replace background image with `sp-landing-cd.svg`
+    - Set `background-color`: `#7795B2`
+    - In `section.page main.body:before`, set `background-color`: `#7795B2`
+    - After last block, add:
+
+```css
+h3 {
+  color: Black;
+}
+```
+
+- Save.
+- Navigate to **Service Portal > Portals**.
+- Open `Cloud Dimensions`.
+- Set `Login page`: `landing_cd`
+- Save.
+
+- **C. Preview the Page**
+
+  - Open a second browser or log out.
+  - Go to `<your_instance>.lab.service-now.com/cdsp`.
+
+- **D. Update the Design of the Page**
+
+  - In Page Designer, reload the page list.
+  - Load `landing_cd`.
+  - Select right-most column in container 1.
+  - Delete the column.
+  - Change remaining column `Size-md`: `12`.
+
+- **E. Update the Style of the Page**
+
+  - Edit the **HTML** widget instance.
+  - Click _Source Code_ icon.
+  - Update welcome message:
+    - Text: `Welcome to the Cloud Dimensions Service Portal`
+  - Remove `class="text-white"` from the `<h3>` tag.
+  - Save and Save again.
+
+- **F. Test Your Work**
+  - Refresh `/cdsp`.
+  - Confirm welcome message, styling, and layout updates.
+
+---
+
+### Lab 7.2.2 - Page Route Maps
+
+🎯 **Goal**: Configure routing so the Service Catalog link redirects to the proper landing page.
+
+- **A. Replace a Quick Link**
+
+  - Load `cd_index` in Page Designer.
+  - Edit **Quick Links** widget in container 2.
+  - Remove: `Request Standing Desk`
+  - Add: `Service Catalog`
+  - Save.
+
+- **B. Create a Page Route Map**
+
+  - Refresh `/cdsp`, click `Service Catalog` link.
+  - Confirm page loaded is `sc_home`.
+  - Navigate to **Service Portal > Page Route Maps**.
+  - Open `Catalog Landing`.
+  - Select _lock icon_ beside **Service Portal(s)** to enable editing.
+  - Add: `Cloud Dimensions`
+  - Select _unlock icon_ to disable editing.
+  - Ensure `Active` is checked.
+  - Select _Update_.
+
+- **C. Test Your Work**
+  - Return to `/cdsp`, click `Service Catalog`.
+  - Confirm display is `sc_landing` (even though URL is `?id=sc_home`).
+
+---
+
+### Lab 7.2.3 - Redirect Users to a Service Portal
+
+🎯 **Goal**: Redirect base URL visitors to the Cloud Dimensions login page.
+
+- **A. Review the SPEntryPage Script Include**
+
+  - Navigate to **System Definition > Script Includes**.
+  - Open `SPEntryPage`.
+  - Review `getDefaultPortal()` and `getLoginURL()` logic.
+
+- **B. Create a System Property**
+
+  - Go to `sys_properties.list` via Filter Navigator.
+  - Select _New_.
+  - Set `Name`: `glide.entry.page.script`
+  - Set `Type`: `string`
+  - Set `Value`: `new SPEntryPage().getLoginURL()`
+  - Select _Submit_.
+
+- **C. Test the Redirect**
+  - Log out or open a second browser.
+  - Navigate to base URL (omit `/cdsp`).
+  - Confirm redirect to `landing_cd`.
