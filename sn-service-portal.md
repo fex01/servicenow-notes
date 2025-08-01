@@ -1,4 +1,4 @@
-# Service Portal
+# Service Portal / Employee Center
 
 ## Resources
 
@@ -33,6 +33,8 @@
 ### 🧠 Community
 
 - [Employee Center Community Forum](https://www.servicenow.com/community/employee-center/ct-p/employee-center)
+  - [Employee Center’s Mega Menu Configurations](https://www.servicenow.com/community/employee-center-articles/employee-center-s-mega-menu-configurations/ta-p/2877634)
+  - [How do I associate my taxonomy with the employee center?](https://www.servicenow.com/community/employee-center-forum/how-do-i-associate-my-taxonomy-with-the-employee-center/m-p/236678)
 - [Employee Center Academy Sessions](https://www.servicenow.com/community/employee-center-articles/employee-center-academy-upcoming-recorded-sessions/ta-p/2320507)
 - [Employee Center YouTube Playlist](https://www.youtube.com/playlist?list=PLkGSnjw5y2U5SRs6n1KBRVNzRjJ1ztbjH)
 - [Quick Start Guide](https://www.servicenow.com/community/ai-intelligence-articles/ai-search-quick-start-guide/ta-p/2307562)
@@ -284,21 +286,28 @@
 - **Overview**
 
   - **Employee Center**: Modern Service Portal for multi-department service delivery.
+
     - Baseline: Free for all customers.
+    - Includes service catalog, knowledge base, AI search, chat (Agent, Virtual Agent), curated experiences (taxonomies), task management, and unified employee profiles.
+
   - **Employee Center Pro**: Extends Employee Center with employee communication & engagement.
     - Requires **HRSD Pro**, **HRSD Enterprise**, or separate license.
+    - Adds employee communications (news, campaigns, governance), dynamic topic microsites, enterprise search (SharePoint), integrations (App Launcher, Approval Hub), Manager Hub, org charts, feedback systems, and employee forums.
 
 - **Key Capabilities**
 
   - **Employee Center**
+
     - Report issues, request items/services.
-    - Find service answers, complete to-dos.
+    - Complete tasks, manage requests, and to-dos.
     - Unified experience across departments.
-    - Baseline portal for new instances.
+    - ML-driven personalized recommendations and favorites across channels.
+
   - **Employee Center Pro**
-    - Adds news, events, campaigns.
-    - ML-driven personalized content.
-    - Access to cross-enterprise tasks and content.
+    - Enhanced content experiences and targeted employee communications.
+    - Integration-powered features (App Launcher, Approval Hub).
+    - Manager-specific capabilities (Manager Hub).
+    - Dynamic content and microsite management.
 
 - **Recommended Practice**
 
@@ -324,27 +333,58 @@
     3. **Mapped Employee Content**: OOB content mapped into taxonomy.
   - **Docs**: [Unified Taxonomy for Employee Center](https://docs.servicenow.com/csh?version=latest&topicname=config-taxonomy)
 
+  - Step-by-Step Setup
+    - **Prepare the Taxonomy**:
+      1. Navigate to: **All > Content Taxonomy > Taxonomies > Employee**.
+      2. **Clone** the baseline taxonomy.
+      3. Open the cloned taxonomy and customize according to your organization's needs (add/remove topics, adjust hierarchy).
+    - **Associate Taxonomy with Employee Center**:
+      1. Navigate to: **All > Employee Center > Administration > Portal configuration**.
+      2. Ensure Application Scope is set to **Employee Center Core**.
+      3. Go to the related list **Taxonomy**, click **Edit**, and select your customized taxonomy.
+    - **Configure Mega Menu (Advanced Portal Navigation)**:
+      1. Navigate to: **All > Employee Center > Advanced Portal Navigation**.
+      2. To configure or fix Mega Menu visibility issues:
+         - Do **not** click on `Employee Center` in the `Portal` column.
+         - Instead, click on the value (`true`) in the `Active` column to activate/deactivate or configure the Advanced Portal Navigation settings.
+
 - **Home Page Highlights**
 
-  - Uses **Modern Portal Theme**.
-  - **Mega Menu** auto-displays if a taxonomy is linked.
-  - **Popular Topics Widget**: Shows trending topics.
-  - **Dynamic Topic Pages**: Separate pages for each topic.
-  - **Quick Links Widget**: Pin important content.
-  - **Employee Center Footer Widget**: Social links, legal, company info.
-  - **Employee Profile Page**: Displays user info; editable pronouns.
-  - **My Active Items Widget**: User’s open activities.
-  - **My Favorites Widget**: Quick access to saved content.
-  - **Recommended for You Widget**: ML-driven suggestions or popularity-based if ML is not licensed.
+  - Modern Portal Theme with dynamic Mega Menu.
+  - Widgets include Popular Topics, Quick Links, My Active Items, My Favorites, Recommended for You (ML/popularity-driven).
+  - Employee Profile widget (key user fields overview).
 
-- **Topic Pages**
+- **Dynamic Topic Pages**
 
-  - **Dynamic Topic Pages**: Auto-created from taxonomy tags.
-  - **Topic Header**: Supports styled banners.
-  - **Subtopics**: Navigation to child topics.
-  - **Unified Browse**: Combines requests/articles for a topic.
-  - Consistent across web & mobile.
-  - Admins can customize layouts.
+  - Auto-created based on taxonomy tags.
+  - Structured components include headers, unified content browsing, subtopic navigation, AI-powered search.
+  - Pro widgets: Videos, News, Employee Communications, Applications, Rich Content.
+
+- **Search Capabilities**
+
+  - Global AI Search (autocomplete, spellcheck, multilingual, machine learning relevancy).
+  - Pro capabilities: News and Microsite searches, SharePoint connector.
+  - Recommended topic facet filters to narrow search results.
+
+- **Employee Communications (Pro)**
+
+  - Targeted and scheduled content experiences.
+  - Content Library: manage, design, preview, and publish content.
+  - Formats: Portal pages, mobile content, notifications (email, Teams, SMS), to-dos, forums.
+  - Analytics via dashboards and PA Packs to measure content success.
+  - Persona-driven (Employees, Content Creators, Communications Leads).
+
+- **Task Management and Integrations**
+
+  - Widgets/pages: My Active Items, To-dos, Requests.
+  - Integration-powered features include SSO-based App Launcher and Approvals Hub.
+  - Manager Hub for team management, tasks overview, team insights, and resources.
+
+- **Integrated Feedback (Pro)**
+
+  - Feedback on features, topic pages, home page, service workflows.
+  - Options: scales (5-point, smiley, thumbs), comments.
+  - Feedback channels: in-page widgets, Outlook integration.
 
 - **References**
   - [Employee Center Community Forum](https://www.servicenow.com/community/employee-center/ct-p/employee-center)
