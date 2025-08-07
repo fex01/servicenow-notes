@@ -8,6 +8,23 @@
   - Ensure consistent service definitions and governance.
   - Drive continuous improvement using best practices and built-in ServiceNow capabilities.
 
+### Marketing Numbers
+
+- CMDB Fundamentals:
+  - Gartner estimates that downtime can cost enterprises up to `$300K an hour`
+    - can be much more for outages in the financial services industry
+  - CMDB can save an organization up to `40%` with respect to ongoing IT efforts
+- Health Matters: CMDBs with good health scores result in (CMDB Health Deep Dive):
+  - 27% faster Time to resolve high priority Incidents
+  - 46% fewer High priority Incidents overall
+  - 20% faster Time to fulfill requests
+  - 26% Fewer failed Changes
+  - 14% Lower age of vulnerabilities
+  - 12% Faster time to close Changes
+  - 28% Lower age of critical vulnerabilities
+  - 22% Fewer reopened Incidents
+  - 485% Increase in Incidents resolved by Problem
+
 ---
 
 ## 2. Resources
@@ -15,14 +32,18 @@
 ### 2.1 Learning and Documentation
 
 - **Courses**
-  - [Learning Path CMDB Fundamentals](https://nowlearning.servicenow.com/lxp/en/now-platform/configuration-management-database-cmdb-fundamentals?id=learning_path_prev&path_id=c120bb5bdbd0c8103e3aaca2ca9619bf)
-  - [MID Server Fundamentals](https://nowlearning.service-now.com/lxp?id=learning_course_prev&course_id=dcfdb5b5dbf5acd030c91fdc1396199a)
+  - [x] [Learning Path CMDB Fundamentals](https://learning.servicenow.com/lxp/en/it-operations-management/configuration-management-database-cmdb?id=learning_course_prev&course_id=c03ca22847ec66547faa0415f16d43f4)
+  - [x] [CMDB Health Deep Dive](https://learning.servicenow.com/lxp/en/it-operations-management/cmdb-health-deep-dive?id=learning_course_prev&course_id=5c01c5fd93f90690fb94b4886cba109d)
+  - [x] [MID Server Fundamentals](https://nowlearning.service-now.com/lxp?id=learning_course_prev&course_id=dcfdb5b5dbf5acd030c91fdc1396199a)
   - **CSDM: Getting Started with Services and Service Offerings**
     - [NowCreate: CSDM Workshop - Getting Started](https://nowlearning.servicenow.com/nowcreate?id=nc_asset&asset_id=dde64c62875255d0f2f443f7dabb354b)
     - [CSDM workshop](https://nowlearning.servicenow.com/nowcreate?id=nc_asset&asset_id=5c4d48bfdb998d100c912b691396198e)
     - [CMDB workshop](https://nowlearning.servicenow.com/nowcreate?id=nc_asset&asset_id=3054c3838795d9d8af9f213acebb35c5)
     - [CSDM Data model examples](https://nowlearning.servicenow.com/nowcreate?id=nc_asset&asset_id=c0ddb115db6d0d900c912b6913961987)
 - **Documentation & Guides**
+  - Help for customers:
+    - [Jumpstart Your CMDB](https://docs.servicenow.com/bundle/washingtondc-impact/page/product/impact/reference/jumpstart-cmdb.html)
+    - [TuneUp Your CMDB Accelerator](https://docs.servicenow.com/bundle/washingtondc-impact/page/product/impact/reference/tuneup-your-cmdb.html)
   - CMDB Best Practices
     - [CMDB Health](https://docs.servicenow.com/csh?topicname=c_CMDBHealth.html&version=latest)
     - [Tables and Classes](https://docs.servicenow.com/csh?topicname=r_TablesAndClasses.html)
@@ -127,9 +148,10 @@
   - Priority: _TSO_ > _Dynamic CI Group_ > _CI Class_ or individual CIs.
 - **Dynamic CI Groups**:
   - Create a CMDB Group (query-based) → Link to a Dynamic CI Group → Optionally attach to a TSO.
+    - or: Encoded Query and/or manual selection
 - **Scheduled Job**:
   - _CSDM Data Sync_ (if enabled) propagates group assignments from TSOs to associated CIs.
-- **Potential Overlaps**:
+- **Avoid Overlaps**:
 
   - If multiple TSOs or groups reference the same CI, they can conflict.
   - CSDM recommends one TSO per CI to avoid contradictory assignments.
@@ -147,7 +169,14 @@
   - End-users reference Business Services.
   - IT staff references Technical Services.
   - System-generated incidents link to discovered or monitored CIs.
-- **Further Reading**: See [Align Incident Management with CSDM](./sn-csdm-incident.md)
+- Recommendations
+  - Service Management meets operations - Cls provide incident managers precision
+  - Person resolving the incident needs the correct Cl - make field mandatory once state moves from In progress to Resolved
+  - Don't use a generic Cl, be specific
+  - Use reference qualifiers - category / sub-category (based on roles)
+  - Configure Principle classes - expose typical Cl classes, not all to limit scope
+  - Event management path - turn Events into an Incidents, identify impacted servicesIncident management advanced feature: related list of bus apps
+- **Further Reading**: More details in an ee [Align Incident Management with CSDM](./sn-csdm-incident.md)
 
 ---
 
@@ -169,6 +198,27 @@
 
 ## 6. Data Maintenance & Quality
 
+### Three Pillars
+
+1. Ingest
+   - Continuously bring in data, merge, update, delete
+   - Automate Physical CIs and Cloud resources / structure
+   - Merge separate sources into one trusted model
+   - Connect the discoverable to non-discoverable
+   - Ensure managed ownership
+2. Govern
+   - Governance team & roles
+   - Ensure health metrics improve
+   - Establish lifecycle processes
+   - Manage & communicate structure and definitions
+   - Support use and customization / extension needs
+3. Insight
+   - Establish analysis guidance
+   - Provide operational support for incident, change mgmt.
+   - Use in reporting and metrics
+   - Leverage for planning
+   - Support consuming products, roles, personas, processes
+
 ### 6.1 Tables, Classes, & Relationships
 
 - **Extension Model**: Child classes inherit from parent classes.
@@ -184,6 +234,8 @@
   - Ensure stable unique attributes to avoid duplicates (e.g., serial number).
   - Reconciliation rules define which source updates which fields.
   - [Multisource CMDB](https://www.servicenow.com/community/itom-forum/task-07-enable-multisource-cmdb-how-to-add-the-property/m-p/967768) can store full data history and revert incorrect updates.
+
+## CMDB Health
 
 ### 6.3 CMDB Health Dashboard
 
@@ -204,9 +256,19 @@ ServiceNow’s **CMDB Health Dashboard** calculates an overall health score base
 4. **Performance Considerations**
    - If you have a large dataset, reduce overhead by limiting Health checks to only the classes you care about, using **Health Inclusion Rules** and disabling unneeded audits, staleness checks, or orphan rules.
 
+- Overview over CMDB Health Rules
+  - Staleness Rules: `cmdb_health_staleness_rule`
+  - Orphan rule: `cmdb_health_orphan_rule`
+  - Health Inclusion Rules: `cmdb_health_config`
 - **Sources**
   - [CMDB Health (docs)](https://docs.servicenow.com/csh?topicname=c_CMDBHealth.html&version=latest)
   - [Manage Duplicate CIs (ServiceNow docs)](https://docs.servicenow.com)
+- additional topics:
+  - community
+    - [CMDB Query used on Dynamic CI Group returns more CIs than expected](https://www.servicenow.com/community/developer-articles/cmdb-query-used-on-dynamic-ci-group-returns-more-cis-than/ta-p/2597546)
+    - [what happens if a same CI is part of 2 different Dynamic CI Groups](https://www.servicenow.com/community/developer-forum/cmdb-dynamic-ci-group-data-sync/td-p/2833966)
+    - [Support Group vs Manage by Group](https://www.servicenow.com/community/cmdb-forum/support-group-vs-manage-by-group/m-p/2840779)
+    - [What exactly is Data Certification vs CI Attestation?](https://www.servicenow.com/community/cmdb-forum/what-exactly-is-data-certification-vs-ci-attestation/td-p/2695953/page/4)
 
 ### 6.4 CMDB Data Manager
 
@@ -263,6 +325,7 @@ ServiceNow’s **CMDB Health Dashboard** calculates an overall health score base
 ### 6.6 CMDB Query Builder
 
 - **Overview**: Build visual or logical queries across CI classes and relationships.
+- required role: `cmdb_query_builder`
 - **Common Use Cases**:
   - Validate orphan rule results, staleness checks, or discover specific topologies.
   - Generate CMDB Groups from saved queries.
@@ -274,9 +337,12 @@ ServiceNow’s **CMDB Health Dashboard** calculates an overall health score base
   - [Properties for CMDB Query Builder](https://docs.servicenow.com/csh?topicname=cmdb-querybldr-sysproprties.html)
   - [Tables and Classes docs](https://docs.servicenow.com/csh?topicname=r_TablesAndClasses.html)
 
-## 6.7 CMDB & CSDM Data Foundations Dashboards
+### 6.7 CMDB & CSDM Data Foundations Dashboards
 
 Beyond the standard Health Dashboard (Completeness, Compliance, Correctness), ServiceNow offers **Data Foundations** or **“Get Well” Dashboards** that use Performance Analytics (PA) to track a broader set of metrics:
+
+- Free plugins
+- OOB metrics (indicators) with links to Remediation playbooks
 
 1. **Example Metrics**
    - “Hardware CIs Missing Serial Number”
@@ -296,6 +362,12 @@ Beyond the standard Health Dashboard (Completeness, Compliance, Correctness), Se
 5. **Remediation**
    - You can still create tasks or workflows for these metrics, similar to the core Health Dashboard approach.
    - Performance Analytics allows you to chart trends over time, set improvement targets, and gauge data quality progress.
+
+#### Deep Dive: Identifying and Remediating Duplicate Locations
+
+- Problem: having duplicate locations does mean that location based queries will not find all CIs in a location
+- Playbook for unique locations: CMDB Data Foundations Dashboard > Data Management Practices > Unique Locations Indicator
+- If locations are provided by or to a third party system: keep in mind to fix them in the upstream system and make sure that fixes propagate to downstream systems
 
 ---
 
