@@ -664,3 +664,293 @@ This section highlights features not always covered in the classic CMDB document
   - Class-specific dynamic rules override parent class dynamic rules
   - If no class-specific rule, parent rule applies
   - Dynamic rules always take precedence over static rules for the same attribute
+
+## Labs
+
+### Lab: New CMDB Class & Identification Rule
+
+🎯 **Goal**: Create a custom `Mongoose Web Server` CMDB class, configure an identification rule, and validate correct insert, update, multi-instance, and multi-source behaviors using scripts without creating duplicates.
+
+- **A. Create New Class**
+
+  - In **CI Class Manager**, add a child class under `Web Server`:
+    - Display Name: `Mongoose Web Server`
+    - Table Name: `u_cmdb_ci_mongoose_web_server` _(prefix `u_cmdb_ci_` for custom tables)\_
+    - Icon: `Web Server`
+  - Configure Identification Rule:
+    - Name: `Mongoose Web Server rule`
+    - Applies to: `u_cmdb_ci_mongoose_web_server`
+    - Dependent: `True`
+    - Identifier Entries:
+      - Attributes: `Class`, `Running process command`
+      - Allow null attributes: `False`
+      - Allow fallback to parent’s rule: `False`
+    - Add dependent relationship to `Hardware`
+  - Verify:
+    - _System Definition > Tables_: `Mongoose Web Server` table exists
+    - _Configuration > Identification/Reconciliation > CI Identifiers_: Rule `Mongoose Web Server rule` exists
+
+- **B. Test Initial Insert & Duplicate Prevention**
+  - _System Definition > Scripts - Background_: Paste and run (see script below)
+  - Run script → Expect **Inserted**
+  - Run again → Expect **No change**
+  - Verify:
+    - _Applications_ module: One Mongoose Web Server
+    - _Windows Server_ module → Dependency View: One `Runs on::Runs` relationship to Mongoose Web Server
+
+```js
+var payload = {
+  items: [
+    {
+      className: "u_cmdb_ci_mongoose_web_server",
+      lookup: [],
+      values: {
+        name: "Mongoose@owa-sd-01",
+        version: "5.5",
+        running_process_command: "c:\\clouddimensions\\mongoose.exe",
+        sys_class_name: "u_cmdb_ci_mongoose_web_server",
+      },
+    },
+    {
+      className: "cmdb_ci_win_server",
+      lookup: [],
+      values: {
+        name: "OWA-SD-01",
+      },
+    },
+  ],
+  relations: [
+    {
+      type: "Runs on::Runs",
+      parent: 0,
+      child: 1,
+    },
+  ],
+};
+var jsonUtil = new JSON();
+var input = jsonUtil.encode(payload);
+var output = SNC.IdentificationEngineScriptableApi.createOrUpdateCI(
+  "ServiceNow",
+  input
+);
+gs.print(output);
+```
+
+- **C. Test Upgrade Without Duplicate**
+
+  - Modify script `"version": "5.5"` → `"version": "6.5"`
+  - Run script → Expect **Updated**
+  - Verify:
+    - _Applications_ module: One Mongoose Web Server, version `6.5`
+    - _Windows_ module: One `OWA-SD-01` with single relationship
+
+- **D. Test Second Instance on Same Host**
+
+  - Modify script `"running_process_command"` to `"d:\\clouddimensions\\mongoose.exe"`
+  - Run script → Expect **Inserted**
+  - Verify:
+    - _Applications_ module: Two Mongoose Web Servers
+    - _Windows_ module: `OWA-SD-01` with two Runs on::Runs relationships
+
+- **E. Test Multiple Discovery Sources**
+
+  - Modify script:
+    - add an value to the Windows Server `ram`: `"4096"`
+    - Change source: in `var output = SNC.IdentificationEngineScriptableApi.createOrUpdateCI()"ServiceNow", input);`, replace `ServiceNow` with `LANDesk`
+  - Run script → Expect **Updated**
+  - Verify:
+    - _Windows Servers_: Only one `OWA-SD-01`
+    - Open record → **Show XML**: `ram = 4096`, `discovery_source = LANDesk`
+
+- **F. Key Points**
+  - Identification rule uses `Class` + `Running process command` to prevent duplicates unless command differs
+  - Static identifiers (like `name` for hardware) merge cross-source data into same CI
+  - Scripts allow testing without Discovery setup
+
+### Lab: Multisource CMDB & Reconciliation Rules
+
+🎯 **Goal**: Enable Multisource CMDB, capture multi-source updates, configure reconciliation and data refresh rules, add a dynamic RAM rule, and validate each with minor script edits.
+
+- **A. Prerequisites**
+
+  - Verify plugin **ITOM Discovery License (com.snc.itom.vis.license)** is installed
+  - Set system property `glide.identification_engine.multisource_enabled = true`
+  - Confirm CMDB 360 views available in **CMDB Workspace**
+
+- **B. Base Script Template** (modify per step)
+  - Run in **System Definition > Scripts - Background**
+  - Change **Discovery source**, **RAM**, **Windows name**, or **process command** per step
+
+```js
+var payload = {
+  items: [
+    {
+      className: "u_cmdb_ci_mongoose_web_server",
+      lookup: [],
+      values: {
+        name: "Mongoose@owa-sd-01",
+        version: "6.5",
+        running_process_command: "d:\\clouddimensions\\mongoose.exe",
+        sys_class_name: "u_cmdb_ci_mongoose_web_server",
+      },
+    },
+    {
+      className: "cmdb_ci_win_server",
+      lookup: [],
+      values: {
+        name: "OWA-SD-01",
+        ram: "2048",
+      },
+    },
+  ],
+  relations: [{ type: "Runs on::Runs", parent: 0, child: 1 }],
+};
+var jsonUtil = new JSON();
+var input = jsonUtil.encode(payload);
+var output = SNC.IdentificationEngineScriptableApi.createOrUpdateCI(
+  "ServiceNow",
+  input
+);
+gs.print(output);
+```
+
+- **C. Verify Multisource CMDB Capture**
+
+  - Step 1: run base script as-is (RAM `2048`, source `ServiceNow`)
+  - Step 2: set source `LANDesk`, RAM `4096`
+  - Verify:
+    - `[cmdb_multisource_data]` shows **OWA-SD-01** entries for both sources
+    - From OWA-SD-01 record:
+      - _Related Links > CMDB 360 Data Preview > RAM_ shows both values
+      - Add Related List `CMDB 360 Data`, add RAM (column 36), verify it displays both values
+
+- **D. Configure Static Reconciliation**
+
+  - In CI Class Manager → `cmdb_ci_win_server` → **Reconciliation Rules**
+  - Static rule: ServiceNow > LANDesk
+  - **Test ServiceNow Wins**: set RAM `2048`, source `ServiceNow`; expect update from `4096` to `2048`  
+    Verify OWA-SD-01 shows RAM `2048` and Discovery Source = ServiceNow
+  - **Test LANDesk Blocked**: set RAM `4096`, source `LANDesk`; expect no change  
+    Verify OWA-SD-01 RAM still `2048` and `[cmdb_datasource_last_update]` shows last update by ServiceNow
+
+- **E. Configure Data Refresh Rule**
+
+  - In CI Class Manager → `cmdb_ci_win_server` → **Data Refresh Rule**
+  - Allow LANDesk to update if ServiceNow hasn’t updated in ≥ 7 days
+  - **Test**: target `SPLI-WIN-SERVER` (>7 days stale)  
+    Set name to `"SPLI-WIN-SERVER"`, RAM `4096`, source `LANDesk`  
+    Verify SPLI-WIN-SERVER RAM updated to `4096` and last updated by LANDesk in `cmdb_datasource_last_update`
+
+- **F. Configure Dynamic Reconciliation**
+  - In CI Class Manager → `cmdb_ci_win_server` → **Reconciliation Rule** → **Add** → **Dynamic Reconciliation Rule**
+    - Rule Type = Largest Value
+    - attribute = RAM
+  - **Test**: OWA-SD-01 has RAM `2048` (ServiceNow) & `4096` (LANDesk in history)  
+    Run with RAM `2048`, source `ServiceNow`  
+    Verify OWA-SD-01 RAM updates to `4096` (largest from Multisource CMDB), Discovery Source = ServiceNow
+
+### Lab: Configuring CMDB Health & Remediation
+
+🎯 **Goal**: Configure, schedule, and test CMDB Health Dashboard jobs; create groups, rules, and queries; and implement remediation workflows for CMDB health management.
+
+- **A. Activate Dashboard, Create Group, Schedule Jobs & Configure Recommended Fields**
+
+  - In CMDB Health Dashboard, activate and run:
+    - Completeness Score Calculation
+    - Compliance Score Calculation
+    - Correctness Score Calculation
+  - In _All > Configuration > CMDB Groups_, create a CMDB Group named _Unix and Windows Servers_ (type = Health)
+    - Use encoded queries to include:
+      - UNIX: AIX, HPUX, Solaris
+      - Windows Servers
+    - From the group record: **Show All CI → Load More Results** and verify ~146 matching servers.
+  - Set Completeness, Compliance, and Correctness Scorecard jobs to run twice daily at 7 AM and 7 PM starting today.
+    - Run: `Periodically`
+    - Repeat Intervall:
+      - Days: `0`
+      - Hours: `12`
+    - Starting: `2025-08-09 19:00:00`
+  - In CI Class Manager → `cmdb_ci_server` → Health > Completeness > Recommended Fields: add _Location_, _Owned by_, _Support group_.
+  - Run Completeness Scorecard job.
+  - ✅ Verify all jobs are active, 9 metrics complete in `[cmdb_health_metric_status]`, CMDB Workspace dashboard shows scores (~3.01K CIs), group metrics display, and Recommended metric is red with ~110/146 missing one or more fields.
+
+- **B. Configure Desired State Audit Rule for Windows Servers**
+
+  - In CI Class Manager:
+    - Certification Filter: _Windows Servers Filter_ (all Windows Servers).
+    - Certification Template: _Windows Servers Template_ with
+      - Filter: `Windows Servers Filter`
+      - Certification Attribute Conditions:
+        - Operating Systems | is one of | `Windows 2012 R2 Standard, Windows 2016 Standard, Windows 2019 Datacenter`
+    - Audit: _Windows Audit_ using above filter/template.
+      - Run Audit
+  - ✅ Verify Windows Servers with listed OS pass; others fail.
+
+- **C. Display Audit Results on Compliance Scorecard**
+
+  - Deactivate all base system audits except your Windows Server audit. (_All > Compliance > Desired State > Audits_)
+  - Run Compliance Score Calculation job.
+  - ✅ Verify group Compliance score reflects audit results (e.g., 54/123 fail = 56%).
+
+- **D. Create Orphan Rule for Email Servers**
+
+  - In CI Class Manager → `cmdb_ci_email_server`, create orphan rule: No _Runs on::Runs_ relationship to `cmdb_ci_server`.
+  - Run Correctness Scorecard job.
+  - ✅ Verify Correctness score shows orphan metric (~7/11 orphans).
+
+- **E. Create Staleness Rules**
+
+  - In CI Class Manager:
+    - Windows Servers = stale after 7 days.
+    - Unix Servers = stale after 14 days.
+  - Run Correctness Scorecard job.
+  - ✅ Verify staleness metrics show number of healthy (non-stale) CIs.
+
+- **F. Remediate Duplicate Windows Servers**
+
+  - In Duplicate CI Remediator, (_CMDB workspace > Maintenance > De-duplication Dashboard_ > View list of tasks) merge OWA-SD-01 duplicates:
+    - select duplication task for Windows Server > Remediate
+    - Keep oldest record ,select _Remediate Manually_
+    - Take _Cost center_, _Company_, _Assigned to_ from duplicate.
+    - Merge all relationships.
+    - Delete duplicate record.
+  - Run Correctness Scorecard job.
+  - ✅ Verify 122/122 CIs are healthy (no duplicates) and Windows Server list shows single OWA-SD-01 with expected attributes.
+
+- **G. Configure Reclassification System Properties**
+
+  - Set:
+    - `glide.class.downgrade.enabled` = false
+    - `glide.class.upgrade.enabled` = false
+    - `glide.class.switch.enabled` = false
+  - ✅ Verify all 3 properties are false.
+
+- **H. Build Simple Query in Query Builder**
+
+  - Name: _Windows 2012, 2016, 2019 Query_.
+  - Filter: Windows 2012 R2 Standard, Windows 2016 Standard, Windows 2019 Datacenter.
+  - Save, run, note record count, add count to Description, save again.
+    - you might have to allow popups to see the results
+  - ✅ Verify only matching servers are returned; compare with Compliance Scorecard audit results.
+
+- **I. Build Query with Non-CMDB Table**
+
+  - Name: _Critical Incidents with No Owner_.
+  - Include:
+    - CMDB Class Configuration Items with _Owned by_ empty.
+    - Incident (priority = 1 - Critical).
+  - Save, run, add count to Description, save again.
+  - ✅ Verify only unowned CIs linked to critical incidents are returned.
+
+- **J. Configure Orphan Remediation Workflow & Rule**
+  - Create/publish workflow: `Remediate Orphan WF`, table = `Orphan CI Remediation`
+    - On execution, set Short Description = `Workflow launched for task number <task number>`.
+  - Create CMDB Remediation Rule:
+    - Name: _Remediate Orphans_.
+    - Task type: Orphan CI Remediation.
+    - Execution: Manual.
+    - Workflow: Remediate Orphan WF.
+  - Enable creation of Orphan CI tasks in Health Preferences.
+  - Run Correctness Scorecard job to create orphan tasks.
+  - From Orphan CIs chart → open task for Email Server AUS01-EXCH → Remediate → select _Remediate Orphans_ rule → Next → Close.
+  - ✅ Verify Short Description updated with correct task number.
