@@ -223,8 +223,16 @@
   - DevOps Teams
   - Information Security
   - Financial Management Team
+- Positioning and Terminology
+  - ServiceNow Discovery is schedule-based; not a real-time solution
+    - Real-time requires [**Agent Client Collector** (ACC)](/sn-discovery-acc.md)
+  - Also referred to as:
+    - **Horizontal discovery**
+    - **Agentless discovery**
+    - **IP-based discovery**
+  - All collected data passes through the IRE to prevent duplicate CIs
 - Identification and Reconciliation Engine (IRE)
-  - **Identification** rules: New Cl, existing Cl, or is data incomplete?
+  - **Identification** rules: New CI, existing CI, or is data incomplete?
   - **Reconciliation** rules: Data is only updated if new values are from a more trusted source than existing data
   - **Relationship** rules: Are all desired relationships present?
 - phases
@@ -284,12 +292,16 @@
       - wide range of OOB patterns
       - additional patterns available in the store
       - ability to create custom patterns
-  - Discovery Admin Workspace
-    - Discover applications and avoid manually creating patterns
-    - Evaluate application suggestions based on machine learning or crowdsourced resources, and create configuration items with a single click
-    - Access one central location to monitor Discovery activities and complete Discovery tasks efficiently
-  - CMDB Health Dashboard: Configuration > CMDB Dashboard > CMDB View
-  - CI Class Manager: Configuration > CI Class Manager
+- CMDB Health Dashboard: Configuration > CMDB Dashboard > CMDB View
+- CI Class Manager: Configuration > CI Class Manager
+
+#### Discovery Admin Workspace
+
+- Central hub for Discovery schedule management and real-time status
+- Visualizations to support data-driven decisions on Discovery performance and coverage
+- Discover applications and avoid manually creating patterns
+- Evaluate application suggestions based on machine learning or crowdsourced resources, and create configuration items with a single click
+- Access one central location to monitor Discovery activities and complete Discovery tasks efficiently
 
 #### DF: Running Discovery
 
@@ -329,6 +341,14 @@
   - specific Discovery Schedule type to create / update CIs
   - Discovered Devices: how many CIs where created / updated
     - grouped by class
+- Discovery Range Best Practices
+  - Avoid full network scans at implementation; start with small, prescriptive IP ranges
+  - **Max recommended range**: `/16` (~65,000 IPs)
+  - Example **limited ranges**:
+    - `192.168.0.1 – 192.168.0.254`
+    - `10.11.128.193 – 10.11.128.254`
+  - Scanning full subnets includes network and broadcast addresses, which can cause redundant or irrelevant data
+  - Smaller initial ranges allow controlled data collection, easier troubleshooting, and improved data quality before scaling
 - specific Discovery Run
   - Discovery > Status
   - open specific run
@@ -1271,6 +1291,20 @@
   - [ ] ServiceNow Store & Google Cloud Discovery
   - [x] Kubernetes Discovery
 
+#### ## Discoverable vs Non-Discoverable Data
+
+- **Discoverable Data** examples:
+  - Hardware: CPU, memory, storage
+  - Software: installed OS, installed applications
+  - Network: IP addresses, MAC addresses, topology
+  - Cloud: AWS, Azure, Google Cloud resources
+- **Non-Discoverable Data** (must be populated manually or via automation):
+  - `Assigned to`
+  - `Support Group`
+  - `Change Group`
+  - `Managed By Group`
+- Non-discoverable data is critical for incident and change workflows
+
 #### POP: ServiceNow Discovery
 
 - **horizontal discovery**: bottom-up
@@ -1280,6 +1314,8 @@
 - **top-down discovery**: Service Mapping technique
   - find CIs that are part of services
 - 3rd-party data is often only delivering CI attributes, but are missing CI relations (inventory <> real CMDB)
+- On first discovery of a device, `discovery source` field is set to `ServiceNow`
+- CIs from other sources (e.g., Asset Management) will have `discovery source` updated to `ServiceNow` once discovered
 - phases
   - **Scanning** - Shazzam probe: detect open ports, identify applications based on standard ports
   - **Classification** - Classify probe: send specific probes based on Shazzam results - for example WMI for Windows machines
@@ -1388,6 +1424,8 @@
 
 ### Discovery Configuration Console
 
-Configure which CI Classes are discovered.
-
+- Controls which device, application, software file, and software CI classes are discovered
+- Disabling a CI class in the console disables its related probes/classifiers
+- Focus discovery only on **principal CI classes** the CMDB team wants to manage
+- Navigation: **Discovery Definition > Configuration Console**
 - [docs: Discovery Configuration Console](https://docs.servicenow.com/bundle/xanadu-it-operations-management/page/product/discovery/concept/c_DiscoveryConfigurationConsole.html)

@@ -7,6 +7,7 @@
 - [x] [Learning Path CMDB Fundamentals](https://learning.servicenow.com/lxp/en/it-operations-management/configuration-management-database-cmdb?id=learning_course_prev&course_id=c03ca22847ec66547faa0415f16d43f4)
 - [x] [CMDB Health Deep Dive](https://learning.servicenow.com/lxp/en/it-operations-management/cmdb-health-deep-dive?id=learning_course_prev&course_id=5c01c5fd93f90690fb94b4886cba109d)
 - [x] [MID Server Fundamentals](https://nowlearning.service-now.com/lxp?id=learning_course_prev&course_id=dcfdb5b5dbf5acd030c91fdc1396199a)
+- [ ] [Service Graph Connector Essentials](https://learning.servicenow.com/lxp/en/it-operations-management/service-graph-connector-essentials?id=learning_path_prev&path_id=2df391441bbe89109098c8ca234bcb57)
 
 ### Documentation
 
@@ -45,10 +46,14 @@
 - [CMDB CI Class Models](https://store.servicenow.com/sn_appstore_store.do#!/store/application/ae99d84b2320330006c0110d96bf65b3/1.57.0?referer=%2Fstore%2Fsearch%3Flistingtype%3Dallintegrations%25253Bancillary_app%25253Bcertified_apps%25253Bcontent%25253Bindustry_solution%25253Boem%25253Butility%25253Btemplate%25253Bgenerative_ai%25253Bsnow_solution%26q%3Dcmdb%2520ci%2520class%2520model&sl=sh): expand base installation CCI Classes
 - [CMDB Workspace](https://store.servicenow.com/sn_appstore_store.do#!/store/application/c8ab76825371201032b7ddeeff7b1280/)
   - free app, no license requirements
+- [Discovery and Service Mapping Patterns](https://store.servicenow.com/sn_appstore_store.do#!/store/application/06a71b1367e4130051c9027e2685ef1e/1.18.1?referer=%2Fstore%2Fsearch%3Flistingtype%3Dallintegrations%25253Bancillary_app%25253Bcertified_apps%25253Bcontent%25253Bindustry_solution%25253Boem%25253Butility%25253Btemplate%25253Bgenerative_ai%25253Bsnow_solution%26q%3DDiscovery%2520and%2520Service%2520Mapping%2520Patterns&sl=sh)
+  - License: Discovery, Service Mapping or ITOM Visibility required
 - [IntegrationHub ETL](https://store.servicenow.com/sn_appstore_store.do#!/store/application/d43fe173dba23300c121f3c61d961958/)
   - free app, no license requirements
 - [Service Graph Connectors](https://store.servicenow.com/sn_appstore_store.do#!/store/search?listingtype=allintegrations%253Bancillary_app%253Bcertified_apps%253Bcontent%253Bindustry_solution%253Boem%253Butility%253Btemplate%253Bgenerative_ai%253Bsnow_solution&q=service%20graph%20connectors)
   - mostly paid, Microsoft SCCM should be free
+- CMDB Integrations Dashboard: [Integration Commons for CMDB](https://store.servicenow.com/store/app/f809636e1be06a50a85b16db234bcbc9#summary)
+  - free app, no license requirements
 
 ---
 
@@ -230,7 +235,7 @@
 
 ### Three Pillars
 
-1. [Ingest](#data-ingestion--reconciliation)
+1. [Ingest](#data-ingestion)
    - Continuously bring in data, merge, update, delete
    - Automate Physical CIs and Cloud resources / structure
    - Merge separate sources into one trusted model
@@ -254,24 +259,48 @@
 - **Extension Model**: Child classes inherit from parent classes.
 - **Suggested Relationships**: Guides valid CI connections.
 
-### Data Ingestion & Reconciliation
+### Life Cycle Management
 
-- See [Ingest Pillar](#three-pillars) for goals
-- **Data Population Best Practices**:
-  - Scope only required data for key use cases or policies
-  - Define owners and relationships per CSDM guidelines
-  - Keep Asset–CI synchronization in mind if tracking financial lifecycles
-- **Identification & Reconciliation Engine (IRE)**:
-  - Use stable unique attributes (e.g., serial number) for duplicate prevention
-  - Apply reconciliation rules to control field update source priority
-  - Multisource CMDB stores history and allows reversion of incorrect updates
-- Primary ServiceNow Ingestion Methods:
-  - **ServiceNow Discovery** (Horizontal, Agentless): Auto-discovers devices/apps; maps dependencies; enrich with non-discoverable data (e.g., managed by, support group); requires ITOM Visibility license
-  - **Service Mapping** (Top-down, Tag, ML): Maps services to supporting components; auto-updates maps; define service owners; align with business apps; requires ITOM Visibility license
-  - **Agent Client Collector (ACC)**: Agent-based; real-time endpoint hardware/software inventory; software utilization data for SAM; requires license
-  - [**Service Graph Connectors**](#useful-plugins-and-store-apps): Prebuilt integrations for external systems (Azure, Intune, SCCM, AWS, Jamf); ensure credentials and data consistency; most require license (SCCM free)
-  - [**IntegrationHub ETL**](#useful-plugins-and-store-apps): Imports/transforms data from external sources; supports non-CMDB tables; automates updates; no license required; requires mapping knowledge
-  - **Import Sets & Transform Maps**: Legacy method; supports CSV/Excel/DB/API; requires [mapping scripts to route through IRE](https://docs.servicenow.com/csh?version=latest&topicname=identification-import-sets) to avoid duplicates
+- **Purpose**: Manage full CI life cycle in the CMDB to maintain accuracy, consistency, and relevance
+- **Stages**: Retire | Archive | Delete | Attest | Certify
+- **Key Practices**
+
+  - Match life cycle policy to CI type (e.g., short-lived containers vs. long-lived servers)
+  - Assign CI owners via **Managed by Group**
+  - Configure life cycle fields (stage, status)
+  - Automate policies with **Data Manager** to archive or purge as required
+  - Monitor and remediate via scheduled **Data Manager Tasks**
+
+- **Shared Fields Between CIs and Assets**
+
+  - Examples: `Asset tag`, `Department`, `Location`, `Support Group`, `Company`, `Serial Number`, `Model ID`, `Assigned to`
+  - Keep synchronized to prevent duplication and inconsistency
+
+- **Legacy Life Cycle Fields**
+
+  - **CI**: Operational Status | Install Status | Hardware Status | Substatus
+  - **Asset**: State | Substate
+  - Used in many orgs; automation keeps CI and asset values aligned
+
+- **CSDM Life Cycle Fields** (recommended for standardization)
+
+  - `Life Cycle Stage`
+  - `Life Cycle Stage Status`
+  - Align with CSDM best practices; map legacy fields via **Life Cycle Mapping [life_cycle_mapping]** table
+
+- **Field Synchronization**
+
+  - **Automatic Creation**: Adding an asset can create a CI and vice versa
+  - **Legacy Sync**: Asset State → CI Install Status (one-way), plus other mappings in **Asset CI Field Mappings**
+  - **CSDM Sync**:
+    - Enable **Life Cycle Sync** to perform one-time mapping from legacy to CSDM fields
+    - Post-sync, legacy and CSDM fields stay synchronized across CI, Asset, and Install Base Item (IBI)
+
+- **Life Cycle Sync Process**
+  - CI life cycle values → Asset life cycle values
+  - Asset life cycle values → Asset legacy values
+  - Asset legacy values → CI legacy values
+  - Asset life cycle values → IBI life cycle values
 
 ### CMDB Query Builder
 
@@ -303,6 +332,39 @@
 - Supports advanced filtering to refine search results
 - No paid license; included in base instance; accessible from CMDB Workspace → Home tab
 - Works best with understanding of data model, fields, and relationships, though NLQ reduces the skill required
+
+### CI Reclassification
+
+- **Purpose**: Correct CI records placed in the wrong CMDB class during identification
+- **Automatic** (default): CI class updated immediately; **Manual**: task created if automation disabled
+- **Types**
+  - **Upgrade**: Parent → child class (more attributes)
+  - **Downgrade**: Child → parent class (fewer attributes, data loss possible)
+  - **Switch**: Different branch in hierarchy (data loss possible)
+- **Base Properties** (default=`true`):
+  - `glide.class.upgrade.enabled`
+  - `glide.class.downgrade.enabled`
+  - `glide.class.switch.enabled`
+- **Granular Properties** (default=`false`):
+  - `glide.identification_engine.update_without_switch_enabled`
+  - `glide.identification_engine.update_without_downgrade_enabled`
+  - `glide.identification_engine.update_without_upgrade_enabled`
+  - When `true`: Update attributes only, skip class change
+- **Restriction Rules**
+  - Control downgrade and switch at specific class-to-class level
+  - Block targeted reclassification paths while allowing attribute updates
+  - Configured in: `cmdb_ire_reclassification_restriction.list`
+  - **Source/Target inheritance** flags:
+    - `true`: applies to extended classes
+    - `false`: applies only to specified classes
+  - **Example 1**:
+    - Block switch between `Linux Server` ↔ `Windows Server`
+    - Source/Target inheritance=`false` → subclasses unaffected
+    - All other switches allowed
+  - **Example 2**:
+    - Block downgrade from `Server` and all subclasses → `Computer`
+    - Source inheritance=`true` → includes all `Server` child classes
+    - All other downgrades allowed
 
 ## CMDB Health
 
@@ -401,7 +463,7 @@ ServiceNow’s **CMDB Health Dashboard** calculates an overall health score base
   - [CMDB Data Archiving (forum)](https://www.servicenow.com/community/cmdb-forum/cmdb-data-archiving/m-p/3077930/highlight/true#M13073)
   - [Non-CMDB Data Archiving Walkthrough](https://www.servicenow.com/community/now-platform-articles/data-archiving-walkthrough/ta-p/2316478)
 
-### Dependent CI Management
+#### Dependent CI Management
 
 - **Cascade Cleanup**: Automatically retire/delete child CIs when a parent is retired.
 - **Orphan Rules**: 1 rule/class to detect missing relationships.
@@ -664,6 +726,73 @@ This section highlights features not always covered in the classic CMDB document
   - Class-specific dynamic rules override parent class dynamic rules
   - If no class-specific rule, parent rule applies
   - Dynamic rules always take precedence over static rules for the same attribute
+
+## Data Ingestion
+
+- **Purpose**
+
+  - Populate CMDB with accurate, up-to-date CI and relationship data
+  - Supplement discoverable data with non-discoverable attributes (e.g., group, location) for complete business context
+  - Support IT operations, incident, and change management with reliable configuration data
+  - See also [Ingest Pillar](#three-pillars) for goals
+
+- **Licensing Considerations**
+
+  - Discovery, Service Mapping, ACC, and most Service Graph Connectors require ITOM Visibility
+  - IntegrationHub ETL and Import Sets are available without paid license (except where connectors require ITOM)
+  - Connector-specific licensing except SCCM (free)
+
+- **Key Best Practices**
+
+  - Scope only required data for defined use cases or policies
+  - Define service owners and CI relationships per CSDM guidelines
+  - Consider Asset–CI synchronization for financial lifecycle tracking
+  - Always route CMDB imports through IRE to avoid duplicates
+  - Use stable unique attributes (e.g., serial number) as identifiers in IRE
+  - Apply reconciliation rules to control field update priority by source
+  - Leverage [Multisource CMDB](#cmdb-360--multisource-cmdb) history for rollback of incorrect updates
+  - Supplement discovered data with non-discoverable attributes early
+  - Establish and enforce group assignment standards for consistent incident/change routing
+  - Schedule regular ingestion and certification cycles
+  - Leverage Store apps for connectors, ETL, and service building to accelerate time-to-value
+
+- **Core Ingestion Methods**
+  - **ServiceNow Discovery**
+    - Automated device/application discovery in network
+    - Maps dependencies between infrastructure and applications
+    - Requires ITOM Visibility license
+    - See: [Discovery](./sn-discovery.md)
+    - Manual process required for non-discoverable fields (groups)
+  - **Service Mapping**
+    - Top-down mapping of business services to infrastructure
+    - Dynamic updates when changes occur
+    - Requires ITOM Visibility license
+    - See: [Service Mapping](./sn-service-mapping.md)
+    - Recommended to assign service owners and CSDM relationships
+  - **Agent Client Collector (ACC)**
+    - Agent-based real-time endpoint configuration visibility
+    - Collects hardware, software, configuration, and usage data
+    - Requires license; agent installation per host
+    - See: [Agent Client Collector](./sn-discovery-acc.md)
+  - **Service Graph Connectors**
+    - Pre-built integrations with third-party systems (AWS, Azure, VMware, etc.)
+    - Leverages IntegrationHub ETL and IRE for normalized, deduplicated imports
+    - ITOM Visibility license required (except SCCM connector)
+    - Store listing: [Service Graph Connectors](https://store.servicenow.com/sn_appstore_store.do#!/store/search?listingtype=allintegrations%253Bancillary_app%253Bcertified_apps%253Bcontent%253Bindustry_solution%253Boem%253Butility%253Btemplate%253Bgenerative_ai%253Bsnow_solution&q=service%20graph%20connectors)
+    - course: [Service Graph Connector Essentials](https://learning.servicenow.com/lxp/en/it-operations-management/service-graph-connector-essentials?id=learning_path_prev&path_id=2df391441bbe89109098c8ca234bcb57)
+  - **IntegrationHub ETL (IH-ETL)**
+    - Store app for guided Extract-Transform-Load into CMDB and supported non-CMDB tables
+    - Uses Robust Transform Engine (RTE) and Identification & Reconciliation Engine (IRE) for data quality and deduplication
+    - Supports transformations, mapping, testing, rollback, scheduling
+    - Supports non-CMDB tables: `cmn_location`, `cmn_department`, `cmn_cost_center`, `cmn_building`, `sys_user`, `sys_user_group`
+    - Store listing: [IntegrationHub ETL](https://store.servicenow.com/sn_appstore_store.do#!/store/application/d43fe173dba23300c121f3c61d961958/)
+    - CMDB Integrations Dashboard: [Integration Commons for CMDB](https://store.servicenow.com/sn_appstore_store.do#!/store/application/f1a5a5b60f94001067ae409dc4767e08/2.15.0)
+  - **Import Sets and Transform Maps**
+    - Base system method for staging and mapping external data to target tables
+    - Supports CSV, Excel, database, API imports
+    - Can use Transform Scripts for complex logic and field setting
+    - Requires custom script to route CMDB imports through IRE to prevent duplicates
+    - IRE API example: [Transform Map Script](https://docs.servicenow.com/bundle/washingtondc-servicenow-platform/page/product/configuration-management/concept/identification-import-sets.html)
 
 ## Labs
 

@@ -8,7 +8,7 @@
 
 ### Courses
 
-- [ ]
+- [ ] [Agent Client Collector Essentials](https://learning.servicenow.com/lxp/en/it-operations-management/agent-client-collector-essentials?id=learning_course_prev&course_id=4737269387906214cfa68519dabb3510)
 
 ### Links
 
@@ -23,9 +23,7 @@
 
 - []
 
-## Topics
-
-### To Sort
+## To Sort
 
 - Empfehlung: als System laufen lassen
   - nur in der Paketierten Version einstellbar
@@ -62,7 +60,22 @@
   - sn_acc_vis_content.set_assigned_to : true
   - sn_acc_vis_content.column_name_for_user_mapping : u_entra_samaccountname (to be created)
 
-### DF: Agent Client Collector for Visibility (ACC-V)
+## Overview
+
+- Lightweight agent-based solution for discovery and real-time monitoring
+- Supports ITOM use cases:
+  - Visibility and Monitoring
+  - Software Asset Management
+  - Security Incident Response
+  - Service Management
+  - Discovery of intermittently connected workstations
+  - Discovery of devices in secure networks without remote access
+- Integrates collected data into CMDB
+- Multi-platform support:
+  - Windows, Linux, macOS
+  - AWS and Azure
+
+## DF: Agent Client Collector for Visibility (ACC-V)
 
 - installation
   - required license: ITOM Discovery v2, ITOM Visibility or any bundle that includes ITOM Visibility
