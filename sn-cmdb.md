@@ -30,6 +30,7 @@
   - CMDB Health References & Further Reading
     - [CMDB Remediation Rules (docs)](https://docs.servicenow.com/bundle/xanadu-servicenow-platform/page/product/configuration-management/task/t_CreateCMDBRemediationRule.html)
     - [CMDB Data Foundations Dashboards](https://docs.servicenow.com/csh?topicname=csdm-cmdb-foundations-dashboards.html)
+      - [List of all "Get Well Playbooks" (CSDM & CMDB)](https://www.servicenow.com/community/cmdb-articles/list-of-all-quot-get-well-playbooks-quot-csdm-amp-cmdb/ta-p/2301917)
     - [Attestation & Certification vs. CMDB Health (KB articles)](https://support.servicenow.com/kb?id=kb_article_view&sysparm_article=KB0829106)
     - [Dynamic Reconciliation](https://docs.servicenow.com/bundle/washingtondc-servicenow-platform/page/product/configuration-management/concept/multisource-cmdb.html)
 - **Archiving**
@@ -370,8 +371,16 @@
 
 ### CMDB Health Dashboard
 
-ServiceNow’s **CMDB Health Dashboard** calculates an overall health score based on three major scorecards: **Completeness**, **Compliance**, and **Correctness**. Each category has its own set of rules and metrics (e.g., required and recommended fields for completeness, audits for compliance, and checks for duplicates/orphans/staleness for correctness).
+ServiceNow’s **CMDB Health Dashboard** calculates an overall health score based on three major scorecards:
 
+- **Completeness**
+  - _required_ and _recommended_ fields
+- **Correctness**
+  - _staleness_
+  - _orphaned CIs_
+  - _duplicates_
+- **Compliance**
+  - _audits_
 - **Top 10 View**: High-level visualization of which CI classes most impact each scorecard; drill down for detailed CI information
 - **License**: No paid license; part of base instance; accessible from CMDB Workspace → Management tab
 
@@ -501,6 +510,62 @@ Beyond the standard Health Dashboard (Completeness, Compliance, Correctness), Se
 5. **Remediation**
    - You can still create tasks or workflows for these metrics, similar to the core Health Dashboard approach.
    - Performance Analytics allows you to chart trends over time, set improvement targets, and gauge data quality progress.
+
+- [List of all "Get Well Playbooks" (CSDM & CMDB)](https://www.servicenow.com/community/cmdb-articles/list-of-all-quot-get-well-playbooks-quot-csdm-amp-cmdb/ta-p/2301917)
+
+#### CMDB Data Foundations Dashboard - Tabs and Metrics
+
+- **Best Practices**
+  - [Hardware CIs with Serial Number](https://support.servicenow.com/kb?id=kb_article_view&sysparm_article=KB0829077)
+  - [Services with Owners](https://support.servicenow.com/kb?id=kb_article_view&sysparm_article=KB0869040)
+  - [Custom CMDB Attributes at the Right Level](https://support.servicenow.com/kb?id=kb_article_view&sysparm_article=KB0832206)
+  - [Create Asset Business Rule is Enabled](https://support.servicenow.com/kb?id=kb_article_view&sysparm_article=KB0829855)
+- **Customizations**
+  - [Base System Relationship Types Not Deleted or Recreated](https://support.servicenow.com/kb?id=kb_article_view&sysparm_article=KB0829857)
+  - [Use of Custom Attributes](https://support.servicenow.com/kb?id=kb_article_view&sysparm_article=KB0832208)
+  - [Base System CMDB Relationship Types Usage](https://support.servicenow.com/kb?id=kb_article_view&sysparm_article=KB0829858)
+  - [Base System Business Application Table Usage](https://support.servicenow.com/kb?id=kb_article_view&sysparm_article=KB0868431)
+  - [Custom CMDB Tables Using Standard Naming](https://support.servicenow.com/kb?id=kb_article_view&sysparm_article=KB1116975)
+- **Data Management Practices**
+  - [CIs Processed via IRE](https://support.servicenow.com/kb?id=kb_article_view&sysparm_article=KB0829078)
+  - [Installed Server CI Naming Reflecting Hostname](https://support.servicenow.com/kb?id=kb_article_view&sysparm_article=KB0864735)
+  - [Active CIs Updated in Last 90 days](https://support.servicenow.com/kb?id=kb_article_view&sysparm_article=KB0829106)
+  - [CIs with Relationships to Parent and Child](https://support.servicenow.com/kb?id=kb_article_view&sysparm_article=KB0829101)
+  - [Unique Locations](https://support.servicenow.com/kb?id=kb_article_view&sysparm_article=KB0832200)
+  - [Managed CIs with Model Entries](https://support.servicenow.com/kb?id=kb_article_view&sysparm_article=KB0832205)
+  - [Handled Duplicate CIs](https://support.servicenow.com/kb?id=kb_article_view&sysparm_article=KB0829103)
+  - [Servers with Location](https://support.servicenow.com/kb?id=kb_article_view&sysparm_article=KB0966472)
+  - [CIs with Names](https://support.servicenow.com/kb?id=kb_article_view&sysparm_article=KB0829852)
+- **ITSM Processes**
+  - [Incidents Referencing a CI](https://support.servicenow.com/kb?id=kb_article_view&sysparm_article=KB0864671)
+  - [Incidents Relating to both a Service and a CI](https://support.servicenow.com/kb?id=kb_article_view&sysparm_article=KB1116972)
+  - [Changes Relating to both a Service and a CI](https://support.servicenow.com/kb?id=kb_article_view&sysparm_article=KB1116973)
+  - [Changes Referencing a CI](https://support.servicenow.com/kb?id=kb_article_view&sysparm_article=KB0868259)
+
+#### CSDM Data Foundations Dashboard - Tabs and Metrics
+
+- **Foundation**
+  - [Named Product Models with Product Owners](https://support.servicenow.com/kb?id=kb_article_view&sysparm_article=KB0864257)
+  - [Business Units with Companies](https://support.servicenow.com/kb?id=kb_article_view&sysparm_article=KB0864259)
+  - [Locations with Parents](https://support.servicenow.com/kb?id=kb_article_view&sysparm_article=KB0864260)
+  - [Configuration Item Status Values](https://support.servicenow.com/kb?id=kb_article_view&sysparm_article=KB095294)
+- **Crawl**
+  - [Business Application with Application Service Relationship](https://support.servicenow.com/kb?id=kb_article_view&sysparm_article=KB0831506)
+  - [Application Services with Business Application Relationships](https://support.servicenow.com/kb?id=kb_article_view&sysparm_article=KB0831505)
+  - [Product Instance 2.0 Model Enabled](https://support.servicenow.com/kb?id=kb_article_view&sysparm_article=KB1703219)
+  - [Application Services with 'Consumes::Consumed By' Relationship to Business Application](https://support.servicenow.com/kb?id=kb_article_view&sysparm_article=KB0831503)
+- **Walk**
+  - [Technical Service Offerings with Support Group or Change Group](https://support.servicenow.com/kb?id=kb_article_view&sysparm_article=KB0952941)
+  - [Dynamic CI Groups with CMDB Group](https://support.servicenow.com/kb?id=kb_article_view&sysparm_article=KB0952944)
+  - [Technical Service Offering with Reference to Technical Service](https://support.servicenow.com/kb?id=kb_article_view&sysparm_article=KB0831509)
+- **Run**
+  - [Application Services with Business Service Offering Relationship](https://support.servicenow.com/kb?id=kb_article_view&sysparm_article=KB0831510)
+  - [Services Using Base System CMDB Tables](https://support.servicenow.com/kb?id=kb_article_view&sysparm_article=KB0831512)
+  - [Base System Service Tables](https://support.servicenow.com/kb?id=kb_article_view&sysparm_article=KB0831513)
+  - [Business Service Offerings with Application Service Relationship](https://support.servicenow.com/kb?id=kb_article_view&sysparm_article=KB0831511)
+- **Fly**
+  - [Information Objects with Business Application relationship](https://support.servicenow.com/kb?id=kb_article_view&sysparm_article=KB0831514)
+  - [Business Application with Information Object Relationship](https://support.servicenow.com/kb?id=kb_article_view&sysparm_article=KB0831515)
 
 #### Deep Dive: Identifying and Remediating Duplicate Locations
 
