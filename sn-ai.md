@@ -4,15 +4,25 @@
 
 ### 📘 Courses
 
-- [Introduction to Generative AI – NowLearning](https://learning.servicenow.com/lxp/en/pages/learning-course?id=learning_course&course_id=647909738794b110f40fc95d0ebb35c7&child_id=0e99df6c47f4b950db63fb25126d43f2&spa=1)
+- [x] [Introduction to Generative AI – NowLearning](https://learning.servicenow.com/lxp/en/pages/learning-course?id=learning_course&course_id=647909738794b110f40fc95d0ebb35c7&child_id=0e99df6c47f4b950db63fb25126d43f2&spa=1)
+- [ ] [AI Agents Essentials (2025 Q2 Store Release)](https://learning.servicenow.com/lxp/en/now-platform/ai-agents-essentials-2025-q1-store-release?id=learning_course_prev&course_id=64484a6d977926102192b37de053af79)
+- hands-on labs
+  - [ ] [AI Agents: Build an AI Agent](https://learning.servicenow.com/lxp?id=learning_course_prev&course_id=1ad1e9d997ad6a502192b37de053af5c)
+  - [ ] [AI Agents: AI Agent Administration](https://learning.servicenow.com/lxp?id=learning_course_prev&course_id=609a999147a5aad03c6f6013e16d43d2)
+  - [ ] [AI Agents: Configure AI Agents](https://learning.servicenow.com/lxp?id=learning_course_prev&course_id=f7aa5d1197a16a50eb773f11f053af87)
+  - [ ] [AI Agents: Build an Intelligent AI Agent to Automate Your Organization](https://learning.servicenow.com/lxp?id=learning_course_prev&course_id=8e97e115972dead07f7070871153af47)
+  - [ ] [AI Agents: Build AI Agents that Plan, Reason, and Automate Workflows](https://learning.servicenow.com/lxp?id=learning_course_prev&course_id=6cd1a9198765aad06a0bedbd0ebb359d)
 
-### 📄 ServiceNow Documentation
+### 📄 ServiceNow Documentation and Other Links
 
 - [Now Assist Landing Page](https://docs.servicenow.com/csh?version=latest&topicname=platform-now-assist-landing.html)
-
-### Other Links
-
 - [Now Assist Product Page](https://www.servicenow.com/now-platform/generative-ai.html)
+- [AI Agents Implementation Guides on Community](https://www.servicenow.com/community/now-assist-articles/ai-agents-implementation-guides-now-available-on-now-create/ta-p/3205458)
+- [NowCreate: AI Agents—Get Started](https://learning.servicenow.com/nowcreate?id=nc_asset&asset_id=30edebf093dc2e903cc0322d6cba1099&nc_source=copy_asset_link)
+- [NowCreate: AI Agents—Initiate](https://learning.servicenow.com/nowcreate?id=nc_asset&asset_id=28ff67bc93dc2e903cc0322d6cba10e7&nc_source=copy_asset_link)
+- [NowCreate: AI Agents—Plan](https://learning.servicenow.com/nowcreate?id=nc_asset&asset_id=a960773093106e903cc0322d6cba10fe&nc_source=copy_asset_link)
+- [NowCreate: AI Agents—Execute](https://learning.servicenow.com/nowcreate/en/pages/assets?asset_id=56ff1064478d2a1019dfe23c326d431e&id=nc_asset&nc_source=copy_asset_link)
+- [NowCreate: AI Agents—Deliver](https://learning.servicenow.com/nowcreate/en/pages/assets?asset_id=df8ee06c47016a1019dfe23c326d4399&id=nc_asset&nc_source=copy_asset_link)
 
 ## Fundamentals
 
@@ -138,3 +148,19 @@
 - Learn more:
   - [Now Assist Landing Page](https://docs.servicenow.com/csh?version=latest&topicname=platform-now-assist-landing.html)
   - [Now Assist Product Page](https://www.servicenow.com/now-platform/generative-ai.html)
+
+## AI Agents
+
+### Tools
+
+- Catalog Item
+- Conversational Topic
+- File Upload
+- Flow Action
+- Knowledge Graph
+- Now Assist Skill
+- Record Operation
+- Script
+- Search Retrieval
+- Subflow
+- Web Search
