@@ -1,312 +1,438 @@
-Scripting in ServiceNow - Course Notes
+next section: ## Client Scripts - remember to aim for condensed reference notes and not a recap of structure or content:
 
-Revisit your instructions on how to format course notes. Deeply analyze the following content to provide  concise and helpful reference notes
-
-Content:
-
-## Scripting Overview
-- Objectives
-Answer the five W's (and one H) of Scripting
-- What is Platform scripting?
-- Why should you not script?
-- When should you script?
-- Where do scripts execute?
-- Who can script?
-- How do you script in ServiceNow?
-Introduce Application Scope
-Review ServiceNow APIs
-Explore where to get Scripting help
-
-What, why, when, where, who, and how?
-What is platform scripting?
-When making changes to your instance, use the Condition Builder whenever possible to configure simple conditions and actions.
-However, use Platform Scripting for complex configurations and behaviors via JavaScript.
-ServiceNow provides the ability to customize an instance using JavaScript (based on Mozilla Rhino).
-JavaScript, popularized by Yahoo, is the most prevalent scripting language on the web. It is object-oriented, runs within a browser and does not need a license.
-Rhino is an open-source implementation of JavaScript written entirely in Java. It is typically embedded into Java applications to provide scripting to end users.
-The JavaScript engine in ServiceNow supports the ECMAScript5 and ECMAScript 2021 standards.
-
-Why should you not script?
-• ServiceNow is continually evolving; what you scripted in the past might not need to be scripted now.
-• Easier to debug and fix configuration changes after an upgrade.
-• Make sure a script is really needed
-- How business-critical is the requirement?
-- Will an Access Control List (ACL) rule perform what you need instead?
-- Can you achieve at least 80% of your requirements via configuration changes instead of scripting?
-• Consider ways of customizing without scripting
-Remain current with ongoing development of ServiceNow:
-• Check Product and Developer documentation of ServiceNow before developing anything new.
-• Stay current on what has changed from release to release.
-• Check the most recent version's release notes.
-• Attend release meetings.
-
-When should you script?
-When to Script
-Add new functionality
-Extend existing functionality
-Guide users through messaging
-Automate processes
-Interact with third-party applications
-Examples of when you should script:
-• Update related record (s) .
-- Cascade a comment from a master incident to its children.
-- Update the ownership of a Configuration Item (CI) after a Change Request.
-• Approval Strategies
-- One or all does not meet your business requirement.
-- Approvers need to be set dynamically.
-• Show/hide a form section.
-• Scan a list of Cis to dynamically determine risk based on criticality.
-• Query a database.
-• Customize widgets.
-• Change default behaviors.
-The list of examples shown above is representative of typical uses for scripting. There are, of course, no limits as to what one can do with JavaScript in ServiceNow. It all comes down to your requirements!
-Tip from the Field
-ServiceNow is always enhancing the platform. For example, the Embedded Help has been updated and a new feature called Guided Tours has been added. Research these options before you script a solution to guide users. If you have already scripted a solution, revisit your code and see if new baseline options can replace the script.
-
-Customization best practices
-ServiceNow is always trying to make the upgrade process easier. Adopting this process helps with future upgrades to your instance.
-Identify the record that needs updating
-Determine whether a no-code (meets > 80% reqs.) -> Yes -> Implement the no-code or low-code approach
-No
-Determine whether a low-code approach would work  -> Yes -> Implement the no-code or low-code approach
-No
-Modify the baseline record
-Review and revert the skipped record after an upgrade
-If you are interested in learning more about customization best practices, go to the Now Community and search for "customization best practices - a resource" and/or download this pdf (https://www.servicenow.com/content/dam/servicenow-assets/public/en-us/doc-type/success/quick-answer/customization-best-practices.pdf).
-
-Where do scripts execute?
-Client side (browser)
-• Auto-populate a field based on the value of another field
-• Show/hide form sections
-Server side
-• Modify a database record
-• Trigger a Flow
-On a MID server
-• Integrate to a third-party application
-Where a script executes matters:
-• Performance considerations
-• Access to objects and methods:
-- Client-side scripts have access to data on forms and in lists.
-- Server-side scripts have access to database records.
-
-Who can script?
-System Administrator: Manages all the features, applications and data in the platform
-System Definition Administrator: Manages a specific System Definition (for example, can only manage Business Rules)
-Application Administrator: Manages all the features and data of an application
-Baseline, the admin role has access to all platform features, functions, and data, regardless of security constraints. Grant this privilege carefully! If you have sensitive information, such as private HR records, ServiceNow recommends granting a custom admin role to an administrator who maintains that application.
-More granular administrative roles, such as business_rule_admin, client.
-_script_admin,
-script include_admin and ui _policy_admin, grant specific access rights without granting the broader privileges of the admin role. For example, an administrator can grant a user rights to change Ul Policies, but not the rights to edit Client Scripts.
-Important: Specific admin roles do not change the access level and behavior of the admin role, which grants general administrative privileges across the platform.
+Client Scripts
+Client Script Overview: What is a Client Script?
+• Client Scripts manage the behavior of forms, fields, and lists in real time
+- Make fields mandatory
+- Set one field in response to another
+- Modify choice list options
+- Hide/Show form sections
+- Display an alert
+- Hide fields
+- Prohibit list editing
+• Client Scripts execute client-side (web browser)
+- Browsers may present items in different ways
+"Well-designed Client Scripts can reduce the amount of time it takes users to complete a form."
+- Plato, c. 427-348 BC
+Although modern browsers largely interpret JavaScript the same way, you may still observe browser-dependent behaviors in client-side scripts.
+FAQ's
+?
+What exists Baseline?
+x Hide
+• More than 1,600 Client Scripts exist baseline.
+• Not all Client Scripts are Active baseline
+• Sample Client Scripts can be used as starting points.
+• Sock monkeys can be Production Assistants at radio stations
+?
+Where can this be found?
+* Hide
+Navigate to the System Definition > Client Scripts module to create or modify Client
+Scripts.
 
 
-How do you script in ServiceNow?
-The Syntax Editor is the built-in text editor of ServiceNow.
-• Allows you to write scripts in ECMAScript 2021 (ES12) mode.
-• Offers the following features as you script
-- Automatic Javascript syntax coloring, auto-indentation, line numbers and creation of closing braces and quotes
-- Context-sensitive help
-- Code editing functions
-- Editor macros for typing commonly used code
-- Syntax error checking
-- Minimap
-The Syntax Editor is enabled baseline for new instances. For upgraded instances, a System Administrator must activate the Syntax Editor [com.glide.syntax_editor] plugin.
+Client Script Overview: Client Script Execution
+Trigger specifies when to execute
+Script specifies what to execute
+All scripts have a trigger specitying when a script's logic should execute. The trigger configuration fields depend on the script type.
+• The Description field is for documenting the script. Include information like who wrote the script, what business requirement the script is for and any other pertinent information.
+• The Messages field is used for internationalizing output to the user. For example, if the script creates an alert that says Hello World, the string "Hello World" would appear in the Messages field on its own line. If an entry exists in the sys_ui_message table with the same key but a localized language, the localized language version is presented to the user even though the script uses the version from the Messages field.
+• The Script field is used to script what needs to happen when the conditions in the trigger are met.
 
-Locate Scripts: navigate directly to table configurations
-• Use commands in the Application Navigator's Filter Navigator field to navigate directly to table elements.
-• Append .config after the table name to display all the configuration changes made to that table (for example, incident.config).
 
-Application scope
-• Every application has a scope.
-• Determines which of its resources are available to other applications.
-• Once scope is assigned to an application, it cannot be changed.
-Baseline applications provided by ServiceNow (for example, Incident, Service Catalog, Service Portal, etc.), as well as any custom application created before application scope was implemented are also in the global scope. It is difficult to protect/isolate application data in the Global scope.
-There is no migration path to a custom or different scope.
-Tip from the Field
-Select the
-update sets using drop-down menus.
-icon on the Header bar so that you can switch between application scopes and
-• Scope protects an application and its artifacts from damage to or from other applications
-• Must be configured to grant other applications the ability to act on its records
-Explicit permission must be granted for applications to share their resources with other applications
-Artifacts are the application files in an application. Examples include, but are not limited to, Tables, Access Controls, Email Notifications, Data Policies, Client Scripts, Business Rules, Script Includes, etc.
-Application developers specify an application scope when they create a new application. They can also specify what parts of an application are accessible to other applications from:
-• The Custom application record.
-• Each application Table record.
-For example, suppose you create a Travel & Expense Management application. By default, the application can access and change its own tables and business logic, but other applications in the platform cannot unless you grant them explicit permission to do so.
-Application scope ensures:
-• The application does not interrupt core business services.
-• Other applications do not interfere with its normal functioning.
+Client Script Overview: Client Script Trigger
+Client Scripts execute when their trigger condition is met
+Additional info is required if the Client Script is triggered by a field value change...
+or if it applies to a specific view of the form
+While on the Client Scripts list, select New to create a new Client Script.
+• Name - name of the Client Script. Use a standard naming scheme to identify custom scripts.
+• Table - table the form or list is related to.
+• Ul Type - select whether the script executes for Desktop only, Mobile/Service Portal only or All environments.
+• Type - select when the script runs: onChange, onLoad, onsubmit, or onCellEdit.
+• Field name - used only if the script responds to a field value change (onChange or onCellEdit); name of the field to which the script applies.
+Application - identifies the scope of the Client Script.
+• Active - if selected the script executes in the runtime environment.
+• Inherited - execute the script for forms from any extending tables when selected.
+• Global - if Global is selected the script applies to all Views. If the Global field is not selected, you must specify the View.
+View - specifies the View to which the script applies. The View field is only visible when Global is not selected. A script can only act on the fields part of the selected form View. If the View field is blank the script applies to the Default view.
 
-Application scope: updating scripts in another scope
-Out-of-scope scripts are read-only.
-Built-in limitations prevent developers from updating artifacts while in a different scope. This protects the application from inadvertent modifications.
 
-Application scope: scope namespace identifier
-• The system automatically prefixes a namespace identifier to scoped application artifacts (including scripts).
-• Cannot be changed or removed to ensure they are always associated with the proper application.
-Syntax          Description                                           Cloud Dimensions Example
-                scoped application artifacts always begin with x_     x_
-Vendor Prefix   Unique ServiceNow generated prefix for each customer  cld
-Application ID  Set when the application is first created             travel
-Script name     Unique script name                                    ExpensesReqBy
-This example generates the namespace identifier:
-x_cld_travel_ExpensesReqBy
-The application scope prevents naming conflicts and allows the contextual development environment to determine what changes, if any, are permitted. Applications in the Global scope do not append a unique namespace identifier to the application name.
+Client Script Overview: Client Script Trigger - Order
+• Use the Order field when multiple Client Scripts for the same table have conflicting logic
+• Executes in order from lowest to highest
+• Does not appear on the Client Script form baseline
+- Configure the form to add the field
+Order is the sequence in which the Client Scripts are executed, from lowest to highest. By convention, Order numbers contain three digits. For example: 100, 200, 300, etc..
 
-JavaScript in ServiceNow
-JavaScript in ServiceNow: JavaScript APls
-Provide classes and methods that can be used in scripts to define the functionality of the platform
-Client-side Classes
-GlideAjax
-GlideForm
-GlideList
-GlideRecord
-GlideUser
-spModal
-Server-side Classes
-GlideAggregate
-GlideDateTime
-GlideElement
-GlideRecord
-Glide Query
-GlideSystem
-JSON
-Workflow
-Classes are grouped by those used for client-side scripts, REST APls, global server scripts, and scoped server scripts.
-More classes are available for use in scripts and new ones are constantly being developed. It is important to stay current on what has changed from release to release.
-• Visit the official Developer site of ServiceNow to see the list of available API classes and methods, definitions on what they do, instructions on how to use them, as well as sample scripts written by ServiceNow developers.
-• Visit the official Documentation site of ServiceNow to review API release notes.
 
-JavaScript in ServiceNow: API documentation
-The APls section of the developer site (developer.servicenow.com) is the place to go for official API documentation.
-Server Scoped: support for scoped applications. These APls may behave differently in the Global scope
-Server Global: support for legacy applications in the Global scope
-API Documentation is presented as Server Scoped or Server Global. Understand what scope you are using, because you cannot call a global Glide APl in a scoped application.
-Another thing you want to consider is the version of your instance. Make sure the documentation you are looking at is for the version of your instance.
-In the API documentation, there are links to REST, Server Scoped, Server Global, Now Experience Ul Framework, Client and Client Mobile APls.
-From the drop-down list, you can select one of the following APl Type options. By default, the link you clicked in the Apis menu is the selected AP Type.
-Client
-Client Mobile
-REST
-Server Scoped
-Server Global
 
-JavaScript in ServiceNow: JavaScript mode - scoped apps
-To support existing scripts and new scripts developed to the ECMAScript 2021 standard, the Javascript engine has three modes:
-• Compatibility Mode.
-• ES5 Standards Mode.
-• ECMAScript 2021 (ES12).
-ECMAScript 2021 (ES12) mode is an option that allows server-side scripts for scoped applications and the global scope to use the ECMAScript 2021 (ES12) standard. This mode does not preserve the legacy behaviors in the pre-Tokyo JavaScript engine. This mode supports a subset of ECMAScript syntax and features such as:
-• let declaration
-• Default function parameters
-• For-of loops
-• const declaration
-• Additional ECMAScript 2021 (Es12) syntax and features can be found at docs.servicenow.com.
-ES5 Standards Mode is the default mode when creating new scoped scripts. It supports ECMAScript5 syntax, extensions and features including:
-• The 'use strict' declaration.
-• Control over extensibility of objects.
-• Get and set properties on objects.
-• Control overwrite-ability, configurability, and innumerability of object properties.
-• New Array and Date methods.
-• Native JSON support.
-Compatibility mode is used for all scripts developed prior to the Helsinki release and all global scripts.
-Compatibility mode has some differences from the old Javascript engine.
-JSON support changes:
-• JSON.stringify() and JSON.parse() are now implemented using the ES5 Native JSON object.
-• The new JSON().encode () and JSON().decode () are still supported but should only be used when the legacy behavior is required.
-• The use of third-party JavaScript libraries is not supported in Compatibility mode.
+Client Script Overview: Client Script Type -
+onLoad()
+• Script runs when a form loads and before control is given to the user
+• Typically used to manipulate a form's appearance or content on the screen
+Users do not have the ability to modify form fields while an onLoad() Client Script executes.
+Select onLoad as Client Script Type
+the onLoad() function template Is automatically inserted into the Script (with no arguments passed to it)
+For example, a baseline onLoad() Client Script on the Change form marks Standard Change fields as read-only before control is given to the user. Usually, onLoad() Client Scripts perform client-side-manipulation of the current form or set default record values.
 
-JavaScript in ServiceNow: JavaScript mode - global scope
-Turned on: when creating server-side scripts you have the option to take advantage of ECMAscript
-2021 syntax and features or use the other modes.
-Turned on - var and const both work
-Turned off: using ECMAScript 2021 syntax or features causes errors.
-Turned off - var works, const doesn't
 
-Scripting resources
-Scripting resources: where to get help
-JavaScript Resources
-W3schools https://www.w3schools.com/js/default.asp
-codecademy https://www.codecademy.com/search?query=javascript
-Pluralsight https://www.pluralsight.com/browse?=&q=javascript
-mozilla https://developer.mozilla.org/en-US/JavaScript
-stackoverflow https://stackoverflow.com/questions/tagged/javascript
+Client Script Overview: Client Script Type -
+onSubmit()
+• Script runs when a form is saved, updated, or submitted
+• Typically used for field validation
+Users do not have the ability to modify form fields while an onSubmit () Client Script executes.
+Note: onLoad client scripts only run if the page is reloaded after a Save. If the user does a Submit or Update, they would be taken to the previous location in the instance, the current page would not reload, and the onLoad script (s) would not execute.
+The onSubmit () function template is automatically inserted into the Script (with no arguments passed to it)
+Tip from the Field: Typically, onSubmit() Client Scripts validate data on the form and ensure the submission makes sense. If the inputs the user submits do not make sense, an onSubmit() Client Script can cancel form submission by returning a value of false.
 
-Scripting overview
-Good Practices
-• Use a Condition Builder whenever possible to configure your instance.
-• Create a Syntax Editor Macro to quickly insert commonly used syntax.
-• Expand the Script Editor when editing large scripts.
-• Identify the Scope of your script to ensure it only affects the resources in the same scope.
-• Use the Now Community and ServiceNow websites.
-• Join at least one SNUG.
-Make good use of the Now Community; ServiceNow websites are more than just product documentation!
 
-Module recap: scripting overview
-Core Concept #1
-Scripts can create new or extend the existing functionality of ServiceNow
-Core Concept #2
-The answer is not always to create a new script
-Core Concept #3
-Scripts execute in different locations:
-Client-side - Server-side - On a MID server
-Core Concept #4
-The built-in Syntax Editor offers industry standard scripting capabilities
-Real-World Cases
-Why would you use these capabilities?
-When would you use these capabilities?
-How often would you use these capabilities?
-Other Core Concepts:
-• Debug with the Syntax Checker
-• Globally scoped scripts are shared resources
-• Privately scoped scripts only affect resources in the same scope
-• Know where to get scripting help
-Discuss: Why, when, and how often would you use the capabilities shown in this module.
+Client Script Overview: Client Script Type -
+onChange()
+• Script runs when a particular field value changes
+• Typically used to
+- Respond to field values of interest
+- Modify one field value in response to another
+An onChange() Client Script watches one field. If two fields need to be watched, a second Client Script must be configured.
+For example, one onChange() Client Script populates the 'Assignment group' field if the value in the Configuration item [cmdb_ci] field changes, while a second onChange(/ Client Script populates the Watch List if the value of the Priority field changes to 1.
+Select onChange as Client Script Type
+Select the field to watch for changes
+The onChange() function template is automatically inserted into the Script (with 5 arguments passed to it)
+An onChange() Client Script runs when a particular field value changes on the form.
+The onChange() Client Script must specify these parameters:
+• control - name of the object (field_name) whose value just changed. The object is identified in the Field name field on the Client Script form.
+• oldValue - value of the control field when the form loaded and prior to the change. For example, if the value of Assigned to changes from Matt to Miranda the value of the parameter oldValue is Matt. oldValue will always be Matt (the value when the form loaded) no matter how many times the Assigned to value changes after the original form load.
+• newValue - value of the control field after the change. For example, if the value of Assigned to changes from Matt to Miranda, the value of the parameter newValue is Miranda.
+• isLoading - boolean value indicating whether the change is occurring as part of a form load.
+Value is true if change is due to a form load. A form load means all the form's fields changed.
+• isTemplate - boolean value indicating whether the change occurred due to population of the field by a template. Value is true if change is due to population from a template.
+
+
+Client Script Overview: Client Script Type - onChange() Template 'if' Statement
+ALL field values change when a form loads
+if statement aborts script execution if field values change due to a form load or newValue has no value
+Modify the script to change the behavior if necessary. For example, you might also check to see if the field value change was due to a template load.
+function onchange (control, oldValue, newValue, isLoading, isTemplate) {
+if (isLoading || newValue === '' || isTemplate) {
+return;
+}
+//Type appropriate comment here, and begin script below
+}
+
+
+
+Client Script Overview: Client Script Type - onCellEdit()
+Applies to all records selected
+Script runs when a particular field on a list changes value
+If you create a client-side script for fields on a form, an onCellEdit () Client Script can be used to ensure data in those fields is similarly controlled in a list.
+Important: onCellEdit() scripts do not apply to List Widgets on homepages or dashboards.
+Select onCellEdit as Client Script Type
+Select the field to watch for changes
+onCellEdit () function template automatically inserted in the Script (with 5 arguments passed to it)
+Parameters automatically passed to an onCellEdit() Client Script:
+• sysIDs - sys id of the edited item (s).
+• table - the table name of the edited items).
+• oldValues - the old value of the edited cells).
+• newValue - the new value of the edited cells). Is the same for all edited items.
+• callback - a callback continues the execution of other related cell edit scripts.
+You must pass back either true or false in the callback function. If true is passed as a parameter, the other scripts are executed, or the change is committed if there are no more scripts. If false is passed as a parameter, any turther scripts are not executed, and the change is not committed.
+Example:
+function onCellEdit(sysIDs, table, oldvalues, newvalue, callback) {
+var saveAndClose = true;
+if(newValue == 6) {//Resolved
+alert ('You cannot change the state to 'Resolved' from a list");
+saveAndClose = false;
+}
+if (newValue == 7) {|/Closed
+alert("You cannot change the state to 'Closed' from a list.");
+saveAndClose = false;
+}
+callback (saveAndClose);
+}
+
+
+Catalog Client Script Overview
+Trigger: When to execUTe
+Script: What to execute
+Name: Unique name for the Catalog Client Script.
+• Applies to: Select the item type this Catalog Client Script applies to (A Catalog Item or A
+Variable Set).
+• Active: Select the check box to enable the Catalog Client Script. Clear the check box to disable the script.
+• Ul Type: Identify where the Catalog Client Script executes (Desktop, Mobile/Service Portal, or All).
+• Application: Identify the scope of the Catalog Client Script.
+• Type: Identify when the Catalog Client Script executes (onChange, onLoad, or onsubmit).
+• Catalog item or Variable set: Select a Catalog Item or Variable Set from the list.
+• Variable name: Identify which field to watch for changes when onChange is selected as the Type.
+• Applies on a Catalog Item view: Select the check box to apply the Catalog Client Script to Catalog Items displayed within the order screen on the Service Catalog. Available in the Requester view.
+• Applies on Requested Items: Select the check box to apply the Catalog Client Script on a Requested Item form, after the item is requested. Available in the Fulfiller view.
+• Applies on Catalog Tasks: Select the check box to apply the Catalog Client Script when a
+Catalog Task form for the item is being displayed. Available in the Fulfiller view.
+• Applies on the Target Record: Select the check box to support the Catalog Ul Policy on a record created for task-extended tables via Record Producers.
+• Script: Script what needs to happen when the conditions in the trigger are met.
+
+
+
+Client-side APIs
+Client-side APIs: What Data Can You See in a Client
+Script?
+• Use predefined client-side classes and methods from ServiceNow to
+Control how the platform looks and behaves in a web browser
+- Enhance the end user experience
+• This class reviews the most popular Client-side APIs
+- g_form (GlideForm)
+- g_user (GlideUser)
+g_scratchpad (used with a Display Business Rule, Module 4)
+ServiceNow provides client-side Javascript APIs:
+•g_form - object whose properties are methods used to manage form and its fields in the record.
+• g_user - object whose properties contain session information about the currently logged in user and their role (s).
+• g_scratchpad - object passed to a Client Script from a server-side script known as a Display Business Rule. The object's properties and values are determined by the server-side script.
+In addition to these predefined global variables, you also have any local variables you declare in a script. Visit developer.servicenow.com for the complete list of available client-side classes and methods.
+
+
+Client-side APIs: g_form Object
+The GlideForm API provides useful methods to
+- Customize forms
+- Manage form fields and their data
+Object properties are the fields from the currently loaded record.
+Object values are the field values when the record is initially loaded.
+
+
+Client-side APIs: g_form Methods
+• Access GlideForm methods using the g_form global object
+9_form.<method
+_name › (parameter information);‹
+Syntax
+• Examples
+9_form. setValue ('impact', 1);
+9_form.showFieldMsg|'state', 'Change is waiting approval' , 'info');
+May also pass 'warning' or 'error' as an argument
+• Commonly used g_form method examples
+- Draw attention to an area on the form: flash (), showFieldMsg()
+- Get field information: getValue()
+- Change a field value: setValue), clearValue ()
+- Change a choice list: addOption(), clearOptions)
+- Get form information: getSections), isNewRecord()
+GlideForm methods are only used client-side.
+Examples:
+g_form.addinfoMessage() - displays an informational message at the top of a form g_form.addOption() - adds an option to the end of a Choice list g_form.clearMessages() - removes messages previously added to the form g_form.clearOptions() - removes all options from a Choice list g_form.clearValue() - clears a field's value
+g_form.flash() - flashes a field's label to draw attention to it g_form.getSections() - returns the elements of a form's section as an array
+g_form.getValue () - retrieves a field's value
+g_form.isNewRecord() - returns true if a record has never been saved
+g_form.setValue() - sets a field's value
+g_form.showFieldMsg() - displays a message under a form field
 
 
 
 
-## Client Scripts
-[content will follow]
+Client-side APls: Referencing Field Names
+• 9_form object methods refer to fields by their field name, not their label
+• Easy way to locate a field name
+- Right-click a field's label
+- The field name appears on the Context menu
+For example, the first parameter required by the addDecoration() method is a field name.
+9_form. addDecoration('String field_name'‚'String icon'‚'String title');
+Provide the field name caller_id vs. the field label Caller.
+9_form. addDecoration('caller_id', 'icon-star' ,'preferred member');
+Tip from the Field: Show - 'field_name' option on the Context menu works great to display the name of a field. A pop-up with a few of the field's properties are displayed. Copy the field name for your script. Additional properties include Table, Type, Max Length, and Attributes.
+
+
+Client-side APls: g_form Method Syntax
+• Method use documented on the Developers portal
+• Two ways to search for methods
+1. Use the Search field to search for a specific string
+2. Manually locate the method of interest on the page
+To locate a g_form method manually:
+1. Select API > Client.
+2. Expand the GlideForm class.
+3. Locate and select the method of interest.
+• The method's syntax is documented in the middle-column of the page. Most methods have their parameters and return value documented.
+• If an example is included, it is located to the right of the method's documentation.
+
+
+Client-side APls: g_form.getValue ()
+• g_form.getValue() is a very commonly used g_form method
+• Retrieves a field value from the form (not the database)
+• Pay close attention to the tield's data type when using this method
+var ‹varName› = 9_form.getValue('<field_name›') ; Syntax
+var incPriority = g_form.getValue ('priority'); Example
+Since JavaScript is weakly typed, it is not always necessary to verify the data type when scripting. In the case of the g_form.getValue() method however, you must pay attention to the data type, or your script may have unexpected results.
+The g_form.getValue() method always returns a string despite the data type of the field. If returning a number is important, use the g_form.getlntValue() or g_form.getDecimalValue() methods instead.
+Important: This method cannot retrieve values from the database, it retrieves values from forms even if the field is not visible in the current view or to the logged in user.
+
+
+Client-side APls: g_form.getValue() - Text Field
+g_form.getValue('number')
+- Returns the field's content exactly as it appears on the form
+- The Number [number] field is a string (text) field
+g_form.getValue('number') returns INC8675309
+Right-click a field's label and select Show - '<field_name>' from the Context menu to confirm a field's
+data type.
+
+
+Client-side APIs: g_form.getValue() - Choice List
+g_form.getValue ('impact)
+- Returns the value of the selection, not the user-friendly label
+- The Impact impact] field is a choice list
+g_form.getValue('impact') returns 1
+To see a choice list's values, right-click the field's label and select Show Choice List.
+
+
+Client-side APls: g_form.getValue() - Reference
+Field
+g_form.getValue|'caller_id')
+- Returns the sys_id of the referenced record
+- The Caller [caller_id] field is a reference field
+g_form.getValue(caller_id') returns 5493fd1787f3b0107703a6483cbb35a0
+A sys_id is the database's unique key for a record.
+Tip from the Field: The examples shown have used the GlideModal() method in a Client Script to show the value of a single field. You can see several field values at once without a Client Script. If you have the 'admin' role, select Show XML on the form's Context menu. This displays the record's data in XML format.
+Right-click on the Caller label and select Show - 'caller_id' to see its data type (reference, in this example) and its reference (to sys_user).
 
 
 
-
-## Ul Policies 
-[content will follow]
-
-
-
-
-
-## Business Rules
-[content will follow]
-
-
-
-
-
-## GlideSystem
-[content will follow]
+Client-side APls: g_user Object
+• The GlideUser API provides useful methods to access information about the currently logged in
+User
+• Access GlideUser methods using the g_user global object
+For the form shown, the g_user object contains the following properties and values for Asaak Monkey:
+9_user = fuserName: "asaak. monkey",
+userID: "46d44a23a9fe19810012d100cca80666"
+firstName: "Asaak", lastName: "Monkey"
+}
+Script used for the alert shown:
+function onSubmit () {
+if (9_form. isNewRecord ()) {
+alert "Thank you for submitting this Incident, " +
+g_user. firstName);
+}
 
 
+Client-side APls: g_user Object Properties and
+Methods
+g_User Properties:
+• firstName
+• lastName
+userID
+• username
+g_user Methods:
+• getClientData()
+• getFulName ()
+• hasRole()
+• hasRoleExactly)
+• hasRoleFromList ()
+• hasRoles()
+Syntax: g_user.<property>
+Example:
+alert "Logged in user: " + g_user.userName);
+Syntax: g_user.<method_name>(parameter information);
+Example:
+if (g_user.hasRole ('itil'{
+alert"Logged in user is a Fulfiller");
+}
+• getClientData() - returns the session client value previously set with the putClientData() method
+• getFullName() - returns the logged in user's first name and last name separated by a space
+• hasRole() - returns true if the logged in user has the specified role or has the admin role
+• hasRoleExactly) - returns true only if the logged in user has the specified role
+• hasRoleFromList) - returns true if the logged in user has at least one role from the passed in list or has the admin role
+• hasRoles) - returns true if the logged in user has any role
+Important: Do not rely on g_user methods to apply security. Client-side security is easily defeated using developer tools built into browsers. Access Control or another server-side security strategy is recommended.
 
 
 
-## GlideRecord
-[content will follow]
+Client-side Debugging: Debugging Client Scripts -
+Desktop
+• Many times, your scripts do not work as expected
+• You can debug them using the following strategies:
+- ServiceNow built-in client-side debugging tools
+• Script debug messages
+• Response Time Indicator
+- JavaScript debugging tools
+• alert ()
+• try/catch
+- Browser tools (for example, JavaScript console, Web Console)
+- Third-party tools
+In some cases, more than one debugging strategy may need to be used. The built-in and Javascript debugging tools will be reviewed.
 
 
+Client-side Debugging: Script Debug Messages
+Include addinfoMessage() and addErrorMessage() methods in your script
+Pros:
+• Convenient strategy as messages appear on the form being tested
+• Write any debugging information you want since messages are not restricted to field
+values
+Cons:
+• Statements must be removed before moving scripts to other instances
+• Other users see the message(s)
+The showFieldMsg) method can also be used to display debugging output next to a specific field.
+All users are affected when the addinfoMessage), addErrorMessage), and show FieldMsg() methods are used as everyone sees the output on the form. In a multiple administrator/developer environment, this approach has the potential to be confusing. Consider including code in your debugging scripts to include your name in the output or to hide the output from other users.
+• Include a g_user property in the script to identify yourself in the message. Example:
+9_form. addInfoMessage (g_user firstName + ", the value of caller_id is: " +
+9_form.getValue('caller_id'));
+• Include a g_user property in combination with an IF statement to display the message only to you. Example:
+if (g_user.userName == 'admin'){
+9_form. addInfoMessage("The value of caller_id is: " +
+9_form.getValuel'caller_id'));
+}
+Tip from the Field: Create a Debug Syntax Editor Macro to quickly insert commonly used debugging code.
 
 
+Client-side Debugging: Response Time Indicator
+• Useful for locating the cause of slow page loads
+• Times are in milliseconds
+- Network
+- Server
+Browser
+Select the clock icon link to see a detailed breakdown of the browser processing times on forms
+Use this strategy to look for Client Script issues causing long load times. Administrators can disable the Response Time Indicator by setting the glide.ui.response_time property to false.
 
-## Script Includes
-[content will follow]
+
+Client-side Debugging: JavaScript Debugging
+Tool-Try/Catch
+Javascript debugging strategy used to trap runtime errors
+Try/Catch syntax:
+try{
+/code to execute goes here
+}
+catch (err){
+//code to deal with error here
+}
+err is a Javascript object with properties description, message, name, and number.
+You can throw your own error messages for the catch function using the JavaScript throw0 function.
+Try/catch only traps runtime errors. Using throw|) you can also catch user errors such as entering an invalid data value in a field.
 
 
+Reference Objects
+• Reference Object records exist on a table other than a form's currently loaded table
+• Reference Object data is not loaded into forms
+• Client-side scripts only have access to data on forms
+"Since Accounts Payable printer issues rarely occur, I always have to look up the correct Assignment group. It would be great if the
+'Assigned to' field would automatically populate when I select the CI."
+When writing client-side scripts, you have access to all form fields and their values. Reference Object fields exist on forms, but the Reference Object record itself is not loaded into the form.
 
 
+Reference Objects: Scripting with Reference
+Objects
+• Forms only store a Reference Object's sys_id
+• Reference Object fields cannot be directly referenced from a Client Script
+Retrieving Reference Object fields requires a trip to the server and back
+- Server trips take time
+- Make as few trips as possible!
+A reference field stores a sys_id for the record it references in the database, but the sys_id is not shown. The reference field shows the record's display value on the form.
 
-## Flow Designer Scripting
-[content will follow]
+
+Script Versions
+• Track changes to the record
+• Created automatically every time a script is saved, submitted or updated
+• Can compare versions to see differences
+• Can revert to a previous version of a script
+Located at the bottom of the form:
+Script versions are available for other script types and are not unique to Client Scripts.
+Update Sets do not include every version. If you migrate a script from one instance to another, only the most recent version of the script is included in an Update Set.
+
+
+Script Versions: Two Ways to Compare Script
+Versions
+Compare to the current version:
+1. Right-click the version record and select Compare to Current on the Context menu
+Compare any two versions: 
+1. Select checkboxes beside two versions
+2. Select Compare on the Actions on selected rows...menu
+The Versions Related List is visible baseline.
+In the event it is not, open the record's Context menu and select Configure > Form Layout. Add Versions to the Selected column and save the change.
