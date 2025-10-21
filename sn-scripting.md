@@ -4,6 +4,9 @@
 
 - [📜 ServiceNow Development Handbook by Tim Woodruff](./30-sn-dev-handbook.md)
 - [Customization Best Practices (PDF)](https://www.servicenow.com/content/dam/servicenow-assets/public/en-us/doc-type/success/quick-answer/customization-best-practices.pdf)
+- Developer API Documentation
+  - [Server-side APIs](https://developer.servicenow.com/dev.do#!/reference/api/latest/server_legacy/c_GlideRecordAPI)
+  - [Client-side APIs](https://developer.servicenow.com/dev.do#!/reference/api/latest/client/c_GlideFormAPI)
 
 ### 📘 Courses
 
@@ -166,6 +169,9 @@
   - **`g_user` quick refs**
     - Props: `firstName`, `lastName`, `userID`, `userName`
     - Methods: `getFullName()`, `hasRole()`, `hasRoleExactly()`, `hasRoleFromList()`, `hasRoles()`
+    - difference between `hasRole()` and `hasRoleExactly()`:
+      - `hasRole()` is also true if the user is admin
+      - `hasRoleExactly()` checks only for the specified role and would not be true for admin
     - Security note: do **not** enforce security in client; use ACLs/server-side
 
 - **Reference Objects**
@@ -192,6 +198,247 @@
     - Select two versions → _Compare_ via _Actions on selected rows…_
   - Revert from Version form: _Revert to this version_
   - Update Sets carry only the **latest** version
+
+## UI Policies
+
+- **Purpose**
+
+  - Client-side form control: `Mandatory`, `Visible`, `Read-only`
+  - Runs after [Client Scripts](#client-scripts)
+  - Prefer over Client Scripts for performance and maintainability
+
+- **Location**
+
+  - Create/modify: **System UI > UI Policies**
+  - Baseline: ~2,100+ policies available
+
+- **Core Fields (UI Policy form)**
+
+  - `Table` • `Application` • `Active`
+  - `Short description` (use as name) • `Description` (add via form layout)
+  - `Order` (lower runs first; add field via form layout if hidden)
+  - **When to apply**
+    - `Conditions` (Condition Builder; blank = always)
+    - `Global` or `View` (if not Global)
+    - `Reverse if false` (invert actions + run “if false” script)
+    - `On load` (on load and on change)
+    - `Inherit` (apply to extending tables)
+
+- **Actions (UI Policy Actions)**
+
+  - Per `Field name`: set `Mandatory`, `Visible`, `Read only`
+  - Target field must exist on the form/view (Next Experience)
+  - Policy can evaluate any record field even if not visible
+
+- **Scripting (optional)**
+
+  - Enable `Run scripts`
+  - `Run scripts in UI type`: Desktop | Mobile/Service Portal | All
+  - `Execute if true` / `Execute if false` → `onCondition()` runs automatically
+  - Same client globals as Client Scripts: `g_form`, `g_user`, `g_scratchpad`
+  - Use scripts for complex logic: section show/hide, advanced validation, dynamic data ops
+
+- **Conditions behavior**
+
+  - Re-evaluated only on **user** field changes
+  - System-driven changes do not recheck; use **Data Policies** for non-form updates
+
+- **Catalog UI Policies**
+
+  - Fields: `Applies to` (Catalog Item | Variable Set) • `Catalog item/Variable set` • `Short description` • `Application` • `Active` • `Order`
+  - When to apply:
+    - `Catalog Conditions` (variables)
+    - Scopes: `Applies on a Catalog Item view` | `Applies on Requested Items` | `Applies on Catalog Tasks` | `Applies on the Target Record`
+    - `On load` • `Reverse if false`
+  - Scripting: `Run scripts` • `Run scripts in UI Type` • `Execute if true/false`
+
+- **Debugging**
+
+  - **Debug UI Policies** (platform toggle) + browser console logs show actions and evaluation
+  - For user-facing messages use `g_form.addInfoMessage()` / `addErrorMessage()` (avoid in shared testing)
+
+- **When to choose**
+
+  - Form load/change effects: **UI Policy** or **Client Script**
+  - Save/submit validation: **Client Script** only
+  - Prior field value needed: **Client Script**
+  - List edits: **Client Script (onCellEdit)**
+  - Need minimal code and fast load: **UI Policy** first
+
+- **Good practices**
+  - Minimize number of policies; tune `Order`
+  - Prefer Condition Builder over scripts
+  - Disable `On load` if not needed
+  - Document with `Short description` + `Description`
+
+## Business Rules
+
+- **Purpose**
+
+  - Server-side logic on record access: display, insert, update, delete, query
+  - Change field values, enforce rules, pass data to client
+  - Runs for all access methods: forms, lists, web services
+
+- **Location**
+
+  - Create/modify: **System Definition > Business Rules**
+  - Baseline: 2,000+ rules
+
+- **Form essentials**
+
+  - `Name` • `Application` (scope) • `Table` • `Active` • `Advanced` (to expose scripting)
+  - Add `Description` via form layout for documentation
+
+- **When to run**
+
+  - Triggers: `Insert` • `Update` • `Delete` • `Query`
+  - Conditions: `Filter Conditions` (must be true) • `Role conditions`
+  - Advanced options:
+    - `When`: `before query` | `display` | `before` | `after` | `async`
+    - `Order`: lower runs first
+
+- **Execution timeline**
+
+  - User/System action → **Before Query** → DB Query → **Display** → Form submit → **Before** → DB Update → **After** → **Async**
+
+- **Types**
+
+  - **Before Query**: pre-filter results like ACL; silent removal of rows
+  - **Display**: after read, before render; populate `g_scratchpad` for [Client Scripts](#client-scripts)
+  - **Before**: validate/mutate before write (e.g., set `closed_by`)
+  - **After**: post-write side effects (e.g., cascade updates)
+  - **Async**: queued job after commit; no `previous`; prefer when user need not wait
+    - `Priority` visible when `async`; 3-digit convention (100, 300, …)
+    - Queue visibility: **System Scheduler > Scheduled Jobs** (names prefixed `ASYNC`)
+
+- **Actions (basic trigger tab)**: what the BR will do
+
+  - `Set field values` • `Add message` • `Abort action` (ends transaction; message still allowed)
+
+- **Advanced tab**
+
+  - `Condition` (JS; blank = true)
+  - `Script` (server JS)
+  - Note: **Both** When-to-run conditions and Advanced `Condition` must be true for `Script` to execute
+  - Use functions only for single-context needs; multi-context logic → Script Include
+
+- **Server globals & data access**
+
+  - `current`: latest in-transaction values
+  - `previous`: values at load; **not available in `async`**
+  - `g_scratchpad`: from **Display** rules for client use; read via [Client Scripts](#client-scripts)
+  - Dot-walking: `<object>.<reference>.<field>` e.g., `current.caller_id.department.name`
+  - Script Tree: expands fields and inserts dot-walk path automatically
+
+- **Debugging**
+
+  - Logs: `gs.info()`, `gs.warn()`, `gs.error()`, `gs.debug()`; prefer over legacy `gs.log()`
+    - View: **System Logs > System Log**
+  - Form messages: `gs.addInfoMessage()`, `gs.addErrorMessage()` (avoid in multi-admin environments)
+  - **Script Debugger** (role: `admin` or `script_debugger`)
+    - Step, breakpoints, call stack, variables, session-specific
+    - Limits: cannot step async jobs; respects read access; timeouts stop session
+    - Console Debugger: evaluate expressions; object printing limited; `gs.*` not supported
+  - **Script Tracer**
+    - Path: **System Diagnostics > Script Tracer**
+    - Filter by file type/table; see changed lines; open in Debugger
+
+- **Good practices**
+  - Prefer **Async** over **After** when immediate response not required
+  - Use **Display** rules + `g_scratchpad` to avoid client roundtrips
+  - Put simple checks in `Filter Conditions`; keep scripts from running unnecessarily
+  - Document via `Description`; structure `Order` in 3-digit steps
+  - Comment code; select appropriate debug method for context
+
+## GlideSystem
+
+- **Purpose**
+
+  - Server-side API (`gs.`) providing system-level data and utilities
+  - Access user, system, logging, and date/time information
+  - Scoped vs Global APIs: scoped apps must use **Scoped GlideSystem**
+
+- **Access**
+
+  - Global: available in any server-side script (`gs.methodName()`)
+  - Scoped: limited method set; cannot call Global APIs
+  - Docs: [developer.servicenow.com → Chevron -> Reference -> APIs → Server Scoped/Global → GlideSystem](https://developer.servicenow.com/dev.do#!/reference/api/latest/server_legacy/c_GlideSystemAPI?navFilter=glidesystem)
+
+- **Key Categories**
+
+  - **User methods**
+
+    - `getUser()`: returns current user object reference
+    - `getUserID()`: returns sys_id
+    - `getUserName()`: returns username (e.g., `admin`)
+    - `getUserDisplayName()`: returns display name (e.g., `System Administrator`)
+    - `hasRole(role)`: true if user has role
+    - `hasRoleInGroup(role, group)`: true if user has role in group
+    - Example:
+
+      ```js
+      if (gs.hasRole("itil")) {
+        gs.addInfoMessage(gs.getUserDisplayName());
+      }
+      ```
+
+  - **System methods**
+
+    - `getProperty(name)`: system property value
+    - `getPreference(name)`: user preference
+    - `getDisplayColumn(table)`: table display column
+    - `tableExists(table)`: true if table exists
+    - `nil(value)`: true if null/empty
+    - `eventQueue(event, record)`: send event to Event Manager
+    - `print(msg)`, `logError(msg)`, `getMessage(key)`: log utilities
+    - `addInfoMessage(msg)` / `addErrorMessage(msg)`: show messages in UI
+
+  - **Date & time methods**
+
+    - `now()`, `nowDateTime()`: current date/time
+    - `dateDiff(date1, date2, format)`: difference between dates
+    - `beginningOfLastWeek()`, `endOfLastWeek()`
+    - `beginningOfNextMonth()`, `endOfNextMonth()`
+    - `minutesAgo(n)`, `daysAgo(n)`, `monthsAgo(n)`, `yearsAgo(n)`
+    - Use **GlideDate** / **GlideDateTime** for manipulation and time zone-safe ops
+
+      ```js
+      var gdt = new GlideDateTime();
+      gs.info(gdt.getDisplayValue());
+      ```
+
+- **GlideDate / GlideDateTime**
+
+  - Manipulate date/time values safely (local + UTC)
+  - Create object via field reference:
+
+    ```js
+    var gdt = gr.my_datetime_field.getGlideObject();
+    ```
+
+  - Use `GlideDateTime` instead of raw JavaScript `Date` for platform consistency
+
+- **Scoped GlideSystem**
+
+  - Use in private app scopes; methods limited to:
+    - User: `getUser()`, `getUserName()`, etc.
+    - General: `getProperty()`, `nil()`, etc.
+    - Logging: `debug()`, `info()`, `warn()`, `error()`, `isDebugging()`
+  - Error shown if global-only methods are used:  
+    _“Function log() not allowed in scope x_app. Use gs.debug() or gs.info() instead.”_
+
+- **Scoped logging**
+
+  - `gs.debug()`, `gs.info()`, `gs.warn()`, `gs.error()`
+  - `gs.isDebugging()`: check if debugging is enabled
+  - Logs visible in **System Logs > System Log > All** and bottom of form with Session Debug on
+
+- **Good practices**
+  - Use GlideDate/GlideDateTime instead of native JS date
+  - Use correct API set for scope (Scoped or Global)
+  - Prefer `gs.info()` over legacy `gs.log()`
+  - Check developer site for current API changes and deprecations
+  - Validate date fields using GlideDateTime where possible
 
 ## Labs
 
@@ -679,3 +926,507 @@
   - Update `Impact` to `3 - Low`
   - Fix error in `else if` block if needed (check for syntax, casing, logic)
   - Retest until no errors remain
+
+### Lab 3.1.1 - Incident Resolved/Closed UI Policy
+
+🎯 **Goal**: Create a UI Policy that triggers on `Resolved` or `Closed` states to adjust field behaviors and provide user guidance
+
+- **A. Create a UI Policy**
+
+  - Navigate to **System UI > UI Policies**
+  - Select _New_
+  - Configure the UI Policy:
+    - `Table`: `Incident [incident]`
+    - `Active`: _checked_
+    - `Short Description`: `Lab 3.1.1 Incident Resolved or Closed`
+    - `Order`: `100` (If not visible, use _Configure > Form Layout_ to add)
+    - `Condition`: `State` **is one of** `Resolved`, `Closed` (use _Shift_ to select both)
+    - `Global`: _checked_
+    - `On Load`: _unchecked_
+    - `Reverse if false`: _checked_
+    - `Inherit`: _unchecked_
+  - Select _Save_ to remain on form
+
+- **Add UI Policy Action: Urgency (Read-only)**
+
+  - Scroll to **UI Policy Actions** and select _New_
+    - `Field name`: `Urgency`
+    - `Read Only`: _True_
+    - Leave `Mandatory` and `Visible` unchanged
+  - Select _Submit_
+  - If red error icon appears next to Urgency:
+    - Open the Urgency action
+    - Select link to conflicting UI Policy (e.g., _Make fields read-only on close_)
+    - Record its `Order` value (e.g., `100`)
+    - Return to `Lab 3.1.1 Incident Resolved or Closed`
+      - Switch to _Advanced view_ if needed
+      - Set `Order` to a value higher than the conflicting policy (e.g., `200`)
+      - Select _Save_
+    - Confirm the error icon disappears
+
+- **Add Additional UI Policy Actions**
+
+  - _Resolved by_: `Mandatory` = _True_
+  - _Impact_: `Read Only` = _True_
+
+- **Add Execute if True Script**
+
+  - On the _Script_ tab, check _Run scripts_
+  - Expand _Show Script_ and copy into `Execute if true`:
+
+    ```javascript
+    if (
+      g_form.getValue("close_code") == "" ||
+      g_form.getValue("close_notes") == "" ||
+      g_form.getValue("resolved_by") == ""
+    ) {
+      g_form.addInfoMessage(
+        "REMINDER: Populate the Resolution Information fields before saving an Incident in a Resolved or Closed State."
+      );
+    }
+    ```
+
+  - Select _Format Code_
+  - Select _Update_
+
+- **B. Test Your Work**
+
+  - Open any Incident record
+  - Set `State` = `Resolved` or `Closed`
+    - Confirm:
+      - `Impact` and `Urgency` fields are read-only
+      - `Resolved by` is mandatory
+      - Info message appears:  
+        _“REMINDER: Populate the Resolution Information fields before saving an Incident in a Resolved or Closed State.”_
+  - Set `State` = `In Progress`
+    - Info message should disappear
+
+- **Add Execute if False Script**
+
+  - Reopen `Lab 3.1.1 Incident Resolved or Closed` UI Policy
+  - On _Script_ tab, add to `Execute if false`:
+
+    ```javascript
+    function onCondition() {
+      g_form.clearMessages();
+    }
+    ```
+
+  - Select _Update_
+  - Test again:
+    - Set `State` = `Resolved` or `Closed`, confirm info message appears
+    - Change `State` back to `In Progress`, confirm message disappears
+
+- **Confirm Behavior**
+  - `Reverse if false` **must** be selected for `Execute if false` to run
+  - If `Execute if false` is empty, nothing will happen—even if `Reverse if false` is checked
+
+### Lab 4.1.1 - Debugging Business Rules
+
+🎯 **Goal**: Debug a Business Rule using multiple server-side debugging strategies, including Script Debugger, logs, Script Tracer, and the Debug Business Rule feature
+
+- **A. Preparation**
+
+  - Navigate to **System Definition > Business Rules**
+  - Open `Lab 4.1.1 Business Rule Debugging`
+  - Check `Active`
+  - In the Script, replace `<your_initials>` with your initials in the error message:
+
+    ```javascript
+    catch (err) {
+      gs.error("abc: a JavaScript runtime error occurred - " + err);
+    }
+    ```
+
+  - Select _Save_
+  - Review when the script triggers and what it does
+  - Select _Create Favorite_ for quick access
+
+- **B. Use Script Debugger – Breakpoints and Variables**
+
+  - Set breakpoints in the Script at:
+    - `var myNum = current.state;`
+    - `var priorityValue = current.priority;`
+    - `var createdValue = current.sys_created_on;`
+    - `SlaTargetNotification(priorityValue, createdValue);`
+  - Select _Open Script Debugger_ (Editor actions) and keep it open
+  - Trigger Business Rule:
+    - Open an active Incident
+    - Change `State` ≠ `Closed`
+    - Select _Save_
+  - In Script Debugger:
+    - Select _Start Debugging_
+    - Script pauses at first breakpoint (line highlighted red)
+    - Expand _Local variables_ and note if `myNum` is shown
+    - Select _Next Breakpoint_ and re-check `myNum` (value now visible)
+    - Repeat for `priorityValue` and `createdValue`
+    - On last breakpoint, allow script to complete
+
+- **C. Use Script Debugger – Current vs Previous Values**
+
+  - Keep Script Debugger open
+  - Open an Incident with a non-matching `Short description`
+  - Trigger the rule:
+    - Change `State` ≠ `Closed`, select _Save_
+  - Start Debugging
+  - Expand:
+    - `previous.short_description` → record this value
+    - `current.short_description` → record this value
+  - ✅ Conclusion: `current` contains updated values, `previous` contains original values
+
+- **D. Use Script Debugger – Call Stack**
+
+  - Navigate to **System Definition > Script Includes**
+  - Open `SlaTargetNotification`
+  - Set breakpoint on `gs.info` line
+  - Open Script Debugger
+  - Confirm breakpoints include Script Include line
+  - In Debugger, load `Lab 4.1.1 Business Rule`
+  - Set only these breakpoints:
+    - `var createdValue = ...`
+    - `try { ...`
+  - Trigger rule:
+    - Open active Incident, change `State`, select _Save_
+  - Start Debugging:
+    - Confirm current script in Code Pane Header
+    - Select _Next Breakpoint_ → debugger jumps into `SlaTargetNotification`
+    - Confirm script name in header is `Script Include`
+    - Select _Next Breakpoint_ → debugger returns to Business Rule
+    - Header confirms context shift
+
+- **E. Debug Using GlideSystem Logging**
+
+  - Open `Lab 4.1.1 Business Rule Debugging Business Rule`
+  - Remove all breakpoints
+  - Review script:
+
+    ```javascript
+    try {
+      thisFunctionDoesNotExist();
+    } catch (err) {
+      gs.error("abc: a JavaScript runtime error occurred - " + err);
+    }
+
+    thisFunctionAlsoDoesNotExist();
+    ```
+
+  - Trigger rule:
+    - Open Incident, change `State`, select _Update_
+  - Navigate to **System Logs > System Log > Script Log Statements**
+    - Search `Message` for `thisFunction`
+    - ✅ Only `thisFunctionDoesNotExist()` logs an error (in try/catch)
+    - ❌ `thisFunctionAlsoDoesNotExist()` does not log (not caught)
+
+- **F. Debug Using Script Tracer**
+
+  - Navigate to **System Diagnostics > Script Tracer**
+  - Select _Start Tracer_
+  - Trigger rule:
+    - Create Incident:
+      - `Caller`: Joe Employee
+      - `Category`: Hardware
+      - `Short Description`: Cassette player is broken
+    - Select _Save_
+  - In Script Tracer:
+    - Select second _Save - UI Action_
+    - Confirm Incident fields match inputs
+    - Select `Lab 4.1.1 Business Rule Debugging`
+    - Confirm `short_description` updated per rule
+    - Review both error entries
+    - ✅ Conclusion: Script Tracer logs **both** errors (even outside try/catch), unlike GlideSystem logs
+
+- **G. Debug Using Debug Business Rule Feature**
+
+  - Navigate to **System Diagnostics > Session Debug > Debug Business Rule**
+  - In another tab:
+    - Open a **Closed** Incident
+    - Modify any field and select _Save_
+  - In Session Log tab, search for: `4.1.1 Business Rule Debugging`
+    - Confirm rule was **skipped** due to condition `current.state != 7` not being met
+  - Navigate to **System Security > Debugging > Stop Debugging**
+  - Deactivate `Lab 4.1.1 Business Rule Debugging Business Rule`
+
+### Lab 4.1.2 - Current and Previous
+
+🎯 **Goal**: Create a Business Rule using `current` and `previous` objects to automatically manage RCA tracking fields on the Incident form
+
+- **A. Preparation**
+
+  - Open an Incident form
+  - Right-click header → _Configure > Form Builder_
+  - Select _+ Add a field_
+    - Field 1:
+      - `Column label`: `RCA included`
+      - `Column name`: `u_rca_included`
+      - `Type`: `True/False`
+    - Click _Add_
+  - Select _Add another one_
+    - Field 2:
+      - `Column label`: `RCA`
+      - `Column name`: `u_rca`
+      - `Type`: `String`
+    - Click _Add_, then _Done_
+  - In Form Builder layout:
+    - Drag `RCA included` below `Description`
+    - Drag `RCA` below `RCA included`
+  - Select _Save_
+  - Close Form Builder and reload Incident form
+
+- **B. Create the Business Rule**
+
+  - Navigate to **System Definition > Business Rules**
+  - Select _New_
+  - Configure:
+    - `Name`: `Lab 4.1.2 RCA Included`
+    - `Table`: `Incident [incident]`
+    - `Active`: _checked_
+    - `Advanced`: _checked_
+    - `When`: `before`
+    - `Order`: `125`
+    - `Insert`: _checked_
+    - `Update`: _checked_
+  - In _Script_ field, start with:
+    - Type `try` and press `<Tab>` to insert macro
+  - Format the code, and replace error handling line:
+
+    ```javascript
+    (function executeRule(current, previous /*null when async*/) {
+      try {
+        if (current.u_rca.nil() && current.u_rca_included) {
+          current.u_rca_included = false;
+        } else if (!current.u_rca.nil() && !current.u_rca_included) {
+          current.u_rca_included = true;
+        }
+      } catch (err) {
+        gs.error("A runtime error occurred: " + err);
+      }
+    })(current, previous);
+    ```
+
+  - Select _Submit_
+
+- **C. Test Your Work**
+  - Open any Incident record
+  - Step 1: Check `RCA included` and _Save_
+    - Field should become unchecked (if `RCA` is empty)
+  - Step 2: Enter any value in `RCA` and _Save_
+    - Field `RCA included` should become checked
+  - ✅ Confirm:
+    - RCA included updates automatically based on RCA content
+  - 🔒 `RCA included` field does **not** need to remain visible on the form
+    - Field can be used for reporting or querying only
+  - Deactivate the Business Rule:
+    - Reopen `Lab 4.1.2 RCA Included`
+    - Uncheck `Active`
+    - Select _Update_
+
+### Lab 4.1.3 - Display Business Rules and Dot-Walking
+
+🎯 **Goal**: Use the `g_scratchpad` object to pass server-side data (via Display Business Rule) to a Client Script using dot-walking and conditionally prompt the user when reopening an Incident
+
+- **A. Create a Display Business Rule**
+
+  - Navigate to **System Definition > Business Rules**
+  - Select _New_
+  - Configure:
+    - `Name`: `Lab 4.1.3 Display Business Rule`
+    - `Table`: `Incident [incident]`
+    - `Active`: _checked_
+    - `Advanced`: _checked_
+    - `When`: `display`
+    - `Order`: `150`
+  - Script:
+
+    ```javascript
+    (function executeRule(current, previous /*null when async*/) {
+      g_scratchpad.resolvedByFirstName = current.resolved_by.first_name;
+      g_scratchpad.resolvedByLastName = current.resolved_by.last_name;
+
+      if (current.reopen_count.nil()) {
+        g_scratchpad.reopenCount = "0";
+      } else {
+        g_scratchpad.reopenCount = current.reopen_count;
+      }
+    })(current, previous);
+    ```
+
+  - Select _Submit_
+
+- **B. Create a Client Script**
+
+  - Navigate to **System Definition > Client Scripts**
+  - Select _New_
+  - Configure:
+    - `Name`: `Lab 4.1.3 ResolvedBy Client Script`
+    - `Table`: `Incident [incident]`
+    - `UI Type`: `Desktop`
+    - `Type`: `onChange`
+    - `Field Name`: `State`
+    - `Active`: _checked_
+    - `Inherited`: _unchecked_
+    - `Global`: _checked_
+  - Script:
+
+    ```javascript
+    function onChange(control, oldValue, newValue, isLoading, isTemplate) {
+      if (isLoading || newValue === "") {
+        return;
+      }
+
+      // 6 = Resolved, 7 = Closed, 8 = Canceled
+      if (
+        (oldValue == "6" || oldValue == "7" || oldValue == "8") &&
+        newValue != "6" &&
+        newValue != "7" &&
+        newValue != "8"
+      ) {
+        var answer = confirm(
+          "This incident was resolved by " +
+            g_scratchpad.resolvedByFirstName +
+            " " +
+            g_scratchpad.resolvedByLastName +
+            " and has been reopened " +
+            g_scratchpad.reopenCount +
+            " times.\n\nAre you sure you want to reopen it?"
+        );
+
+        if (!answer) {
+          g_form.setValue("state", oldValue);
+        }
+      }
+    }
+    ```
+
+  - Select _Submit_
+
+- **C. Test Your Work**
+  - Open an Incident in `Resolved` state (or create and resolve one)
+  - Fill Resolution Information fields and _Save_
+  - Change `State` to `In Progress`
+    - ✅ Confirmation dialog should appear
+    - ✅ Names and reopen count from `g_scratchpad` should display
+  - Click _Cancel_ in confirmation
+    - ✅ State should revert to original (`Resolved`)
+  - Repeat change to `In Progress` and click _OK_
+    - _Save_ the record to remain on form
+  - Set State back to `Resolved`, repopulate Resolution fields, and _Save_
+  - Set State to `In Progress` again
+    - ✅ Reopen count should increment
+  - Deactivate both scripts:
+    - `Lab 4.1.3 Display Business Rule` → _Inactive_
+    - `Lab 4.1.3 ResolvedBy Client Script` → _Inactive_
+
+### Lab 5.1.1 - Set the CAB Date
+
+🎯 **Goal**: Automatically set the CAB date for new Change Requests to the next Wednesday using `GlideSystem` and `GlideDateTime`
+
+- **A. Create a Business Rule**
+
+  - Navigate to **System Definition > Business Rules**
+  - Select _New_
+  - Configure:
+    - `Name`: `Lab 5.1.1 Set CAB Date`
+    - `Table`: `Change Request [change_request]`
+    - `Active`: _checked_
+    - `Advanced`: _checked_
+    - `When`: `before`
+    - `Order`: `300`
+    - `Insert`: _checked_
+  - In the _Script_ tab:
+
+    - Type `try` and press `<Tab>` to insert macro (from Lab 1.3.1)
+    - Replace the script content with:
+
+      ```javascript
+      (function executeRule(current, previous /*null when async*/) {
+        try {
+          var gdt = new GlideDateTime(gs.beginningOfNextWeek());
+          gdt.addDaysLocalTime(2); // Adds 2 days = Wednesday
+          current.setValue("cab_date_time", gdt);
+        } catch (err) {
+          gs.error("A runtime error occurred: " + err);
+        }
+      })(current, previous);
+      ```
+
+    - Select _Format Code_
+
+  - Select _Submit_
+
+- **B. Test Your Work**
+  - Create a new Change Request:
+    - Select **Models > Normal: ITIL Mode 1 Normal Change**
+    - Set `Short description`: `Testing Lab 5.1.1`
+  - Save the record
+  - Navigate to the _Schedule_ tab
+    - ✅ Verify `CAB Date/Time` is set to the upcoming Wednesday
+  - If value is incorrect, debug and re-test logic
+  - Deactivate the Business Rule:
+    - Reopen `Lab 5.1.1 Set CAB Date`
+    - Uncheck `Active`
+    - Select _Update_
+
+### Lab 5.1.2 - Re-Open Problem Date Validation
+
+🎯 **Goal**: Enforce a policy that prevents Problem records from being reopened if they were closed more than 30 days ago using GlideDateTime logic in a UI Action
+
+- **A. Update a UI Action**
+
+  - Navigate to **Problem > All**
+  - Open any Problem record
+  - Right-click header → _Configure > UI Actions_
+  - Locate and open **UI Action: Re-Analyze**
+    - (Tip: Alternatively, right-click the _Re-Analyze_ link on the form and select _Edit UI Action_)
+  - Update the script with the following:
+
+    ```javascript
+    action.setRedirectURL(current);
+
+    try {
+      var today = new GlideDateTime();
+      var closed = new GlideDateTime(current.closed_at);
+
+      if (closed) {
+        var dateDiff = GlideDateTime.subtract(closed, today);
+        var dateDiffNum = dateDiff.getDayPart();
+
+        if (dateDiffNum > 30) {
+          gs.addErrorMessage(
+            "A problem cannot be reopened after it has been closed for more than 30 days. Please open a new Problem."
+          );
+        } else {
+          new ProblemStateUtils().onReAnalyze(current);
+        }
+      }
+    } catch (err) {
+      gs.error("A runtime error occurred: " + err);
+    }
+    ```
+
+  - Select _Update_
+
+- **B. Test Your Work**
+
+  - Navigate to **Problem > All**
+  - Open a Problem record with:
+    - `State`: `Closed`
+    - `Resolution code`: `Risk Accepted`
+    - `Closed date`: more than 30 days ago
+    - (Adjust list view if necessary to display these fields)
+  - Select the **Re-Analyze** UI Action
+    - ✅ Confirm error message appears:
+      _"A problem cannot be reopened after it has been closed for more than 30 days. Please open a new Problem."_
+    - ❌ If not, debug the date comparison logic and re-test
+
+- **C. Revert to the Original Version**
+  - Reopen the **UI Action: Re-Analyze**
+  - In the _Versions_ related list:
+    - Select both the _Current_ and a _Previous_ version
+    - From _Actions on selected rows..._, select **Compare**
+  - In the _Compare to Current_ view:
+    - Select the `Script` field
+    - Compare and determine if the selected version is the original
+  - If so:
+    - Click _Revert to Selected Version_
+    - Select _OK_ when prompted
+  - Confirm the script has been restored in the Re-Analyze UI Action
