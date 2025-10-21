@@ -440,6 +440,113 @@
   - Check developer site for current API changes and deprecations
   - Validate date fields using GlideDateTime where possible
 
+## GlideRecord
+
+- **Purpose**
+
+  - Server-side API for database operations without SQL
+  - Represents table data as an object of records and fields
+  - Executes server-side (avoid client-side use for performance)
+
+- **Core steps**
+
+  1. `new GlideRecord('table')` → create object
+  2. `addQuery(field, operator, value)` → define conditions
+  3. `query()` → execute query
+  4. `while (gr.next()) {}` → process results
+
+- **Example**
+
+  ```js
+  var gr = new GlideRecord("incident");
+  gr.addQuery("priority", 1);
+  gr.query();
+  while (gr.next()) {
+    gs.info(gr.number + ": " + gr.short_description);
+  }
+  ```
+
+- **Query methods**
+
+  - `addQuery(field, value)` / `addQuery(field, operator, value)` → add AND condition
+  - `addOrCondition(field, operator, value)` → add OR condition
+  - `addEncodedQuery(queryString)` → apply encoded list query
+  - `get(field, value)` → return one record; true/false if found
+  - `hasNext()` → check if next record exists (does not load)
+  - `_query()` / `_next()` → used when column names conflict
+  - Use **Condition Builder** or breadcrumbs → _Copy query_ for encoded queries
+  - Invalid fields ignored unless system property `glide.invalid_query.returns_no_rows=true`
+
+- **Operators**
+
+  - Numeric: `>`, `>=`, `<`, `<=`
+  - String: `STARTSWITH`, `ENDSWITH`, `CONTAINS`, `DOES NOT CONTAIN`
+  - Universal: `=`, `!=` (default operator is equality)
+
+- **Processing results**
+
+  - `while (gr.next()) {}` → iterate all
+  - `if (gr.next()) {}` → process first only
+  - `update()` → save current record (inserts if nonexistent)
+
+- **Record counting**
+
+  - `getRowCount()` → quick but heavy; avoid on large tables
+  - `GlideAggregate()` → efficient COUNT alternative for production
+
+- **Cross-table operations**
+
+  - Business Rule table ≠ GlideRecord table possible
+  - Example: Problem BR updating related Incident records
+
+- **GlideRecordSecure**
+
+  - Extends GlideRecord; enforces ACLs automatically
+  - `canRead()`, `canWrite()` checks built-in
+  - Non-readable fields return `null` instead of requiring manual ACL checks
+  - Best for secure data operations
+
+### GlideQuery
+
+modern alternative to GlideRecord
+
+- JavaScript-style, fail-fast API built atop GlideRecord
+- Principles: **Fail Fast**, **Be JavaScript**, **Be Expressive**
+- Detects invalid fields, choices, and types → throws `NiceError`
+- Returns consistent JS types (no stringly-typed behavior)
+- CRUD methods:
+  - `insert(keyValues, [fields])` → Optional (new record)
+  - `select(...fields)` → Stream (multiple)
+  - `selectOne(...fields)` → Optional (single)
+  - `update(changes, [fields])` → Optional (updated record)
+  - `deleteMultiple()` → deletes all matching
+- **Stream** (multiple results): methods like `map`, `forEach`, `reduce`, `some`
+- **Optional** (single result): `get`, `map`, `isEmpty`, `ifPresent`, `orElse`
+- Lazy evaluation → handles large result sets efficiently
+- Example:
+
+  ```js
+  new GlideQuery("incident")
+    .where("priority", "=", 1)
+    .select("number", "short_description")
+    .forEach((r) => gs.info(r.number));
+  ```
+
+- **Future improvements**
+
+  - Scoped permission checks
+  - Optional field/choice checking
+  - Enhanced join and field casting support
+  - Encoded query parsing
+
+- **Good practices**
+  - Use **GlideAggregate** instead of `getRowCount()` for large datasets
+  - Perform queries only **server-side**
+  - Log results before enabling insert/update/delete
+  - Prefer `GlideQuery` for modern, safer operations (`NiceError` helps debugging)
+  - Use Developer portal for latest API updates
+  - No undo for `update()`, `deleteRecord()`, `deleteMultiple()` — validate first
+
 ## Labs
 
 ### Lab 1.3.1 - Using the Syntax Editor
@@ -1430,3 +1537,302 @@
     - Click _Revert to Selected Version_
     - Select _OK_ when prompted
   - Confirm the script has been restored in the Re-Analyze UI Action
+
+### Lab 6.1.1 - Two GlideRecord Queries
+
+🎯 **Goal**: Use GlideRecord to query and update data across one or more tables
+
+- **A. Script 1: Find Active SAP Incidents**
+
+  - Create a Business Rule:
+    - `Name`: `Lab 6.1.1 SAP Incidents`
+    - `Table`: `Incident [incident]`
+    - `Active`: _checked_
+    - `Advanced`: _checked_
+    - `When`: `after`
+    - `Order`: `150`
+    - `Insert`: _checked_
+    - `Update`: _checked_
+  - Script:
+
+    ```javascript
+    (function executeRule(current, previous /*null when async*/) {
+      var sapIncs = new GlideRecord("incident");
+      sapIncs.addActiveQuery();
+      sapIncs.addQuery("short_description", "CONTAINS", "SAP");
+      sapIncs.query();
+
+      var myLog = "";
+      while (sapIncs.next()) {
+        myLog += sapIncs.number + ", ";
+      }
+      gs.addInfoMessage("These records are active SAP Incidents: " + myLog);
+    })(current, previous);
+    ```
+
+  - Select _Submit_
+
+- **B. Test Script 1**
+
+  - Go to `incident.list` and build the condition:  
+    `Active = true AND Short Description CONTAINS SAP`
+  - Record the number of returned results
+  - Create and save a new Incident with SAP in the Short Description
+  - Confirm SAP Incident numbers display in InfoMessage
+  - Deactivate the Business Rule
+
+- **C. Script 2: Update Executive User Records**
+
+  - Create a Business Rule:
+    - `Name`: `Lab 6.1.1 VIP Users`
+    - `Table`: `Incident [incident]`
+    - `Active`: _checked_
+    - `Advanced`: _checked_
+    - `When`: `after`
+    - `Order`: `100`
+    - `Insert`: _checked_
+    - `Update`: _checked_
+  - Script:
+
+    ```javascript
+    (function executeRule(current, previous /*null when async*/) {
+      var makeVIP = new GlideRecord("sys_user");
+      var q1 = makeVIP.addQuery("title", "CONTAINS", "VP");
+      q1.addOrCondition("title", "CONTAINS", "Vice");
+      q1.addOrCondition("title", "CONTAINS", "Chief");
+      makeVIP.query();
+
+      while (makeVIP.next()) {
+        makeVIP.vip = true;
+        gs.info(
+          "ADMIN: " +
+            makeVIP.name +
+            " with title: " +
+            makeVIP.title +
+            " is now a VIP."
+        );
+        makeVIP.update();
+      }
+    })(current, previous);
+    ```
+
+  - Save and Submit
+  - Run query on `sys_user` table using `title` CONTAINS (Vice, VP, Chief)
+  - Trigger Business Rule by submitting an Incident
+  - Check **System Logs > Script Log Statements**
+  - Deactivate the Business Rule
+
+---
+
+### Lab 6.1.2 - RCA Attached: Problem and Child Incidents
+
+🎯 **Goal**: On closing a Parent Incident, update related Problem and Child Incidents with RCA information
+
+- **A. Create a Business Rule**
+
+  - `Name`: `Lab 6.1.2 RCA Update PRB and Child INCs`
+  - `Table`: `Incident [incident]`
+  - `Active`: _checked_
+  - `Advanced`: _checked_
+  - `When`: `after`
+  - `Order`: `100`
+  - `Insert`: _checked_
+  - `Update`: _checked_
+  - `Condition` (Advanced tab):
+
+    ```javascript
+    current.state.changesTo(IncidentState.CLOSED);
+    ```
+
+  - Script:
+
+    ```javascript
+    (function executeRule(current, previous /*null when async*/) {
+      if (!current.problem_id.nil()) {
+        var prbRecord = new GlideRecord("problem");
+        prbRecord.get(current.problem_id);
+        prbRecord.work_notes +=
+          "\n\nRCA from " + current.number + ": " + current.u_rca;
+        prbRecord.update();
+      }
+
+      var childIncs = new GlideRecord("incident");
+      childIncs.addQuery("parent_incident", current.sys_id);
+      childIncs.query();
+
+      while (childIncs.next()) {
+        childIncs.u_rca += "RCA from " + current.number + ": " + current.u_rca;
+        childIncs.update();
+      }
+    })(current, previous);
+    ```
+
+  - Select _Submit_
+
+- **B. Test Your Work**
+  - Create:
+    - One Parent Incident (link to active Problem)
+    - Two Child Incidents (set Parent Incident)
+  - Set RCA and State = Closed on Parent Incident
+  - Set:
+    - Resolution code: `Solution provided`
+    - Resolution notes: Custom value
+  - Update Parent Incident
+  - Confirm:
+    - Problem work notes contain RCA reference
+    - Child Incident RCA fields are populated
+  - Deactivate the Business Rule
+
+---
+
+### Lab 6.1.3 - addEncodedQuery()
+
+🎯 **Goal**: Refactor a previous GlideRecord script to use `addEncodedQuery()`
+
+- **A. Preparation**
+
+  - Open `Lab 6.1.1 VIP Users` Business Rule
+  - Rename to `Lab 6.1.3 addEncodedQuery`
+  - Set `Active = true`
+  - Use Condition Builder in `sys_user`:
+    - Title CONTAINS `Vice`, `VP`, `Chief`
+    - OR `roles = itil`
+  - Copy the query using breadcrumb → _Copy query_
+  - Record result count:  
+    **type response here**
+
+- **B. Modify the Script**
+
+  - Replace the script with:
+
+    ```javascript
+    (function executeRule(current, previous /*null when async*/) {
+      var makeVIP = new GlideRecord("sys_user");
+      makeVIP.addEncodedQuery(
+        "titleLIKEVice^ORtitleLIKEVP^ORtitleLIKEChief^ORroles=itil"
+      );
+      makeVIP.query();
+
+      while (makeVIP.next()) {
+        makeVIP.vip = true;
+        gs.info(
+          makeVIP.name + " with title: " + makeVIP.title + " is now a VIP."
+        );
+        makeVIP.update();
+      }
+    })(current, previous);
+    ```
+
+  - Select _Update_
+
+- **C. Test Your Work**
+  - Modify any Incident to trigger Business Rule
+  - Go to **System Logs > Script Log Statements**
+  - Confirm expected records updated
+  - Deactivate the Business Rule
+
+---
+
+### Lab 6.2.1 - Explore GlideQuery
+
+🎯 **Goal**: Use GlideQuery to insert, retrieve, update, and delete user records
+
+- **A. Insert Users (Create Recall List)**
+
+  - Navigate to **System Definition > Fix Scripts**
+  - Open/create Fix Script: `Lab 6.2.1 Glide Query create`
+  - Ensure script contains:
+
+    ```javascript
+    new GlideQuery("sys_user").insert({
+      user_name: "walt.disney",
+      first_name: "Walt",
+      last_name: "Disney",
+      department: "221f3db5c6112284009f4becd3039cc9",
+      roles: "admin",
+      email: "walt.disney@example.com",
+      phone: "555-1212",
+      mobile_phone: "815-1945",
+    });
+
+    new GlideQuery("sys_user").insert({
+      user_name: "mickey.mouse",
+      first_name: "Mickey",
+      last_name: "Mouse",
+      department: "221f3db5c6112284009f4becd3039cc9",
+      roles: "itil",
+      email: "mickey.mouse@example.com",
+      phone: "555-2112",
+      mobile_phone: "606-1944",
+    });
+
+    new GlideQuery("sys_user").insert({
+      user_name: "minnie.mouse",
+      first_name: "Minnie",
+      last_name: "Mouse",
+      department: "221f3db5c6112284009f4becd3039cc9",
+      roles: "itil",
+      email: "minnie.mouse@example.com",
+      phone: "555-1234",
+      mobile_phone: "127-1941",
+    });
+    ```
+
+  - Save and _Run Fix Script_
+
+- **B. Retrieve Walt’s Phone Number**
+
+  - Create Fix Script: `Lab 6.2.1 GlideQuery retrieve`
+  - Script:
+
+    ```javascript
+    new GlideQuery("sys_user")
+      .where("active", true)
+      .where("user_name", "walt.disney")
+      .select("user_name", "sys_id", "mobile_phone")
+      .forEach(function (u) {
+        gs.info(
+          "User: " +
+            u.user_name +
+            ", sys_id: " +
+            u.sys_id +
+            ", Mobile: " +
+            u.mobile_phone
+        );
+      });
+    ```
+
+  - Save and Run
+  - Record Walt’s `sys_id`:  
+    **type response here**
+
+- **C. Update Walt’s Mobile Number**
+
+  - Create Fix Script: `Lab 6.2.1 GlideQuery update`
+  - Script (use Walt's actual `sys_id`):
+
+    ```javascript
+    new GlideQuery("sys_user")
+      .where("sys_id", "PASTE_WALT_SYS_ID_HERE")
+      .update({
+        mobile_phone: "800-Cof-fee1",
+      });
+    ```
+
+  - Save and Run
+  - Confirm update in **User Administration > Users**
+
+- **D. Delete Walt’s Record**
+
+  - Create Fix Script: `Lab 6.2.1 GlideQuery delete`
+  - Script:
+
+    ```javascript
+    new GlideQuery("sys_user")
+      .where("active", true)
+      .where("sys_id", "PASTE_WALT_SYS_ID_HERE")
+      .deleteMultiple();
+    ```
+
+  - Save and Run
+  - Confirm deletion by filtering `Created on Today` in **Users**
