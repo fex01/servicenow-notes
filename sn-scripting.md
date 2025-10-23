@@ -547,6 +547,116 @@ modern alternative to GlideRecord
   - Use Developer portal for latest API updates
   - No undo for `update()`, `deleteRecord()`, `deleteMultiple()` — validate first
 
+## Script Includes
+
+- **Purpose**
+
+  - Reusable server-side JavaScript, invoked on demand
+  - Can expose selected methods to clients via **GlideAjax**
+  - Use for shared logic across Business Rules, Flows, Actions, etc.
+
+- **Location**
+
+  - **System Definition > Script Includes**
+
+- **Configuration**
+
+  - `Name` (no spaces/special chars; class name must match) • `API name` (scoped) • `Application` (scope)
+  - `Accessible from`: **All application scopes** | **This application scope only**
+  - `Glide AJAX enabled` (client callable) • `Mobile callable` • `Sandbox enabled` • `Active`
+  - `Description` (document purpose, params, returns)
+
+- **Types**
+
+  - **Classless / On-demand**
+    - Single function; **server-side only**
+    - Not client-callable even if “Glide AJAX enabled” is checked
+  - **Class-based**
+
+    - Multiple methods, optional client-callable
+    - Pattern:
+
+      ```js
+      var MyUtils = Class.create();
+      MyUtils.prototype = {
+        initialize: function () {},
+        doThing: function (arg) {
+          /* logic */
+        },
+        type: "MyUtils",
+      };
+      ```
+
+  - **Extends existing class**
+
+    - Add methods without editing base:
+
+      ```js
+      var MyAjax = Class.create();
+      MyAjax.prototype = Object.extendsObject(AbstractAjaxProcessor, {
+        sayHi: function () {
+          return "Hi " + this.getParameter("sysparm_name");
+        },
+        type: "MyAjax",
+      });
+      ```
+
+- **Client ↔ Server (GlideAjax)** _(See: [Client Scripts](#client-scripts))_
+
+  - **Client steps**
+    - `new GlideAjax('MyAjax')`
+    - `addParam('sysparm_name','methodName')` + other `sysparm_*`
+    - `getXMLAnswer(callback)` or `getXML(callback)`
+  - **Notes**
+    - All parameters start with `sysparm_`
+    - Use `getXMLAnswer` for direct string; parse JSON when returning objects
+
+- **JSON exchange**
+
+  - **Server**: `return JSON.stringify(objOrArray);`
+  - **Client**: `var data = JSON.parse(response);`
+  - Use `:` delimiter only for simple pairs; prefer JSON for datasets
+
+- **Scope & Calling**
+
+  - Same scope: `new MyUtils()`
+  - Cross-scope: `new x_ns_app.MyUtils()` or `new global.SomeUtil()`
+  - Public vs private controlled by **Accessible from**
+  - **Protection Policy** (App Store installs): `None` | `Read-only` | `Protected`
+
+- **Reference qualifiers** _(context use)_
+
+  - **Simple** (conditions), **Dynamic** (stored filter/Script Include), **Advanced** (`javascript:<ScriptInclude>.method()`)
+
+- **Good practices**
+
+  - Centralize shared logic here; keep UI logic in Client Scripts/UI Policies
+  - Validate inputs; return clear errors for client callers
+  - Prefer JSON payloads for structured data
+  - Add a `debug` flag and consistent logging
+  - Do not modify baseline Script Includes
+  - Document params/returns; unit-test via scoped ATF where possible
+
+- **Quick patterns**
+
+  - **Initialize shared objects**
+
+    ```js
+    initialize: function(){
+      this.me = gs.getUserID();
+      this.userGR = new GlideRecord('sys_user'); this.userGR.get(this.me);
+    }
+    ```
+
+  - **GlideAjax client call**
+
+    ```js
+    var ga = new GlideAjax("MyAjax");
+    ga.addParam("sysparm_name", "sayHi");
+    ga.addParam("sysparm_name", "Ruth"); // example extra param
+    ga.getXMLAnswer((ans) => alert(ans));
+    ```
+
 ## Labs
 
 ### Lab 1.3.1 - Using the Syntax Editor
@@ -1694,16 +1804,16 @@ modern alternative to GlideRecord
   - Open `Lab 6.1.1 VIP Users` Business Rule
   - Rename to `Lab 6.1.3 addEncodedQuery`
   - Set `Active = true`
+  - copy by selecting context menu -> Insert
   - Use Condition Builder in `sys_user`:
     - Title CONTAINS `Vice`, `VP`, `Chief`
     - OR `roles = itil`
   - Copy the query using breadcrumb → _Copy query_
-  - Record result count:  
-    **type response here**
+  - Record result count
 
 - **B. Modify the Script**
 
-  - Replace the script with:
+  - rewrite script to use `addEncodedQuery()`:
 
     ```javascript
     (function executeRule(current, previous /*null when async*/) {
@@ -1836,3 +1946,515 @@ modern alternative to GlideRecord
 
   - Save and Run
   - Confirm deletion by filtering `Created on Today` in **Users**
+
+### Lab 7.1.1A - Classless Script Includes: logPropertyValues
+
+🎯 **Goal**: Create and use a classless Script Include to log property values from a Business Rule.
+
+- **A. Create a Classless Script Include**
+
+  - Navigate to **System Definition > Script Includes**
+  - Select _New_
+  - Configure the Script Include:
+    - `Name`: `logPropertyValues`
+    - `Accessible from`: `All application scopes`
+    - `Description`: `Lab 7.1.1A server-side logging`
+  - Delete the default template code in the Script field
+  - Enter the following script:
+
+    ```javascript
+    function logPropertyValues(str) {
+      this.debug = true;
+      this.debugPrefix = "<YOUR INITIALS>: ";
+
+      if (this.debug) {
+        gs.info(this.debugPrefix + str);
+      }
+    }
+    ```
+
+  - Select _Submit_
+
+- **B. Use the Classless Script Include**
+
+  - Create a new Business Rule:
+    - `Name`: `Lab 7.1.1A Script Include Logging`
+    - `Table`: `Incident [incident]`
+    - `Active`: `true`
+    - `Advanced`: `true`
+    - `When`: `after`
+    - `Insert`: `true`
+    - `Update`: `true`
+  - In the script field, enter:
+
+    ```javascript
+    (function executeRule(current, previous /*null when async*/) {
+      for (var property in current)
+        if (current[property]) {
+          logPropertyValues(property + ", " + current[property]);
+        }
+    })(current, previous);
+    ```
+
+  - Select _Submit_
+
+- **C. Test Your Work**
+
+  - Create a new `Incident` and fill in mandatory fields
+  - Select _Submit_
+  - Navigate to **System Logs > System Log > Script Log Statements**
+  - Confirm log entries include Incident properties and values
+  - Edit the Script Include:
+    - Change `this.debug = true;` to `this.debug = false;`
+  - Create another new `Incident` and submit
+  - Return to **Script Log Statements**
+  - Confirm that no new log entries appear (as expected due to `debug = false`)
+    - A toggleable debug flag helps simplify troubleshooting without changing Business Rule logic.
+
+- **D. Cleanup**
+  - Set `Lab 7.1.1A Script Include Logging` Business Rule to `Inactive`
+  - No need to deactivate `logPropertyValues` Script Include:
+    - Script Includes execute only when called
+    - No performance impact when idle
+
+### Lab 7.1.1B - Classless Script Includes: hasRoleExactly
+
+🎯 **Goal**: Create a classless Script Include to validate if a user has exactly the `admin` or `itil` role (without role inheritance).
+
+- **A. Create a Classless Script Include**
+
+  - Navigate to **System Definition > Script Includes**
+  - Select _New_
+  - Configure the Script Include:
+    - `Name`: `hasRoleExactly`
+    - `Accessible from`: `This application scope only`
+    - `Description`: `Lab 7.1.1B hasRoleExactly server-side logging`
+  - Delete the default script template
+  - Enter the following script:
+
+    ```javascript
+    function hasRoleExactly(userSysID, roleString) {
+      try {
+        var roleGr = new GlideRecord("sys_user_role");
+        if (roleGr.get("name", roleString)) {
+          var role = roleGr.getValue("sys_id");
+          var gr = new GlideRecord("sys_user_has_role");
+          gr.addQuery("user", userSysID);
+          gr.addQuery("role", role);
+          gr.query();
+          if (gr.next()) {
+            return true;
+          } else {
+            return false;
+          }
+        }
+      } catch (error) {
+        gs.error("Error in Script Include hasRoleExactly: " + error);
+      }
+    }
+    ```
+
+  - Select _Submit_
+
+- **B. Use the Classless Script Include**
+
+  - Create a new Business Rule:
+    - `Name`: `Lab 7.1.1B Script Include Logging`
+    - `Table`: `Incident [incident]`
+    - `Active`: `true`
+    - `Advanced`: `true`
+    - `When`: `after`
+    - `Insert`: `true`
+    - `Update`: `true`
+    - `Condition`: `current.category == 'hardware'`
+  - In the script field, enter:
+
+    ```javascript
+    (function executeRule(current, previous /*null when async*/) {
+      try {
+        var admin = hasRoleExactly(gs.getUserID(), "admin");
+        var itil = hasRoleExactly(gs.getUserID(), "itil");
+        var debug =
+          "User Has Role Admin? " + admin + " | User Has Role itil? " + itil;
+        gs.info("DEBUG: " + debug);
+      } catch (error) {
+        gs.error(
+          "Error in Business Rule Lab 7.1.1B Script Include Logging: " + error
+        );
+      }
+    })(current, previous);
+    ```
+
+  - Select _Submit_
+
+- **C. Test Your Work**
+
+  - Create a new `Incident`:
+    - Set `Category` to `Hardware`
+    - Fill in required fields
+  - Select _Submit_
+  - Navigate to **System Logs > System Log > Script Log Statements**
+  - Verify if the expected `admin` and `itil` role results are logged
+  - Impersonate user `Beth Anglin`
+  - Repeat Incident creation and submission
+  - End impersonation
+  - Recheck **Script Log Statements**
+
+- **D. Cleanup**
+  - Set `Lab 7.1.1B Script Include Logging` Business Rule to `Inactive`
+  - No need to deactivate `hasRoleExactly` Script Include:
+    - It only executes when explicitly called
+    - No idle performance impact
+
+### Lab 7.2.1 - Create a New Class: Asset Location Filtering
+
+🎯 **Goal**: Implement a class-based Script Include to restrict available Location values based on user role for Asset Management.
+
+- **A. Preparation**
+
+  - Navigate to **Configuration > Base Items > Printers**
+  - Select _New_
+  - Add the `Location` field to the form layout
+  - Select the magnifying glass next to the `Location` field
+  - Confirm all Locations are currently visible
+
+- **B. Write the Script Include to Restrict Location Selections**
+
+  - Navigate to **System Definition > Script Includes**
+  - Select _New_
+  - Configure the Script Include:
+    - `Name`: `LocationsByRole`
+    - `Accessible from`: `All application scopes`
+    - `Description`: `Lab 7.2.1 Restrict Location Options`
+  - Paste the following script:
+
+    ```javascript
+    var LocationsByRole = Class.create();
+    LocationsByRole.prototype = {
+      initialize: function () {
+        this.loggedInUser = new GlideRecord("sys_user");
+        this.loggedInUser.get(gs.getUserID());
+      },
+
+      forCMDB: function () {
+        var refQual = "";
+
+        if (gs.hasRole("admin")) {
+          refQual += "^EQ";
+        }
+
+        if (gs.hasRole("asset_mgr_local")) {
+          refQual += "parent=" + this.loggedInUser.location.parent + "^EQ";
+        }
+
+        if (gs.hasRole("asset_mgr_corporate")) {
+          refQual += "company=" + this.loggedInUser.location.company + "^EQ";
+        }
+
+        return refQual;
+      },
+
+      type: "LocationsByRole",
+    };
+    ```
+
+  - Select _Submit_
+
+- **C. Configure the Location’s Reference Qualifier**
+
+  - Navigate to **Configuration > Base Items > Printers**
+  - Select _New_
+  - Right-click the `Location` field label > _Configure Dictionary_
+  - Select the _Click here_ link to open the Dictionary Entry for `Location` in the `cmdb` table
+  - Select _Advanced view_
+  - Under **Reference Specification**:
+    - `Use reference qualifier`: `Advanced`
+    - `Reference qual`: `javascript:new LocationsByRole().forCMDB()`
+  - In the **Attributes** Related List:
+    - Find `Tree picker` and set its `Value` to `false`
+  - Select _Update_
+  - Close the Dictionary Entry tab
+
+- **D. Test Your Work**
+  - Navigate to **Configuration > Base Items > Printers**
+  - Select _New_
+  - Select the magnifying glass next to `Location`
+  - Confirm the List view is shown
+  - Scroll to the bottom and record total number of records (baseline: ~427)
+  - Impersonate `Luke Wilson` (Group: Asset Managers - New York, Role: `asset_mgr_local`)
+  - Go to **Configuration > Base Items > Printers**
+  - Select _New_ > open the Location picker
+  - Confirm only New York Region locations are available
+  - Impersonate `Howard Johnson` (Group: Asset Managers - Corporate, Role: `asset_mgr_corporate`)
+  - Go to **Configuration > Base Items > Printers**
+  - Select _New_ > open the Location picker
+  - Confirm only ACME North America corporate locations are listed
+  - Record the total number of records (baseline: ~372)
+  - End impersonation and return as System Administrator
+
+### Lab 7.3.1 - Hello World GlideAjax
+
+🎯 **Goal**: Create a Script Include extending `AbstractAjaxProcessor` and call it using a Client Script.
+
+- **A. Create a Script Include**
+
+  - Navigate to **System Definition > Script Includes**
+  - Select _New_
+  - Configure the Script Include:
+    - `Name`: `HelloWorld`
+    - `Glide AJAX`: `true` (checked)
+    - `Accessible from`: `All application scopes`
+    - `Active`: `true` (checked)
+    - `Description`: `Lab 7.3.1 Extends the AbstractAjaxProcessor class`
+  - Paste the following script:
+
+    ```javascript
+    var HelloWorld = Class.create();
+    HelloWorld.prototype = Object.extendsObject(AbstractAjaxProcessor, {
+      alertGreeting: function () {
+        return "Hello " + this.getParameter("sysparm_user_name") + "!";
+      },
+
+      type: "HelloWorld",
+    });
+    ```
+
+  - Select _Submit_
+  - In the role dialog, select `admin`, then select _OK_
+
+- **B. Create a Client Script to Call the Script Include**
+
+  - Navigate to **System Definition > Client Scripts**
+  - Select _New_
+  - Configure the Client Script:
+    - `Name`: `Lab 7.3.1 HelloWorld Client Script`
+    - `Table`: `Incident [incident]`
+    - `Type`: `onLoad`
+    - `Active`: `true` (checked)
+    - `Global`: `true` (checked)
+  - Paste the following script:
+
+    ```javascript
+    function onLoad() {
+      var ga = new GlideAjax("HelloWorld");
+      ga.addParam("sysparm_name", "alertGreeting");
+      ga.addParam("sysparm_user_name", "<YOUR NAME>");
+      ga.getXML(HelloWorldParse);
+
+      function HelloWorldParse(response) {
+        var answerFromXML =
+          response.responseXML.documentElement.getAttribute("answer");
+        alert(answerFromXML);
+      }
+    }
+    ```
+
+  - Select _Submit_
+  - Answers:
+    - `sysparm_name` tells the Script Include which method to call
+    - Other parameters (like `sysparm_user_name`) do **not** have to be reserved names; only `sysparm_name` is reserved
+
+- **C. Test Your Work**
+  - Open any record in the `Incident` table
+  - Confirm an alert appears with your greeting (e.g., "Hello John!")
+  - If not, debug both Script Include and Client Script
+  - Set `Lab 7.3.1 HelloWorld Client Script` to `Inactive`
+
+### Lab 7.3.2 - Number of Group Members
+
+🎯 **Goal**: Return the number of users in an Assignment Group using a Script Include and display it in a Client Script alert.
+
+- **A. Create a Script Include**
+
+  - Navigate to **System Definition > Script Includes**
+  - Select _New_
+  - Configure the Script Include:
+    - `Name`: `AssignmentGroupUtils`
+    - `Glide AJAX`: `true` (checked)
+    - `Accessible from`: `All application scopes`
+    - `Active`: `true` (checked)
+    - `Description`: `Lab 7.3.2 extends the AbstractAjaxProcessor class and returns the number of members in a Group.`
+  - Paste the following script:
+
+    ```javascript
+    var AssignmentGroupUtils = Class.create();
+    AssignmentGroupUtils.prototype = Object.extendsObject(
+      AbstractAjaxProcessor,
+      {
+        countGroupMembers: function () {
+          var grpName = "";
+          var message = "There are no members in this Assignment Group";
+          var groupID = this.getParameter("sysparm_group_id");
+
+          var grpMems = new GlideRecord("sys_user_grmember");
+          grpMems.addQuery("group.sys_id", groupID);
+          grpMems.query();
+
+          if (grpMems.next()) {
+            grpName = grpMems.getDisplayValue("group");
+          }
+
+          if (grpName != "") {
+            message =
+              "There are " +
+              grpMems.getRowCount() +
+              " members in the " +
+              grpName +
+              " group";
+          }
+
+          return message;
+        },
+
+        type: "AssignmentGroupUtils",
+      }
+    );
+    ```
+
+  - Select _Submit_
+  - In the role dialog, select `admin` > _OK_
+
+- **B. Create a Client Script to Call the Script Include**
+
+  - Navigate to **System Definition > Client Scripts**
+  - Select _New_
+  - Configure the Client Script:
+    - `Name`: `Lab 7.3.2 Number of Group Members`
+    - `Table`: `Incident [incident]`
+    - `Type`: `onChange`
+    - `Field name`: `Assignment group`
+    - `Active`: `true`
+    - `Global`: `true`
+  - Paste the following script:
+
+    ```javascript
+    function onChange(control, oldValue, newValue, isLoading, isTemplate) {
+      if (isLoading || newValue === "") {
+        return;
+      }
+
+      var membersGA = new GlideAjax("AssignmentGroupUtils");
+      membersGA.addParam("sysparm_name", "countGroupMembers");
+      membersGA.addParam(
+        "sysparm_group_id",
+        g_form.getValue("assignment_group")
+      );
+      membersGA.getXML(membersParse);
+
+      function membersParse(response) {
+        var myObj = response.responseXML.documentElement.getAttribute("answer");
+        alert(myObj);
+      }
+    }
+    ```
+
+  - Select _Submit_
+
+- **C. Test Your Work**
+
+  - Navigate to **User Administration > Groups**
+  - Select a group with members and record the name
+  - Open any `Incident` record
+  - Change the `Assignment group` to the selected group
+  - Confirm alert displays correct member count
+  - Change `Assignment group` to `IT Securities` (has no members)
+  - Confirm alert indicates no members
+
+- **D. Reuse the Script Include**
+  - Identify two other tables that use `Assignment group`:
+    - Example: `Change Request`, `Problem`
+  - Open **Lab 7.3.2 Number of Group Members** Client Script
+  - Update:
+    - `Name`: `Lab 7.3.2 Number of Group Members (PRB)`
+    - `Table`: `Problem [problem]`
+  - Select _Insert_ via form context menu
+  - Open a `Problem` record
+  - Change `Assignment group` to previously tested group
+  - Confirm alert appears with expected message
+  - Set both Client Scripts (`Incident`, `Problem`) to `Inactive`
+
+### Lab 7.4.1 - JSON Object
+
+🎯 **Goal**: Randomly assign an analyst from a selected Assignment group using a JSON response from a Script Include.
+
+- **A. Add a New Method to an Existing Script Include**
+
+  - Open the existing `AssignmentGroupUtils` Script Include
+  - After the `countGroupMembers` method, add a blank line and insert the following method:
+
+    ```javascript
+    assignAnalyst: function() {
+      var groupID = this.getParameter('sysparm_group_id');
+      var membersArray = [];
+
+      var membersGR = new GlideRecord('sys_user_grmember');
+      membersGR.addQuery('group.sys_id', groupID);
+      membersGR.query();
+
+      while (membersGR.next()) {
+        var member = {};
+        member.sys_id = membersGR.user.sys_id.toString();
+        member.name = membersGR.user.getDisplayValue();
+        membersArray.push(member);
+      }
+      return JSON.stringify(membersArray);
+    },
+    ```
+
+  - Select _Update_
+
+- **B. Copy and Modify the Client Script**
+
+  - Open `Lab 7.3.2 Number of Group Members` Client Script
+  - Use _Insert and Stay_ to duplicate it
+  - Update the configuration:
+    - `Name`: `Lab 7.4.1 Assign Analyst`
+    - `Table`: `Incident [incident]`
+    - `Active`: `true`
+  - Replace the script with:
+
+    ```javascript
+    function onChange(control, oldValue, newValue, isLoading, isTemplate) {
+      if (isLoading || newValue === "") {
+        return;
+      }
+
+      var membersGA = new GlideAjax("AssignmentGroupUtils");
+      membersGA.addParam("sysparm_name", "assignAnalyst");
+      membersGA.addParam(
+        "sysparm_group_id",
+        g_form.getValue("assignment_group")
+      );
+      membersGA.getXMLAnswer(membersParse);
+
+      function membersParse(response) {
+        var members = JSON.parse(response);
+
+        if (members.length > 0) {
+          var randomNum = Math.floor(Math.random() * members.length);
+          g_form.setValue(
+            "assigned_to",
+            members[randomNum].sys_id,
+            members[randomNum].name
+          );
+        } else {
+          g_form.setValue("assigned_to", "");
+          alert("The assignment group has no users assigned to it");
+        }
+      }
+    }
+    ```
+
+  - Select _Update_
+
+- **C. Test Your Work**
+  - Open an `Incident` record with a populated `Assigned to` field
+  - Record the current `Assigned to` name
+  - Change the `Assignment group` to one with known members
+  - Confirm that `Assigned to` updates to a random member of that group
+  - Record the new `Assigned to` name
+  - Change the `Assignment group` to `IT Securities` (no members baseline)
+  - Confirm:
+    - `Assigned to` is cleared
+    - Alert indicates no users in the group
+  - Set `Lab 7.4.1 Assign Analyst` Client Script to `Inactive`
