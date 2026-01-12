@@ -2,6 +2,8 @@
 
 ## To Sort
 
+- [Email config with M365 and OAuth](https://www.servicenow.com/community/sysadmin-articles/office-365-email-oauth-2-0-integration-with-servicenow/tac-p/3465475#M10)
+  - SMTP, IMAP, OAuth 2, M365, Azure, Entra ID
 - [Pricing](https://partnerportal.service-now.com/kb?id=kb_article_view&sysparm_article=KB0011614&campid=146442&cid=e:eDM-PTR-Vancouver.email09%2F20-20SEP23-Global.Email1&utm_source=marketo&utm_medium=email&utm_campaign=eDM-PTR-Vancouver.email09%2F20-20SEP23-Global.Email1&mkt_tok=MDg5LUFOUy02NzMAAAGOUkyKeFE825UAMvR_MneTnj2Dk6GBSFzu2c0v_qgvsd_4UuP4FO3IkQxYGIRSFH6RgeVLpDO2QGqVsPyNMm4PRrlp64a74AlJADleRYujDiRlgkB4&sys_kb_id=6dbeca678795bd50de17ea473cbb3510&spa=1)
   - overview decks
   - gezielte decks pro module
@@ -18,6 +20,11 @@
   ```
 
 - fix scripts: [sys_script_fix]
+- LAYER CAKE / TechStack
+  - Service Portal (AngularJS1.5, BootStrap, Underscore[etc.], SCSS)
+  - ServiceNow GUI (HTML/CSS/JS, Seismic.... Jelly)
+  - Mozilla Rhino (Java[ do] <—> JavaScriptECMA2021)
+  - Relational DB (MariaDB—>RaptorDB)
 
 ## Resources
 

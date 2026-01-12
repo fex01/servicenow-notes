@@ -46,5 +46,3 @@
   - **Importance**: Primary channel for ServiceNow to communicate critical security-related information.
   - **Recommendations**: Keep contact details current, including an individual and a distribution list.
   - **Reference**: Search “Company Key Contacts and Notifications List Overview” on Now Support to update contacts.
-
-## Topics
