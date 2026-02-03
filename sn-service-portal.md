@@ -9,6 +9,7 @@
 - [x] [Employee Center Essentials](https://nowlearning.servicenow.com/lxp/en/hr-service-delivery/hr-service-deliveryname?id=learning_course_prev&course_id=167dea289374b5103cc0322d6cba1019)
 - [ ] [AI Search: Indexing (Now Learning)](https://nowlearning.servicenow.com/lxp/en/now-platform/ai-search-indexing?id=learning_course_prev&course_id=beb44c4147cb29142a090dcbd36d435c)
 - [ ] [Hands-on AI Search Lab](https://nowlearning.servicenow.com/lxp/en/now-platform/ai-search-explore-ai-search-with-a-hands-on-lab?id=learning_course_prev&course_id=fa0c0ccdc38f29545922751ce001319d)
+- [x] [Train Users at Scale with Guided Tour Designer](https://learning.servicenow.com/lxp/en/now-platform/train-users-at-scale-with-guided-tour-designer?id=learning_course_prev&course_id=b09eab94dbe410503e73166e139619ef&s=1&ssa=3)
 
 ### 📄 ServiceNow Documentation
 
@@ -1424,6 +1425,7 @@ Provides:
 
 ### Guided Tours
 
+- course: [Train Users at Scale with Guided Tour Designer](https://learning.servicenow.com/lxp/en/now-platform/train-users-at-scale-with-guided-tour-designer?id=learning_course_prev&course_id=b09eab94dbe410503e73166e139619ef&s=1&ssa=3)
 - **Purpose**:
 
   - Demonstrate navigation and usage of Service Portal pages/features

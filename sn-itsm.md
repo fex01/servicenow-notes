@@ -5,80 +5,169 @@
 ### Xanadu
 
 - [Delta Exam Study Guide](https://nowlearning.servicenow.com/lxp/en/credentials/certified-system-administrator-delta-exam-study-guide-vancouver?id=kb_article_view&sysparm_article=KB0012135)
-- **Benchmarks**  
-  - **Enhanced in Xanadu**:  
-    - **Self-solved using AI search QnA** and **Self-solved using Proactive Engagement for DeX** added as KPIs for self-solved deflection tracking.  
+- **Benchmarks**
+  - **Enhanced in Xanadu**:
+    - **Self-solved using AI search QnA** and **Self-solved using Proactive Engagement for DeX** added as KPIs for self-solved deflection tracking.
     - New Benchmarks dashboard installs automatically with Xanadu and is available from the ServiceNow Store.
-- **DevOps Change Velocity**  
-  - **Highlights in Xanadu**:  
-    - Configure Change Management features from **Service Operations Workspace (SOW) Admin Center**, integrating DevOps data for change automation.  
-    - Improved accessibility to meet WCAG 2.1 Level AA standards, with a configurable workspace.  
-  - **New in Xanadu**:  
-    - **Change Management in SOW Admin Center**: Increases change efficiency, accelerates approvals, leverages DevOps data for automation.  
-  - **Changes in This Release**:  
-    - **Reflow for Configurable Workspace**: Pages can be zoomed to 400% without losing functionality.  
-    - **DevOps Data in Change Requests**: Manage DevOps data within manually created change requests in Service Operations Workspace.  
-    - **Enhancements to DevOps Model Change**:  
-      - In-product guidance to create DevOps changes with minimal disruption.  
-      - Change tasks are no longer automatically created in the DevOps model’s main flow.  
-      - **Change – DevOps – Update execution state** flow introduced, removing the need for activating manual approval flows.  
-      - **DevOps Simplified change model** added, which omits the Assess state; change approval is based on the DevOps Simplified Model Change policy.  
-      - Branch details for artifacts and packages now visible from pipeline executions.  
-    - **Create Lists**: Customize lists under Changes, Tools, and Administration in DevOps Change Workspace.  
-    - **Jira Server Connection Using API Key**: Allows API key authentication instead of basic authentication.  
+- **DevOps Change Velocity**
+  - **Highlights in Xanadu**:
+    - Configure Change Management features from **Service Operations Workspace (SOW) Admin Center**, integrating DevOps data for change automation.
+    - Improved accessibility to meet WCAG 2.1 Level AA standards, with a configurable workspace.
+  - **New in Xanadu**:
+    - **Change Management in SOW Admin Center**: Increases change efficiency, accelerates approvals, leverages DevOps data for automation.
+  - **Changes in This Release**:
+    - **Reflow for Configurable Workspace**: Pages can be zoomed to 400% without losing functionality.
+    - **DevOps Data in Change Requests**: Manage DevOps data within manually created change requests in Service Operations Workspace.
+    - **Enhancements to DevOps Model Change**:
+      - In-product guidance to create DevOps changes with minimal disruption.
+      - Change tasks are no longer automatically created in the DevOps model’s main flow.
+      - **Change – DevOps – Update execution state** flow introduced, removing the need for activating manual approval flows.
+      - **DevOps Simplified change model** added, which omits the Assess state; change approval is based on the DevOps Simplified Model Change policy.
+      - Branch details for artifacts and packages now visible from pipeline executions.
+    - **Create Lists**: Customize lists under Changes, Tools, and Administration in DevOps Change Workspace.
+    - **Jira Server Connection Using API Key**: Allows API key authentication instead of basic authentication.
     - **GitHub Actions Reruns**: Failed GitHub jobs use the existing change request instead of creating a new one.
-- **Digital End-User Experience (DEX)**  
-  - **Enhanced in Xanadu**:  
-    - Comprehensive visibility of apps, networks, and end-user devices to detect and resolve issues proactively.  
-    - **Action Library**: Prebuilt resolutions to automate issue fixes.  
-  - **New in Xanadu**:  
-    - **DEX Insights**: Consolidated view of device performance, user interactions, and network health.  
-    - **Integration with Proactive Engagement**: Monitors devices/apps, sends alerts, guides you through issue resolution.  
-    - **Desktop Assistant with Now Assist**: Access generative AI for self-service troubleshooting.  
-    - **UI Changes**:  
-      - Enhanced error handling in User/Device details, Web applications, Installed applications.  
-      - Improved Status options for Application users page.  
-      - **Scalable Pagination**: Choose 10, 20, 50, or 100 records per page.  
+- **Digital End-User Experience (DEX)**
+  - **Enhanced in Xanadu**:
+    - Comprehensive visibility of apps, networks, and end-user devices to detect and resolve issues proactively.
+    - **Action Library**: Prebuilt resolutions to automate issue fixes.
+  - **New in Xanadu**:
+    - **DEX Insights**: Consolidated view of device performance, user interactions, and network health.
+    - **Integration with Proactive Engagement**: Monitors devices/apps, sends alerts, guides you through issue resolution.
+    - **Desktop Assistant with Now Assist**: Access generative AI for self-service troubleshooting.
+    - **UI Changes**:
+      - Enhanced error handling in User/Device details, Web applications, Installed applications.
+      - Improved Status options for Application users page.
+      - **Scalable Pagination**: Choose 10, 20, 50, or 100 records per page.
     - **Activation**: Install DEX from the ServiceNow Store.
-- **Digital Portfolio Management (DPM)**  
-  - **New in Xanadu**:  
-    - **DPM Admin Center**: Guided walkthrough to set up and configure the DPM Workspace.  
-      - Provides suggestions to hide or show relevant data tabs and links to tables for managing services, applications, and portfolios.  
-    - **Unified Map**: Replaces custom DPM relationship map with the platform Unified Map for broader service/application relationships.  
-    - **Update KPI Descriptions**: Administrators can revise base system KPI descriptions for clarity in the DPM Workspace.  
-    - **Needs Attention Panels**: Problems (PRB records) are added so you can identify them across services, business applications, and application services.  
-    - **Teams Tab Updates**: Multiple teams can support a record; displayed in the DPM Workspace.  
-  - **Changed in This Release**:  
-    - **Reflow for Configurable Workspace**: Supports zoom up to 400% for accessibility.  
+- **Digital Portfolio Management (DPM)**
+  - **New in Xanadu**:
+    - **DPM Admin Center**: Guided walkthrough to set up and configure the DPM Workspace.
+      - Provides suggestions to hide or show relevant data tabs and links to tables for managing services, applications, and portfolios.
+    - **Unified Map**: Replaces custom DPM relationship map with the platform Unified Map for broader service/application relationships.
+    - **Update KPI Descriptions**: Administrators can revise base system KPI descriptions for clarity in the DPM Workspace.
+    - **Needs Attention Panels**: Problems (PRB records) are added so you can identify them across services, business applications, and application services.
+    - **Teams Tab Updates**: Multiple teams can support a record; displayed in the DPM Workspace.
+  - **Changed in This Release**:
+    - **Reflow for Configurable Workspace**: Supports zoom up to 400% for accessibility.
     - **Activation**: DPM is available from the ServiceNow Store.
-- **Now Assist for IT Service Management (ITSM)**  
-  - **Enhanced in Xanadu**:  
-    - **Summarize a Change Request**: Automated summarization helps administrators understand change content and impact.  
-    - **Generate Knowledge Article**: Create knowledge articles from similar incident sets.  
-    - **Chat Reply Recommendations**: Use Now Assist icon to provide quick answers in chats.  
-    - **Summarize Sidebar Discussion**: Summaries can be posted to work notes on multiple record types.  
+- **Now Assist for IT Service Management (ITSM)**
+  - **Enhanced in Xanadu**:
+    - **Summarize a Change Request**: Automated summarization helps administrators understand change content and impact.
+    - **Generate Knowledge Article**: Create knowledge articles from similar incident sets.
+    - **Chat Reply Recommendations**: Use Now Assist icon to provide quick answers in chats.
+    - **Summarize Sidebar Discussion**: Summaries can be posted to work notes on multiple record types.
     - **Confluence Search Connector**: Get AI Search results from Atlassian Confluence in Employee Center, Agent Workspaces, Now Mobile, and Virtual Agent.
-- **Service Operations Workspace (SOW) for ITSM**  
-  - **Highlights in Xanadu**:  
-    - Simplified navigation from Admin Center to manage incident, problem, change request, and contextual side panel settings.  
-    - Utility to migrate Agent Workspace features to Service Operations Workspace.  
-    - Granular roles for record pages.  
-    - **CI Dependency Map**: View dependencies from an incident record.  
-    - **VIP Field Decorator** for incident caller fields.  
-    - **Quick Start Tests** for Incident Management.  
-    - **Announcements** in Major Incident Management.  
-    - **Password Reset UI Action** for incident-related issues.  
-    - **Enhanced Interaction Records**: Specify “Opened for” and “Short description” fields for better processing.  
-    - **AI-Powered Search** for incidents, tasks, problems, change requests, requests, and interactions.  
-    - **Configurable Overview Tab** for Problem Management.  
-    - **Guided Tours** for concept/process learning in Service Operations Workspace.  
+- **Service Operations Workspace (SOW) for ITSM**
+  - **Highlights in Xanadu**:
+    - Simplified navigation from Admin Center to manage incident, problem, change request, and contextual side panel settings.
+    - Utility to migrate Agent Workspace features to Service Operations Workspace.
+    - Granular roles for record pages.
+    - **CI Dependency Map**: View dependencies from an incident record.
+    - **VIP Field Decorator** for incident caller fields.
+    - **Quick Start Tests** for Incident Management.
+    - **Announcements** in Major Incident Management.
+    - **Password Reset UI Action** for incident-related issues.
+    - **Enhanced Interaction Records**: Specify “Opened for” and “Short description” fields for better processing.
+    - **AI-Powered Search** for incidents, tasks, problems, change requests, requests, and interactions.
+    - **Configurable Overview Tab** for Problem Management.
+    - **Guided Tours** for concept/process learning in Service Operations Workspace.
     - **Accessibility Improvements** for WCAG 2.1 Level AA conformance.
-- **Service Portfolio Management**  
-  - **Highlights in Xanadu**:  
-    - Set the time zone for **Service Availability** records.  
-    - Configure the global time zone or use a service offering commitment time zone for availability calculations.  
-    - Read-only time zone field on service availability records.  
-    - Teams related link added to service offering records, enabling multiple teams to support a single service offering.  
-  - **New in Xanadu**:  
-    - **Set Time Zone for Availability Results**: Choose to calculate availability using either the global time zone or the service offering commitment’s time zone.  
-    - **Assign Multiple Teams to a Service Offering**: Use the Teams related list to add diverse support groups.  
+- **Service Portfolio Management**
+  - **Highlights in Xanadu**:
+    - Set the time zone for **Service Availability** records.
+    - Configure the global time zone or use a service offering commitment time zone for availability calculations.
+    - Read-only time zone field on service availability records.
+    - Teams related link added to service offering records, enabling multiple teams to support a single service offering.
+  - **New in Xanadu**:
+    - **Set Time Zone for Availability Results**: Choose to calculate availability using either the global time zone or the service offering commitment’s time zone.
+    - **Assign Multiple Teams to a Service Offering**: Use the Teams related list to add diverse support groups.
+
+### Zurich
+
+- **Delta Exam Study Guide**
+  - [CIS-ITSM Delta Exam Study Guide – Zurich](https://learning.servicenow.com/lxp/en/certified-system-administrator-delta-exam-study-guide-vancouver-release?id=kb_article_view&sysparm_article=KB0012135)
+- **Service Operations Workspace (SOW)**
+  - Unified workspace for ITSM/ITOM workflows
+  - Replaces ITSM Agent Workspace
+  - Configurable via Admin Center and UI Builder
+- **Agent Roles**
+  - **Tier 1**
+    - Roles: `itil` or `sn_sow.sow_home`
+    - Member of Service Desk group
+    - Focus: Interaction, Incident, Request
+  - **Tier 2**
+    - Role: `itil`
+    - Focus: Incident, Request, Change, Problem, Major Incident
+- **Workspace Overview (Donut Cards)**
+  - Tier 1: catalog tasks, unresolved incidents
+  - Tier 2: problems, changes, catalog tasks, unresolved incidents
+  - Selecting donut segment → filtered list
+  - Selecting center → full list
+  - Preview & update records from list view
+- **Core Workspace Areas**
+  - **Landing Page**
+    - Home icon access
+    - Assignments, announcements, upcoming tasks
+    - Tier 1: performance and assigned courses
+  - **Lists**
+    - Access via List icon
+    - My Lists supports custom list variants
+    - Field config: UX List Menu Configuration → Default → Service Operations Workspace
+  - **Inbox (Agent Chat)**
+    - Agent status: Available / Away
+    - Auto-assignment creates Interaction record
+    - Manual accept/reject if auto-assignment disabled
+    - Chat end → Interaction closed
+- **Major Incident Enhancements**
+  - Incident promoted to Major Incident
+    - **Communicate** and **Playbook** tabs appear
+  - **Post-Incident Review AI Agent**
+    - Generates report after closure
+    - Sections: Executive Summary, Impact, Technical Summary, Action Items
+    - `itil` role included by default for access
+- **Recommendations**
+  - ML-driven next-best actions
+  - Based on historical incidents
+  - Supports new or less-experienced agents
+- **Escalation Triggers (On-Call)**
+  - Automatically notify SMEs on incident
+  - Roles: `rota_manager`, `rota_admin`
+  - Configured via SOW → Schedules or Teams
+  - Policies define users, notifications, escalation paths
+- **SOW Configuration & Admin Center**
+  - Roles: `sn_sow_itsm_admin.sow_admin_user`, `admin`, `change_manager`
+  - **Admin Center Tabs**
+    - Overview: all SOW customizations
+    - Configurations: landing page, record pages, modern change
+    - Learning: SOW guidance and resources
+- **Landing Page Configuration**
+  - Audience-based access (Now Experience Framework)
+  - Default audiences include:
+    - `admin`
+    - `itil` + Service Desk group
+    - `sn_incident_write` + Service Desk group
+  - Sections toggleable: Overview, Announcements, Quick Links, Upcoming
+- **Incident Record Configuration (SOW)**
+  - Roles: `workspace_admin`, `ui_builder_admin`, `admin`
+  - Tabs:
+    - Overview (tier-1 visibility configurable)
+    - Details (form builder)
+  - Overview sections: Summary, Impact, Cause, Resolution
+  - Response Templates
+    - Role required: `sn_templated_snip.template_snippet_reader`
+  - Controlled by Incident Management properties
+- **On-Call Scheduling**
+  - Configure groups, schedules, templates, escalation policies
+  - Notification channels: phone, SMS, Microsoft Teams
+  - Separate weekday/weekend preferences
+- **Absence & Coverage**
+  - Request absence from SOW Schedule
+  - Provide proposed cover
+  - Supports overtime requests
+- **Migration: ITSM Agent Workspace → SOW**
+  - Run in non-production first
+  - Use migration utility (`sn_sow_migration`)
+  - Create update set to capture changes
+  - Custom tables configured via system property
+  - Promote to production via update set
