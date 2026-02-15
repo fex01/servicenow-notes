@@ -36,51 +36,6 @@ Back to [SNow ITOM](./sn-itom.md)
   - [Mainline Exam Blueprint: Certified Implementation Specialist - Service Mapping (CIS-SM)](https://nowlearning.servicenow.com/lxp/en/credentials/certified-implementation-specialist-service-mapping-mainline?id=kb_article_view&sysparm_article=KB0011558)
   - [eBook: Service Mapping Advanced](https://servicenow.read.inkling.com/a/b/19c4613ca7d841ee9b3cc5f1bd05302d/p/18356415fd69484b9dd3100dfd444379)
 
-## Delta Content
-
-### Xanadu
-
-- [Delta Exam Study Guide](https://nowlearning.servicenow.com/lxp/en/credentials/certified-system-administrator-delta-exam-study-guide-vancouver?id=kb_article_view&sysparm_article=KB0012139)
-- **Upgrading to Xanadu**
-  - Install **Service Mapping Plus version 1.13.0** from the ServiceNow® Store for improved Service Mapping.
-  - Install the **App Service Extension** app to further enhance application service mapping (especially for Service Mapping Plus customers).
-  - **Discovery and Service Mapping Patterns** are available in the ServiceNow Store (see "Activation information" in the release notes).
-- **ITOM Visibility Enhancements**
-  - **Discovery Admin Workspace**:
-    - Unified location to configure Discovery, track progress, manage errors, and leverage diagnostic tools.
-    - Home: View discovery trends, tasks, and access relevant ITOM Visibility apps.
-    - Schedules: Gain insights into discovery performance.
-    - Diagnostics: Troubleshoot discovery errors.
-    - Insights: Access reports to optimize discovery operations.
-  - **Data Enrichment**:
-    - Expand discovered data in the CMDB using ITOM Content Service.
-    - Create application services using CMDB-based mapping.
-  - **Kubernetes Integration**:
-    - Upgrade and configure Informer pods from the ServiceNow instance (no direct Kubernetes admin dependency).
-    - Use OAuth2.0 authorization for enhanced security.
-  - **MID Server Enhancements**:
-    - Run other applications without storing credentials on the instance (Microsoft Azure Key Vault).
-    - Log file compression available (disabled by default).
-  - **CMDB-Based Mapping**:
-    - Use Automated Service Suggestions and existing CMDB data (no MID Server needed) to create new application services.
-  - **Cloud Native Operations (CNO) for Visibility**:
-    - From version 3.6.3, upgrade the CNO Informer directly from the instance.
-    - Control Informer execution parameters from the instance.
-    - Store instance credentials in Microsoft Azure Vault (when using AKS).
-- **Key Changes in This Release**
-  - **Shazzam Probe Enhancements**:
-    - Collect expanded data from devices.
-    - View extended Shazzam data in Discovery Admin Workspace (Insights tab).
-  - **Service Mapping Roles**:
-    - `service_mapping_admin` replaces `sm_admin`.
-    - `service_mapping_user` replaces `sm_user`.
-    - Updated roles improve visibility into ML-powered candidate suggestions.
-  - **New/Updated Discovery & Service Mapping Patterns**:
-    - Discover Dell EMC Data Domain storage and Dell EMC PowerMax storage.
-    - New pattern extensions: Pure Storage FlashArray, Azure SQL license information.
-  - **Integration with Agent Client Collector**:
-    - Top-down Service Mapping supports Automated Service Suggestions using Agent Client Collector.
-
 ## Courses
 
 ### Service Mapping Advanced
@@ -977,7 +932,6 @@ Back to [SNow ITOM](./sn-itom.md)
 ### PtPM: Migration Procedure
 
 - **Option 1: Individual Conversion Scripts** (Recommended for larger CMDBs):
-
   - Navigate to `System Definition > Scheduled Jobs`.
   - Create jobs for each CI type (e.g., Windows, Unix, Load Balancers).
   - Use the provided script snippets, such as:
@@ -990,7 +944,6 @@ Back to [SNow ITOM](./sn-itom.md)
   - Repeat for other CI types (Unix, Routers & Switches, Load Balancers).
 
 - **Option 2: Full Conversion Script** (Recommended for smaller CMDBs):
-
   - Navigate to `System Definition > Scheduled Jobs`.
   - Create a job with the script:
 
@@ -1669,3 +1622,95 @@ Back to [SNow ITOM](./sn-itom.md)
         - _Service Map Form button_ (cogwheel)
           - Related Links > Recalculate Service
           - _View Map_
+
+## Delta Content
+
+### Xanadu
+
+- [Delta Exam Study Guide](https://nowlearning.servicenow.com/lxp/en/credentials/certified-system-administrator-delta-exam-study-guide-vancouver?id=kb_article_view&sysparm_article=KB0012139)
+- **Upgrading to Xanadu**
+  - Install **Service Mapping Plus version 1.13.0** from the ServiceNow® Store for improved Service Mapping.
+  - Install the **App Service Extension** app to further enhance application service mapping (especially for Service Mapping Plus customers).
+  - **Discovery and Service Mapping Patterns** are available in the ServiceNow Store (see "Activation information" in the release notes).
+- **ITOM Visibility Enhancements**
+  - **Discovery Admin Workspace**:
+    - Unified location to configure Discovery, track progress, manage errors, and leverage diagnostic tools.
+    - Home: View discovery trends, tasks, and access relevant ITOM Visibility apps.
+    - Schedules: Gain insights into discovery performance.
+    - Diagnostics: Troubleshoot discovery errors.
+    - Insights: Access reports to optimize discovery operations.
+  - **Data Enrichment**:
+    - Expand discovered data in the CMDB using ITOM Content Service.
+    - Create application services using CMDB-based mapping.
+  - **Kubernetes Integration**:
+    - Upgrade and configure Informer pods from the ServiceNow instance (no direct Kubernetes admin dependency).
+    - Use OAuth2.0 authorization for enhanced security.
+  - **MID Server Enhancements**:
+    - Run other applications without storing credentials on the instance (Microsoft Azure Key Vault).
+    - Log file compression available (disabled by default).
+  - **CMDB-Based Mapping**:
+    - Use Automated Service Suggestions and existing CMDB data (no MID Server needed) to create new application services.
+  - **Cloud Native Operations (CNO) for Visibility**:
+    - From version 3.6.3, upgrade the CNO Informer directly from the instance.
+    - Control Informer execution parameters from the instance.
+    - Store instance credentials in Microsoft Azure Vault (when using AKS).
+- **Key Changes in This Release**
+  - **Shazzam Probe Enhancements**:
+    - Collect expanded data from devices.
+    - View extended Shazzam data in Discovery Admin Workspace (Insights tab).
+  - **Service Mapping Roles**:
+    - `service_mapping_admin` replaces `sm_admin`.
+    - `service_mapping_user` replaces `sm_user`.
+    - Updated roles improve visibility into ML-powered candidate suggestions.
+  - **New/Updated Discovery & Service Mapping Patterns**:
+    - Discover Dell EMC Data Domain storage and Dell EMC PowerMax storage.
+    - New pattern extensions: Pure Storage FlashArray, Azure SQL license information.
+  - **Integration with Agent Client Collector**:
+    - Top-down Service Mapping supports Automated Service Suggestions using Agent Client Collector.
+
+### Zurich
+
+- **Delta Exam Study Guide**
+  - [Certified Implementation Specialist – Service Mapping Delta Exam Study Guide](https://learning.servicenow.com/lxp/en/credentials/certified-system-administrator-delta-exam-study-guide-vancouver?id=kb_article_view&sysparm_article=KB0012139)
+- **Tag-based Service Mapping**
+  - Requires Service Mapping Plus v1.16.3
+  - Uses tags to categorize CIs and create application services
+  - Tags stored in Key Value [cmdb_key_value] table
+  - Tag Governance recommended
+  - Discovery required to populate tagged CIs
+  - Role required: `service_mapping_admin`
+- **Create Tag-based Application Services**
+  - Navigation: Workspaces > Service Mapping > Tag-based Service Mapping
+  - Create or select tag category
+  - Define tag values
+  - Find candidates
+  - Map selected candidates
+  - Create tag-based service family
+  - Result: tag-based application service and service family
+- **Service Mapping Workspace**
+  - Navigation: Workspaces > Service Mapping
+  - Central workspace for creating and managing application services
+- **Key Capabilities**
+  - Machine Learning readiness validation
+  - Automated Service Suggestions
+  - Tag-based service mapping dashboard
+  - Unmapped servers used to create application services
+- **Key Metrics**
+  - Mapped application services
+  - ML-powered candidates
+  - Mapped servers
+- **Reports**
+  - Service maps by operation type
+  - Service maps by creation method
+  - Service maps by criticality
+  - Unmapped servers
+    - Behavior differs before and after Service Mapping Plus v1.16.3
+    - Filtering improvements require ITOM Content Service
+- **Application Service Readiness**
+  - Validates Predictive Intelligence
+  - Confirms Machine Learning readiness
+  - Verifies training data
+- **Kubernetes Visibility Agent**
+  - Continuous discovery for Kubernetes resources
+  - Updates CMDB with cluster changes
+  - Supports EKS, GKE, AKS, OpenShift, Rancher

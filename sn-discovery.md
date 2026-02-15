@@ -187,7 +187,6 @@
 #### DE: Advanced Discovery Configuration
 
 - [Advanced Discovery configuration](https://docs.servicenow.com/csh?topicname=c_DiscoveryExtendedCapabilities.html&version=latest)
-
   - [Group managed service accounts (gMSAs) configuration for Discovery](https://docs.servicenow.com/csh?topicname=gmsa-configuration-for-discovery.html&version=latest)
   - [Credential-less Discovery with Nmap](https://docs.servicenow.com/csh?topicname=nmap-credential-less-discovery.html&version=latest)
   - [PowerShell for Discovery and Service Mapping](https://docs.servicenow.com/csh?topicname=r_PowerShellForDiscovery.html&version=latest)
@@ -1429,3 +1428,94 @@
 - Focus discovery only on **principal CI classes** the CMDB team wants to manage
 - Navigation: **Discovery Definition > Configuration Console**
 - [docs: Discovery Configuration Console](https://docs.servicenow.com/bundle/xanadu-it-operations-management/page/product/discovery/concept/c_DiscoveryConfigurationConsole.html)
+
+## Delta Exams
+
+### Zurich
+
+- [CIS-Discovery Delta Exam Study Guide – Zurich](https://learning.servicenow.com/lxp/en/credentials/certified-system-administrator-delta-exam-study-guide-vancouver?id=kb_article_view&sysparm_article=KB0012130)
+
+- **Discovery Admin Workspace**
+  - Navigation: Workspaces > Discovery Admin Workspace
+  - Central workspace to assess Discovery, manage schedules, and resolve errors
+- **Home – Quick Overview**
+  - **Active schedules**
+    - Count of active IP-based and Cloud Discovery schedules
+    - Redirects to Schedules page
+  - **Error tasks**
+    - Active Discovery error tasks
+    - Redirects to Case management
+  - **Schedules with anomalies**
+    - Visible only when anomaly detection is enabled
+    - Redirects to Anomaly detection tab
+  - **Discovery admin tasks**
+    - Top three critical Discovery error tasks
+  - **Discovery tuning advice**
+    - Automated suggestions for Discovery and MID Server tuning
+  - **Quick Discovery**
+    - Run discovery outside schedules
+    - Supports single IP, IP range, IP list, IP network
+    - MID Server, MID cluster, or auto-selection
+  - **ITOM Visibility apps**
+    - View installed and available ITOM Visibility applications
+    - App updates require `admin`
+  - **Learnings**
+    - ITOM Visibility Knowledge Base resources
+    - Requires ITOM Content Service v1.2.8
+- **Diagnostics**
+  - Navigation: Workspaces > Discovery Admin Workspace > Diagnostics
+  - Prioritize and resolve Discovery errors and anomalies
+- **Anomaly Detection**
+  - Visible only when anomaly detection is enabled
+  - Anomaly types:
+    - Failed schedule
+    - Low CI discovery rate
+    - Increased error count
+    - Long run time
+  - Severity levels: Critical, Major, Minor
+  - Thresholds configurable on Settings page
+- **Diagnostics – Errors**
+  - Create or edit error tasks
+  - Ignore errors or retry discovery
+  - Filter by category: CMDB, Configuration, Credentials, Internal, Network
+  - Error Stats Page:
+    - Instructions
+    - Knowledge Base article (if available)
+    - Suggested actions
+- **Case Management**
+  - Manage Discovery error tasks
+  - Kanban Board View and List View
+  - Create tasks from existing errors
+- **Support Tools & Logs**
+  - ECC Queue and Discovery Logs access
+  - Logs can be filtered and exported
+- **Ignored Errors**
+  - Retained for 30 days
+  - Can be restored using Undo ignore
+- **Virtual Agent Chat**
+  - Available when `sn_disco_workspace.visibility_diagnostic_utility.enabled` = true
+  - Capabilities:
+    - MID Server Pre-Upgrade Check
+    - MID Server Status Validation
+    - MID Server Mutual Authentication
+    - Pattern Synchronization Validation
+    - Discovery Performance Metrics
+    - Retrieve Pattern Logs, Discovery Logs, Node Logs
+- **Schedules**
+  - Navigation: Workspaces > Discovery Admin Workspace > Schedules
+  - Monitor, manage, and create Discovery schedules
+- **Schedules – Overview**
+  - Active schedules
+  - Schedules completed without anomalies
+  - Schedule trends with anomaly indicators
+  - Schedules by location
+  - Errors by category
+- **Discovery Schedules**
+  - View IP-based and Cloud Discovery schedules
+  - Filter by type, location, provider
+  - Edit and run schedules from workspace
+- **Quick Discovery**
+  - Available from any Schedules tab
+  - Run IP-based discovery directly
+- **New Discovery**
+  - Create IP-based or Cloud Discovery schedules

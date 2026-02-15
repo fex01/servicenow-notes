@@ -1243,7 +1243,6 @@ Check also [Lab 1](#l1-a-validate-plugins) for plugin validation.
 #### PM: Asset Retirement
 
 - **Asset Retirement Overview**
-
   - Asset retirement is more than just changing an asset’s state
   - Common reasons for retirement
     - Reducing maintenance costs, parts, and asset-related taxes
@@ -2173,7 +2172,6 @@ To create the associated asset: 5. End impersonation 6. Navigate to **System Def
 6. Submit the transfer order line.
 7. Create two additional transfer order lines for one Apple MacBook Pro 15" laptop each, selecting assets with a state of **In stock** and a substate of **Available**.
 8. Validate that there are three lines:
-
    - One line for 20 Logitech M510 wireless mice.
    - Two lines for Apple MacBook Pro 15" laptops.
 
@@ -3085,3 +3083,68 @@ To create the associated asset: 5. End impersonation 6. Navigate to **System Def
    - **AND Asset.Class**: `is Hardware`
 7. Save the conditions and close the condition builder.
 8. Review the resulting graph.
+
+## Delta Exams
+
+### Zurich
+
+- **Delta Exam Study Guide**
+  - [Certified Implementation Specialist – Hardware Asset Management Delta Exam Study Guide](https://learning.servicenow.com/lxp/en/credentials/certified-system-administrator-delta-exam-study-guide-vancouver?id=kb_article_view&sysparm_article=KB0012133)
+- **Asset put away**
+  - Tracks asset movement from receiving bay to stockroom drop-off location
+  - Asset put away task auto-created in Hardware Asset Workspace when:
+    - Hardware asset created and Aisle-space is empty
+    - Stockroom updated on Hardware Asset Details form
+    - Stockroom enabled to perform warehouse tasks (required for stockroom task creation)
+  - Inventory users can:
+    - Create Asset put away task manually for in stock assets
+    - View open put away tasks
+    - Update Drop off location and close task
+    - Use ServiceNow Agent application to scan assets and put away to scanned drop-off location
+- **Asset Attestation**
+  - Audits serialized hardware assets assigned to employees (supports remote audits)
+  - Create one-time asset attestation or attestation schedule (recurring)
+  - Hardware Asset Management v13.0.0
+    - Playbook is default for creation of asset attestations and schedules
+    - Set `sn_itam_common.enable_asset_attestation_playbook` = false to use forms (role: asset or inventory_admin)
+  - Dependencies (ServiceNow Store applications)
+    - Employee Center (sn_ex_sp)
+    - Employee Profile (sn_employee)
+  - Limitations
+    - Only serialized hardware assets in opted-in resource categories
+    - Consumables, bundles, pallets cannot be attested
+    - HAM + Telecommunications Network Inventory: Server, Network gear, Telecom Network Inventory (TNI)
+    - HAM + Zero Touch Mobility: Mobile Device
+- **Asset Attestation tables**
+  - Asset Attestation [sn_itam_common_asset_attestation]
+  - Attestations for Asset [sn_itam_common_attestation_asset_m2m]
+  - Asset Attestation Schedule [sn_itam_common_attestation_schedule]
+  - ITAM Common- Asset attestation daily job creates attestations based on schedule frequency
+- **Asset analytics view**
+  - Available with Hardware Asset Management v10.0.0+
+  - Filters: location, stockroom, model category
+  - Total cost of ownership (TCO)
+    - Approaching benchmark TCO threshold default: 75%
+    - Property: `sn_itam_common.asset_tco_benchmark_threshold_percentage`
+    - Domain separation support requires plugins:
+      - Domain Extension Installer (com.glide.domain.msp_extensions.installer)
+      - Domain Support (com.snc.pa.domain_support)
+  - Asset performance KPIs: Availability, Mean time between failures (MTBF), Mean time to repair (MTTR)
+    - Max two filters on KPI reports: Domain, Location, Classification, Model
+- **Inventory reports (Hardware Asset Workspace)**
+  - Inventory availability report (replacement options, substitute models, lead time)
+  - Supply vs Demand report (available/incoming vs requests)
+  - Open demands report (available stock to fulfill sourcing requests)
+- **Content lookup portal**
+  - Visibility into Content Library (IT Asset Management Content Service)
+  - Content library portal application from ServiceNow Store
+  - Requires AI Search (com.glide.ais) plugin
+  - Navigation: Hardware Asset Workspace > Content lookup
+  - First access charts not populated; run Historical Data Collection jobs
+  - Tabs (HAM only + asset role): Hardware Overview, Hardware Manufacturers, Hardware Products, Hardware Models, Hardware Lifecycles
+  - Tables used:
+    - Hardware Product [sn_hamp_hw_product]
+    - Hardware Model Libraries [sn_hamp_hw_product_model]
+    - Hardware Manufacturer [sn_hamp_hw_manufacturer]
+    - Hardware Lifecycle Definition [sn_hamp_lifecycle_definition]
+  - Content record page opens read-only

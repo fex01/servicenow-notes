@@ -29,42 +29,6 @@ back to [Asset Management](./sn-asset.md)
 
 - []
 
-## Delta Content
-
-### Xanadu
-
-- [Delta Exam Study Guide](https://nowlearning.servicenow.com/lxp/en/credentials/certified-system-administrator-delta-exam-study-guide-vancouver?id=kb_article_view&sysparm_article=KB0012141)
-- **Success Portal in Software Asset Workspace**  
-  - Track SAM progress with success goals, success activities, health checks, Value builder tasks, and maturity items.  
-  - Set up success goals to analyze license value and calculate savings.  
-  - Create success activities tied to goals for ongoing progress tracking.  
-  - Use health checks to review license, permission, and configuration statuses.  
-  - Review Value builder tasks to address software upgrades, publisher packs, and integrations.  
-  - Improve SAM maturity through Crawl, Walk, and Run stages; link maturity items to goals and tasks.  
-  - Notifications are sent for assigned goals/activities or when a goal is Pending Review.  
-  - Domain separation is supported when Performance Analytics – Domain Support is active.
-- **SaaS Detection Report**  
-  - Identifies and manages SaaS applications accessed through a browser and linked to Digital End-User Experience (DEX).  
-  - Helps address shadow IT usage by revealing user access and usage duration.  
-  - Requires SAM – SaaS License Management (v13.1.0+) and DEX (v2.1.0+).
-- **Adobe Cloud Integration**  
-  - Tracks subscriptions and compliance for Creative Cloud, Experience Cloud, and Document Cloud.  
-  - Only supports Adobe Creative Cloud for Enterprise plans.  
-  - Integrations use either JWT or OAuth Server to Server credentials.
-- **Publish a Specific Set of Software Products**  
-  - Focus on reporting licensable products relevant to your current SAM implementation phase.  
-  - Start small, then expand scope as needed.  
-  - Ensure the `com.snc.samp.manage.published.products` property is enabled.
-- **Software Asset Management for Red Hat Enterprise Linux (RHEL)**  
-  - Requires the Software Asset Management Professional for IBM plugin (`com.sn_samp_ibm`) and CMDB CI Class Models from the Store.  
-  - RHEL discovery relies on Discovery and Service Mapping Patterns from the Store.  
-  - Supports socket-pair and core-based licensing for RHEL.  
-  - Create entitlements manually or import via spreadsheet.
-- **Bring Your Own License (BYOL) to Public Cloud**  
-  - Leverage existing Microsoft (SQL Server, Windows Server) or Oracle (Database, WebLogic) on AWS, Azure, GCP.  
-  - Pay only for infrastructure costs.  
-  - Includes Oracle Database Standard/Enterprise and Oracle WebLogic Server editions.
-
 ## Topics
 
 ### SAM Architecture
@@ -880,3 +844,152 @@ back to [Asset Management](./sn-asset.md)
       - Microsoft SQL Server and Microsoft Windows Server
       - Cloud Special Rights such as dual use rights, edition flexibility, and unlimited virtualization
       - remediation when software is out of compliance
+
+## Delta Content
+
+### Xanadu
+
+- [Delta Exam Study Guide](https://nowlearning.servicenow.com/lxp/en/credentials/certified-system-administrator-delta-exam-study-guide-vancouver?id=kb_article_view&sysparm_article=KB0012141)
+- **Success Portal in Software Asset Workspace**
+  - Track SAM progress with success goals, success activities, health checks, Value builder tasks, and maturity items.
+  - Set up success goals to analyze license value and calculate savings.
+  - Create success activities tied to goals for ongoing progress tracking.
+  - Use health checks to review license, permission, and configuration statuses.
+  - Review Value builder tasks to address software upgrades, publisher packs, and integrations.
+  - Improve SAM maturity through Crawl, Walk, and Run stages; link maturity items to goals and tasks.
+  - Notifications are sent for assigned goals/activities or when a goal is Pending Review.
+  - Domain separation is supported when Performance Analytics – Domain Support is active.
+- **SaaS Detection Report**
+  - Identifies and manages SaaS applications accessed through a browser and linked to Digital End-User Experience (DEX).
+  - Helps address shadow IT usage by revealing user access and usage duration.
+  - Requires SAM – SaaS License Management (v13.1.0+) and DEX (v2.1.0+).
+- **Adobe Cloud Integration**
+  - Tracks subscriptions and compliance for Creative Cloud, Experience Cloud, and Document Cloud.
+  - Only supports Adobe Creative Cloud for Enterprise plans.
+  - Integrations use either JWT or OAuth Server to Server credentials.
+- **Publish a Specific Set of Software Products**
+  - Focus on reporting licensable products relevant to your current SAM implementation phase.
+  - Start small, then expand scope as needed.
+  - Ensure the `com.snc.samp.manage.published.products` property is enabled.
+- **Software Asset Management for Red Hat Enterprise Linux (RHEL)**
+  - Requires the Software Asset Management Professional for IBM plugin (`com.sn_samp_ibm`) and CMDB CI Class Models from the Store.
+  - RHEL discovery relies on Discovery and Service Mapping Patterns from the Store.
+  - Supports socket-pair and core-based licensing for RHEL.
+  - Create entitlements manually or import via spreadsheet.
+- **Bring Your Own License (BYOL) to Public Cloud**
+  - Leverage existing Microsoft (SQL Server, Windows Server) or Oracle (Database, WebLogic) on AWS, Azure, GCP.
+  - Pay only for infrastructure costs.
+  - Includes Oracle Database Standard/Enterprise and Oracle WebLogic Server editions.
+
+### Zurich
+
+- **Delta Exam Study Guide**
+  - [Certified Implementation Specialist – Software Asset Management Delta Exam Study Guide](https://learning.servicenow.com/lxp/en/credentials/certified-system-administrator-delta-exam-study-guide-vancouver?id=kb_article_view&sysparm_article=KB0012141)
+- **Software Asset Management Guided Experiences**
+  - Provides step-by-step guidance for daily software management tasks
+  - Installed from ServiceNow Store
+  - Accessed from Software Asset Workspace landing page
+- **Playbooks**
+  - Workflow broken into lanes
+  - Each lane includes tasks, status indicators, check boxes
+  - Components:
+    - task lanes
+    - work area
+    - activity log
+  - Review screen shown before selecting Finish
+- **Using playbook to set up entitlements**
+  - Guided walk-through from initiation to completion
+  - Used to create software entitlements
+- **Guided Setup**
+  - Access: Workspaces > Software Asset Workspace > Success portal
+  - Product Setups tab
+  - Supports:
+    - SaaS
+    - On-premise
+  - Products with Guided Setup:
+    - Microsoft SQL Server (single instance at a time)
+    - Microsoft Windows Server (single instance at a time)
+    - Microsoft 365
+    - Adobe Cloud
+  - Required tasks must be completed to proceed
+- **Subscription exclusions**
+  - Used to exclude subscriptions from license cost calculations
+  - Types:
+    - Identifier-based exclusions
+    - User-based exclusions
+  - Role required: `sam_admin`
+  - Identifier-based exclusions:
+    - Specific to subscription profile type
+  - User-based exclusions:
+    - Apply across all SaaS integration profiles
+- **Software models**
+  - Profile of purchased software
+  - Can link multiple entitlements
+  - Deleting a software model deletes related downgrade rights records
+- **Software entitlements**
+  - Record license terms and rights
+  - Used to track compliance
+  - Supports remediation when rights are exceeded or underused
+- **Import software entitlements**
+  - Supports bulk import
+  - Publisher Part Number (PPN):
+    - Matched to Content Service Library
+    - Can trigger automatic software model creation
+  - Microsoft-specific rules:
+    - Step-up license type only for Microsoft
+    - Contractual licenses require start and end date
+- **Automatic creation of software models**
+  - Created automatically when installations are discovered
+- **Content lookup portal (SAM)**
+  - Visibility into Content Library data
+  - Requires:
+    - Content library portal application
+    - AI Search (com.glide.ais)
+  - Navigation: Software Asset Workspace > Content lookup
+  - First access requires Historical Data Collection jobs
+  - Tabs (SAM Professional + `sam_user`):
+    - Software Overview
+    - Software Publishers
+    - Software Products
+    - Software DMAPs
+    - Software Lifecycles
+    - Software PPNs
+  - Content opens in read-only mode
+- **License usage view**
+  - Navigation: Software Asset Workspace > License usage
+  - Single plane for license position and compliance
+  - Capabilities:
+    - View reconciliation results
+    - Manage removal candidates
+    - Forecast license needs
+    - Generate and export reports
+  - Publishers tab:
+    - Compliance status: compliant, non-compliant, failed
+    - Pin publishers (user-specific)
+    - Published status filter controlled by system property
+- **Publisher details**
+  - Shows:
+    - Product Results
+    - Software Model Results
+    - License Metric Results
+    - Removal candidates
+    - Entitlements
+  - Navigation tree statuses:
+    - Compliant
+    - Not compliant
+    - Failed
+- **Reconciliation**
+  - Results shown in License usage view
+  - Status:
+    - Completed
+    - Failed
+    - Partially Completed
+- **Removal candidates**
+  - Used to reclaim unused software
+  - Managed from License usage view
+- **Reports**
+  - Includes:
+    - Software license compliance position
+    - SaaS detection report
+    - Microsoft infrastructure reports
+    - Oracle reports
