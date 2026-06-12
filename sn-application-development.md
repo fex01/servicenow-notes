@@ -2181,3 +2181,1070 @@ Referenced User Data
   - Verify Loaner Request records appear in the list
   - If records do not appear:
     - Debug and re-test
+
+### Lab 5.1.1 - Configure application security
+
+🎯 **Goal**: Implement role-based security for the Loaner Request application, including access to modules, records, fields, and views, and complete the update set.
+
+- **A. Create an update set**
+  - In **ServiceNow Studio**, open **Apps > Loaner Request**
+  - Open the **Update set** widget
+  - Select _+ New_
+  - Name=`LR-Module 5`
+  - Select _Save_
+  - Select _Apply_
+
+- **B. Configure roles, groups, and users**
+  - In **ServiceNow Studio**, navigate to:
+    - **Loaner Request app > Role > x\_...loaner...admin**
+  - In **Contains Roles** related list:
+    - Select _Edit_
+    - Add role=`x_...loaner...user`
+    - Select _Save_
+    - Select _Update_
+  - In main browser, navigate to **User Administration > Groups**
+  - Select _New_
+  - Configure:
+    - Name=`Loaner Request Admins`
+    - Description=`Loaner Request application users with admin role`
+  - Select _Save_
+  - In **Roles** related list:
+    - Select _Edit_
+    - Add role=`x_...loaner...admin`
+    - Select _Save_
+    - Select _Update_
+  - Navigate to **User Administration > Users**
+  - Open user=`System Administrator`
+    - In **Groups**:
+      - Select _Edit_
+      - Add `Loaner Request Admins`
+      - Select _Save_
+      - Select _Update_
+  - Open user=`Fred Luddy`
+    - In **Roles**:
+      - Select _Edit_
+      - Remove `admin`
+      - Select _Save_
+    - In **Groups**:
+      - Select _Edit_
+      - Add `Loaner Request Admins`
+      - Select _Save_
+      - Select _Update_
+
+- **C. Secure application modules**
+  - In **ServiceNow Studio**, open module=`All`
+  - In **Roles**:
+    - Remove `x_...loaner...user`
+    - Add `x_...loaner...admin`
+    - Select _Done_
+    - Select _Update_
+  - Repeat for modules:
+    - `Closed`
+    - `Open - Unassigned`
+  - Leave other modules unchanged
+
+- **D. Secure record and field access (ACLs)**
+  - In main browser:
+    - Select profile > _Elevate role_
+    - Enable `security_admin`
+    - Select _Update_
+  - In **ServiceNow Studio**, navigate to:
+    - **Access Control > Loaner Request**
+  - Edit **Read ACL**:
+    - Remove role=`x_...loaner...user`
+    - Add role=`x_...loaner...admin`
+    - Select _Update_
+  - Edit **Delete ACL**:
+    - Ensure only role=`x_...loaner...admin`
+  - Create new **Read ACL (Condition-based)**:
+    - Type=`record`
+    - Operation=`read`
+    - Decision=`Allow if`
+    - Admin Overrides=`true`
+    - Name=`Loaner Request / --None--`
+    - Active=`true`
+    - Requires role=`x_...loaner...user`
+    - Condition:
+      - `Requested for` `is (dynamic)` `Me`
+    - Select _Submit_
+  - Create new **Read ACL (Script-based)**:
+    - Type=`record`
+    - Operation=`read`
+    - Decision=`Allow if`
+    - Admin Overrides=`true`
+    - Active=`true`
+    - Advanced=`true`
+    - Requires role=`x_...loaner...user`
+    - Script:
+      - `current.isNewRecord();`
+    - Select _Submit_
+  - In main browser:
+    - Disable `security_admin` via _Elevate role_
+
+- **E. Create View Rule (force ESS view)**
+  - In **ServiceNow Studio**, select _Create_ > _File_
+  - File type=`View Rule [sysrule_view]`
+  - Configure:
+    - Name=`Users see only ESS view`
+    - Active=`true`
+    - Advanced=`true`
+    - Table=`Loaner Request`
+    - Device type=`Browser`
+  - Script:
+    - `if(!gs.hasRole('x_...loaner...admin')){`
+    - `  answer = 'ess';`
+    - `}`
+  - Select _Submit_
+
+- **F. Validate security behavior (impersonation testing)**
+  - Impersonate **Fred Luddy (admin/fulfiller)**:
+    - Can create records
+    - Sees all modules
+    - Can read/edit/delete all records
+    - Can access all views
+  - Impersonate **Beth Anglin (user/requester)**:
+    - Can create records
+    - Sees modules:
+      - `Create New`
+      - `Open`
+    - Can read records where `Requested for = Me`
+    - Forced to `Self Service (ESS)` view
+  - Impersonate **Abel Tuter (non-user)**:
+    - No access to application or records
+
+- **G. Complete the update set**
+  - End impersonation
+  - In **ServiceNow Studio**, go to **Deployment > Update sets**
+  - Expand **Application: Loaner Request**
+  - Open update set=`LR-Module 5`
+  - Set:
+    - State=`Complete`
+    - Description=`Module 5 labs complete`
+  - Select _Update_
+  - Close update set tab
+
+### Lab 5.2.1 - Set application access
+
+🎯 **Goal**: Test and understand cross-scope application access by executing a Fix Script from Global scope with and without update permissions on the Loaner Request table.
+
+- **A. Prepare table application access settings**
+  - Ensure user=`System Administrator` (no elevated privileges)
+  - In **ServiceNow Studio**, navigate to **Table > Loaner Request**
+  - From _Additional actions_, select _Advanced view_
+  - In **Application Access** tab, verify:
+    - Accessible from=`All application scopes`
+    - Can read=`true`
+    - Can create=`false`
+    - Can update=`false`
+    - Can delete=`false`
+    - Allow access via web services=`true`
+  - Select _Update_
+  - In main browser, navigate to **Loaner Request > All**
+  - Verify sufficient records exist (create ≥4 active records if needed)
+
+- **B. Create Fix Script in Global scope**
+  - In main browser, switch scope=`Global`
+  - Navigate to **System Definition > Fix Scripts**
+  - Select _New_
+  - Name=`Update LNRs from Global`
+  - Add script:
+    - `gs.invalidateCache();`
+    - `var loanerRecs = new GlideRecord('x_..._loaner_request');`
+    - `loanerRecs.addQuery('state','!=',3);`
+    - `loanerRecs.setLimit(3);`
+    - `loanerRecs.query();`
+    - `while(loanerRecs.next()){`
+    - `  loanerRecs.setValue('state',3);`
+    - `  loanerRecs.update();`
+    - `}`
+  - Select _Save_ (not Submit)
+
+- **C. Test without cross-scope update access**
+  - Select _Run Fix Script_
+  - Select _Proceed_
+  - Observe output:
+    - Error message: `Security restricted: Write operation... refused due to cross-scope access policy`
+  - Select _Close_
+  - Navigate to **Loaner Request > All**
+  - Verify:
+    - No records updated to `Closed Complete`
+
+- **D. Enable update access and re-test**
+  - Switch scope back to `Loaner Request`
+  - In **ServiceNow Studio**, open **Table > Loaner Request**
+  - Select _Advanced view_
+  - In **Application Access**:
+    - Set Can update=`true`
+  - Select _Update_
+  - Refresh browser
+  - Return to Fix Script
+  - Select _Run Fix Script_
+  - Select _Proceed_
+  - Observe:
+    - No "Security restricted" message
+  - Select _Close_
+  - Navigate to **Loaner Request > All**
+  - Verify:
+    - Up to 3 records updated to `Closed Complete`
+
+- **E. Reset application access**
+  - In **ServiceNow Studio**, open **Table > Loaner Request**
+  - In **Application Access**:
+    - Set Can update=`false`
+  - Select _Update_
+
+### Lab 6.1.1 - Flow Designer to manage deployment states
+
+🎯 **Goal**: Build a Flow Designer automation to manage Loaner Request lifecycle for laptops and create supporting table and business rule.
+
+- **A. Create an update set**
+  - In **ServiceNow Studio**, open **Apps > Loaner Request**
+  - Open the **Update set** widget
+  - Select _+ New_
+  - Name=`LR-Module 6`
+  - Select _Save_
+  - Select _Apply_
+
+- **B. Create Loaner Task table**
+  - In **ServiceNow Studio**, select _Create_ > _File_
+  - Select **Data** > `Table`
+  - Select _Continue_
+  - Configure:
+    - Label=`Loaner Task`
+    - Extends table=`Task`
+    - Create module=`true`
+    - Create mobile module=`false`
+    - Add module to menu=`Loaner Request`
+  - In **Controls** tab:
+    - Create access controls=`true`
+    - User role=`x_...loaner...admin`
+  - Select _Submit_
+
+- **C. Create Flow: Loaner Laptop**
+  - In **ServiceNow Studio**, select _Create_ > _File_
+  - Select **Automation** > `Flow`
+  - Select _Continue_
+  - Configure:
+    - Flow name=`Loaner Laptop`
+    - Application=`Loaner Request`
+    - Description=`Basic flow for assigning work on a loaner laptop`
+    - Protection=`None`
+    - Run As=`User who initiates session`
+  - Select _Build flow_
+
+- **D. Configure Flow Trigger**
+  - Select _Add a trigger_
+  - Trigger type=`Created or Updated`
+  - Table=`Loaner Request`
+  - Conditions:
+    - `Item type` `is` `Laptop`
+    - `State` `is` `Reserved`
+  - Run Trigger=`Once`
+  - Select _Done_
+  - Select _Save_
+
+- **E. Add Wait For Condition actions**
+  - Add action: **Wait For Condition**
+    - Record=`Loaner Request Record`
+    - Condition=`State is Deployment Prep`
+  - Select _Done_
+  - Select _Save_
+  - Add second **Wait For Condition**:
+    - Record=`Loaner Request Record`
+    - Condition=`State is Post Deployment`
+  - Select _Done_
+  - Select _Save_
+
+- **F. Add Create Task actions**
+  - Add action: **Create Task**
+    - Table=`Loaner Task`
+    - Add field:
+      - Parent=`Loaner Request Record`
+    - Priority=`3 - Moderate`
+    - Short description=`Prepare the laptop for deployment`
+    - Wait=`true`
+    - Annotation=`Deployment Prep`
+  - Select _Done_
+  - Select _Save_
+  - Add second **Create Task**:
+    - Table=`Loaner Task`
+    - Parent=`Loaner Request Record`
+    - Priority=`3 - Moderate`
+    - Short description=`Perform the post deployment tasks`
+    - Wait=`true`
+    - Annotation=`Post Deployment`
+  - Select _Done_
+  - Select _Save_
+
+- **G. Add Update Record actions**
+  - Add action: **Update Record**
+    - Record=`Loaner Request Record`
+    - Field:
+      - State=`Ready for Pickup`
+    - Annotation=`Ready for Pickup`
+  - Select _Done_
+  - Select _Save_
+  - Add second **Update Record**:
+    - Record=`Loaner Request Record`
+    - Field:
+      - State=`Closed Complete`
+    - Annotation=`Closed Complete`
+  - Select _Done_
+  - Select _Save_
+  - Arrange flow order:
+    - Trigger
+    - Wait (Deployment Prep)
+    - Create Task (Deployment Prep)
+    - Update Record (Ready for Pickup)
+    - Wait (Post Deployment)
+    - Create Task (Post Deployment)
+    - Update Record (Closed Complete)
+
+- **H. Modify Loaner Task State field**
+  - In **ServiceNow Studio**, select _Create_ > _File_
+  - File type=`Form`
+  - Table=`Loaner Task`
+  - Select _Open_
+  - Select `State` field
+  - Edit **Choices**:
+    - Open=`1`
+    - Work in Progress=`2`
+    - Closed Complete=`3`
+  - Remove all other choices
+  - Select _Apply_
+  - Confirm override
+  - Set Default=`1`
+  - Select _Save_
+
+- **I. Prepare for testing**
+  - Flow trigger conditions:
+    - `Item type = Laptop`
+    - `State = Reserved`
+  - Add related list:
+    - Open Loaner Request record
+    - Right-click header > _Configure > Related Lists_
+    - Add `Loaner Task > Parent`
+    - Select _Save_
+
+- **J. Test the flow**
+  - In Flow Designer, select _Test_
+  - Create new record:
+    - Requested for=`<value>`
+    - State=`Reserved`
+    - Start date=`<value>`
+    - End date=`<value>`
+    - Item type=`Laptop`
+  - Select _Run Test_
+  - Open execution details
+  - Validate progression:
+    - Flow pauses at `Wait for Deployment Prep`
+  - Update record:
+    - Set State=`Deployment Prep`
+    - Save
+  - Refresh flow execution
+  - Close Loaner Task records
+  - Update record:
+    - State=`Post Deployment`
+    - Save
+  - Close Loaner Tasks
+  - Verify:
+    - State auto-updates to `Closed Complete`
+  - Activate flow:
+    - Select _Activate_
+    - Confirm activation
+
+- **K. Create Business Rule: Set Reserved State**
+  - In **ServiceNow Studio**, select _Create_ > _File_
+  - File type=`Business Rule`
+  - Configure:
+    - Name=`Set Reserved State`
+    - Table=`Loaner Request`
+    - Active=`true`
+    - When:
+      - Insert=`true`
+      - Update=`true`
+    - Conditions:
+      - State=`Requested`
+      - Configuration item=`changes`
+      - Configuration item=`is not empty`
+  - In **Actions** tab:
+    - Set field:
+      - State=`Reserved`
+  - Select _Submit_
+  - Test:
+    - Update record:
+      - State=`Requested`
+      - Set `Configuration item`
+    - Save
+  - Verify:
+    - State updates to `Reserved`
+    - Flow triggers if `Item type = Laptop`
+
+### Lab 6.2.1 - Create application properties
+
+🎯 **Goal**: Create and manage application properties for the Loaner Request application, including category, properties, module, and access control.
+
+- **A. Create System Property Category**
+  - In **ServiceNow Studio**, select _Create_ > _File_
+  - Select **Properties**
+  - File type=`System Property Category`
+  - Select _Continue_
+  - Configure:
+    - Name=`Loaner Request`
+    - Title=`Loaner Request Properties`
+    - Add informational text (e.g., admin guidance)
+  - Apply formatting to Title
+  - Select _Submit_
+
+- **B. Create System Properties**
+  - In **ServiceNow Studio**, select _Create_ > _File_
+  - Select **Properties**
+  - File type=`System Property`
+  - Select _Continue_
+  - Create property:
+    - Suffix=`pickup.leadtime`
+    - Description=`Number of hours before a reservation starts to send a reminder`
+    - Type=`integer`
+    - Value=`24`
+    - Read roles=`x_...loaner...admin`
+    - Write roles=`x_...loaner...admin`
+  - Select _Submit_
+  - Create additional properties:
+    - Suffix=`return.remindtime`
+      - Description=`Number of hours before a reservation ends to send a reminder`
+      - Type=`integer`
+      - Value=`24`
+      - Read/Write roles=`x_...loaner...admin`
+    - Suffix=`overdue.remindtime`
+      - Description=`Number of hours between overdue reminders`
+      - Type=`integer`
+      - Value=`24`
+      - Read/Write roles=`x_...loaner...admin`
+
+- **C. Configure property category and ordering**
+  - Open **Loaner Request System Property Category**
+  - In **Properties** related list:
+    - Select _Edit_
+    - Move all three properties to selected list
+    - Select _Save_
+  - Set Order values:
+    - `<scope>.pickup.leadtime`=`100`
+    - `<scope>.return.remindtime`=`200`
+    - `<scope>.overdue.remindtime`=`300`
+  - Select _Update_
+
+- **D. Create Properties module**
+  - In **ServiceNow Studio**, select _Create_ > _File_
+  - Select **User Interface** > `Module`
+  - Configure:
+    - Title=`Properties`
+    - Application Menu=`Loaner Request`
+    - Order=`800`
+  - In **Visibility**:
+    - Roles=`x_...loaner...admin`
+    - Active=`true`
+  - In **Link Type**:
+    - Link type=`URL (from Arguments)`
+    - URL=`system_properties_ui.do?sysparm_title=Loaner Request Properties&sysparm_category=Loaner Request`
+  - Select _Submit_
+
+- **E. Create separator module**
+  - Create another **Module**
+  - Configure:
+    - Title=`Admin tools`
+    - Application Menu=`Loaner Request`
+    - Order=`700`
+  - In **Visibility**:
+    - Roles=`x_...loaner...admin`
+    - Active=`true`
+  - In **Link Type**:
+    - Link type=`Separator`
+  - Select _Submit_
+
+- **F. Test application properties**
+  - Refresh browser
+  - Search `Loaner Request` in Application Navigator
+  - Open **Properties** module
+  - Verify:
+    - All 3 properties visible
+    - Correct order (100, 200, 300)
+  - Modify a property value
+  - Select _Save_
+  - Re-open module
+  - Verify updated value persists
+
+- **G. Validate role-based access**
+  - Impersonate `Beth Anglin`
+  - Verify:
+    - Cannot see `Properties` module
+    - Cannot see `Admin tools` separator
+  - End impersonation
+
+### Lab 6.3.1 - Scheduled Script Execution and email
+
+🎯 **Goal**: Automate pickup reminders using a Scheduled Script Execution that generates events and sends email notifications.
+
+- **A. Add Pick up reminder field**
+  - In **ServiceNow Studio**, navigate to **Form > Loaner Request (Default view)**
+  - Hover over `Other` field > select _+ Add_
+  - Select _+ Add a field in the table_
+  - Configure:
+    - Column label=`Pick up reminder`
+    - Column name=`pick_up_reminder`
+    - Type=`Date/Time`
+  - Select _Add_
+  - Select _Done_
+  - Select _Save_
+
+- **B. Register Event**
+  - In **ServiceNow Studio**, select _Create_ > _File_
+  - Select **Server Development**
+  - File type=`Event Registration`
+  - Select _Continue_
+  - Configure:
+    - Suffix=`pickUp`
+    - Table=`Loaner Request`
+    - Fired by=`Scheduled Script Execution: Loaner Item Pick Up`
+    - Description=`Trigger email reminder for pickup`
+  - Select _Submit_
+
+- **C. Create Scheduled Script Execution**
+  - In **ServiceNow Studio**, select _Create_ > _File_
+  - Select **Server Development**
+  - File type=`Scheduled Script Execution`
+  - Select _Continue_
+  - Configure:
+    - Name=`Loaner Item Pick Up`
+    - Active=`true`
+    - Run=`Periodically`
+    - Repeat Interval=`1 hour`
+  - Populate script:
+    - Type `ScheduledScriptExecution` + `<tab>`
+  - Script behavior:
+    - Reads property=`<scope>.pickup.leadtime`
+    - Converts hours → milliseconds
+    - Queries `Loaner Request` where:
+      - `State = 16` (Ready for Pickup)
+      - `pick_up_reminder is empty`
+      - `start_date <= noticeTime`
+    - For each record:
+      - Set `pick_up_reminder = current time`
+      - Update record
+      - Fire event=`<scope>.pickUp`
+  - Select _Submit_
+
+- **D. Test Scheduled Script Execution**
+  - Prepare test records:
+    - State=`Ready for Pickup`
+    - Start date within lead time window
+    - `pick_up_reminder`=`empty`
+  - In Studio, open Scheduled Script Execution
+  - Select _Execute Now_
+  - In main browser:
+    - Navigate to **System Logs > Events**
+    - Filter: Name contains `loaner`
+  - Verify event=`pickUp` generated
+
+- **E. Create Email Notification**
+  - In **ServiceNow Studio**, select _Create_ > _File_
+  - Select **Automation**
+  - File type=`Notification`
+  - Select _Continue_
+  - Configure:
+    - Name=`Loaner Item Pick Up`
+    - Table=`Loaner Request`
+    - Category=`Targeted Communication`
+    - Active=`true`
+  - In **When to send**:
+    - Send when=`Event is fired`
+    - Event name=`<scope>.pickUp`
+  - Select _Advanced view_
+  - In **Who will receive**:
+    - Unlock field
+    - Add `Requested for`
+    - Lock field
+  - In **What it will contain**:
+    - Subject=`Your loaner ${item_type} is ready for pick up`
+    - Message HTML:
+      - `Dear ${requested_for},`
+      - `The ${item_type} (${cmdb_ci}) is available for pick up at ${depot}.`
+      - `Reservation starts ${start_date}`
+      - `Return by ${end_date}`
+  - Select _Update_
+  - Select _Preview Notification_
+  - Update again if needed
+
+- **F. Test Notification**
+  - Ensure test record:
+    - Requested for=`George Washington`
+    - State=`Ready for Pickup`
+    - Start date within leadtime
+    - `pick_up_reminder`=`empty`
+  - Execute Scheduled Script:
+    - Select _Execute Now_
+  - Navigate to **System Logs > Emails**
+  - Verify email sent
+  - Open email:
+    - Select timestamp
+    - Select _Preview Email_
+  - Verify field values resolved correctly
+
+### Lab 6.4.1 - Script include
+
+🎯 **Goal**: Use a Script Include to centralize pickup reminder logic, extend the application for return and overdue reminders, and complete the Module 6 update set.
+
+- **A. Create and examine the Script Include**
+  - In **ServiceNow Studio**, select _Create_ > _File_
+  - Select **Server Development**
+  - File type=`Script Include`
+  - Select _Continue_
+  - Configure:
+    - Name=`LoanerUtils`
+    - API Name=Auto-populated
+    - Accessible from=`This application scope only`
+    - Active=`true`
+  - Replace the default script:
+    - Delete existing Script contents
+    - Type `LoanerUtils`
+    - Press `<tab>`
+  - Select _Submit_
+  - Review key functions:
+    - `initialize()`
+      - Loads property values such as `pickup.leadtime`
+      - Stores values in object properties (for example, `this.pickupLeadTime`)
+    - `getNullPickupReminders()`
+      - Returns Loaner Request records in `Ready for Pickup`
+      - Filters to records with empty `Pick up reminder`
+      - Filters to records within the pickup lead-time window
+    - `sendPickupReminder()`
+      - Sets `Pick up reminder` to current date/time
+      - Queues pickup event to trigger email notification
+  - Compare with previous Scheduled Script logic:
+    - Query/filter logic moved into `getNullPickupReminders()`
+    - Reminder update + event generation moved into `sendPickupReminder()`
+    - Scheduled job becomes more modular and reusable
+
+- **B. Update Scheduled Script Execution to use the Script Include**
+  - In **ServiceNow Studio**, open **Loaner Item Pick Up** Scheduled Script Execution
+  - Replace the script with:
+    - `var lutil = new LoanerUtils();`
+    - `var plist = [];`
+    - `plist = lutil.getNullPickupReminders();`
+    - `for (var i=0; i<plist.length; i++) {`
+    - `   lutil.sendPickupReminder(plist[i]);`
+    - `}`
+  - Select _Update_
+
+- **C. Test pickup reminder logic**
+  - Prepare one or more Loaner Request records that meet criteria:
+    - State=`Ready for Pickup`
+    - `Start date` within next `24` hours
+    - `Pick up reminder` is empty
+  - In **ServiceNow Studio**, open **Loaner Item Pick Up** Scheduled Script Execution
+  - Select _Execute Now_
+  - Verify in **System Logs > Events**:
+    - Pickup event generated for expected Loaner Requests
+  - Verify in **System Logs > Emails**:
+    - Pickup reminder email sent
+  - Open affected Loaner Request record(s)
+  - Verify:
+    - `Pick up reminder` populated with current date/time
+
+- **D. Extend the form for return and overdue reminders**
+  - In **ServiceNow Studio**, open **Form > Loaner Request** in **Default** view
+  - Add a new section:
+    - Section name=`Reminders`
+    - Layout=`Two columns`
+  - Create and add fields to the `Reminders` section:
+    - Column label=`Return reminder`
+    - Column name=`return_reminder`
+    - Type=`Date/Time`
+    - Column label=`Overdue reminder`
+    - Column name=`last_overdue_reminder`
+    - Type=`Date/Time`
+    - Column label=`Overdue count`
+    - Column name=`overdue_count`
+    - Type=`Integer`
+  - Move existing field:
+    - `Pick up reminder` into `Reminders` section
+  - Select _Save_
+
+- **E. Register return and overdue events**
+  - In **ServiceNow Studio**, create Event Registrations using the existing `pickUp` event as the model
+  - Create event:
+    - Suffix=`return`
+    - Table=`Loaner Request`
+    - Fired by=`Scheduled Script Execution` for return reminder job
+    - Description=Reminder email for upcoming return
+  - Create event:
+    - Suffix=`overdue`
+    - Table=`Loaner Request`
+    - Fired by=`Scheduled Script Execution` for overdue reminder job
+    - Description=Reminder email for overdue return
+
+- **F. Create Scheduled Script Executions for return and overdue reminders**
+  - Use **Loaner Item Pick Up** Scheduled Script Execution as the model
+  - Create scheduled job for return reminders:
+    - Determine Loaner Requests with `End date` within reminder window
+    - Generate `return` event
+    - Update `Return reminder` field with reminder sent date/time
+  - Create scheduled job for overdue reminders:
+    - Determine overdue Loaner Requests
+    - Generate `overdue` event
+    - Update `Overdue reminder` field with reminder sent date/time
+    - Increment `Overdue count`
+  - Use `LoanerUtils` functions where applicable
+  - Save and test each job
+
+- **G. Create email notifications for return and overdue reminders**
+  - Use **Loaner Item Pick Up** notification as the model
+  - Create notification for event=`<scope>.return`
+    - Table=`Loaner Request`
+    - Recipient=`Requested for`
+    - Subject/body reflect upcoming return reminder
+  - Create notification for event=`<scope>.overdue`
+    - Table=`Loaner Request`
+    - Recipient=`Requested for`
+    - Subject/body reflect overdue reminder
+  - Preview and test both notifications
+  - Verify field values resolve correctly in email content
+
+- **H. Test return and overdue reminder flows**
+  - Create or modify Loaner Request records to meet return reminder criteria
+  - Execute return reminder scheduled job
+  - Verify:
+    - `return` event created
+    - email sent
+    - `Return reminder` field populated
+  - Create or modify Loaner Request records to meet overdue reminder criteria
+  - Execute overdue reminder scheduled job
+  - Verify:
+    - `overdue` event created
+    - email sent
+    - `Overdue reminder` field populated
+    - `Overdue count` incremented
+  - Debug and re-test as needed
+
+- **I. Complete the update set**
+  - In **ServiceNow Studio**, close open tabs
+  - Return to main landing page
+  - Select **Deployment**
+  - Open **Update sets** tab
+  - Expand **Application: Loaner Request**
+  - Open update set=`LR-Module 6`
+  - Set:
+    - State=`Complete`
+    - Description=`Module 6 labs complete`
+  - Select _Update_
+  - Close the tab
+
+### Lab 7.1.1 - Importing records from a spreadsheet
+
+🎯 **Goal**: Import data from an Excel spreadsheet into a new table using Import Sets and Transform Maps.
+
+- **A. Create an update set**
+  - In **ServiceNow Studio**, open **Apps > Loaner Request**
+  - Open the **Update set** widget
+  - Select _+ New_
+  - Name=`LR-Module 7`
+  - Select _Save_
+  - Select _Apply_
+
+- **B. Download and prepare source data**
+  - Navigate to **All > Self-Service > Knowledge**
+  - Open **ADF Knowledge Base**
+  - Download `Passwords` Excel file
+  - Open `passwords.xlsx`
+  - Review data (Asset tags and Passwords)
+
+- **C. Prepare related CMDB records**
+  - Set scope=`Global`
+  - Navigate to **Configuration > Base Items > Computers**
+  - Filter:
+    - Asset tag `is one of` `<paste asset tags from Excel>`
+  - Update records:
+    - Modify `Name` (e.g., prefix with `LNR`)
+  - Save changes
+
+- **D. Create Password Vault table**
+  - Navigate to **System Definition > Tables**
+  - Select _New_
+  - Configure:
+    - Label=`Password Vault`
+    - Name=`u_password_vault`
+    - Create module=`true`
+    - Create mobile module=`false`
+    - Add module to menu=`Create New`
+    - New menu name=`Password Vault`
+  - In **Controls** tab:
+    - Create access controls=`true`
+    - User role=`admin`
+  - In **Application Access**:
+    - Accessible from=`All application scopes`
+    - Can read=`true`
+    - Allow access via web services=`true`
+  - Select _Save_
+  - In **Columns**:
+    - Add field:
+      - Column label=`Password`
+      - Type=`String`
+    - Add field:
+      - Column label=`Asset`
+      - Type=`String`
+  - Select _Update_
+
+- **E. Load data via Import Set**
+  - Navigate to **System Import Sets > Load Data**
+  - Configure:
+    - Import set table=`Create table`
+    - Label=`Password Import File`
+    - Table name=`u_password_import_file`
+    - Source=`File`
+    - File=`passwords.xlsx`
+  - Select _Submit_
+
+- **F. Create Transform Map**
+  - Select _Create transform map_
+  - Configure:
+    - Name=`Password Transform Map`
+    - Source table=`Password Import File`
+    - Active=`true`
+    - Run business rules=`false`
+    - Target table=`Password Vault`
+  - Select _Save_
+  - Select _Auto Map Matching Fields_
+  - Verify field mappings:
+    - Ensure `Password` → `Password`
+    - Ensure `Asset` → `Asset`
+  - Correct mappings if needed
+
+- **G. Transform data**
+  - Select _Transform_
+  - Select _Transform_ again to execute
+
+- **H. Validate import**
+  - Open Import Set record (`ISET...`)
+  - Review **Import Set Rows**
+  - Navigate to **Password Vault > Password Vaults**
+  - Verify:
+    - Records created
+    - Asset and Password values populated correctly
+
+### Lab 7.2.1 - Web service consumer
+
+🎯 **Goal**: Configure the Loaner Request application as a web service consumer to retrieve passwords via REST and include them in email notifications.
+
+- **A. Prepare web service scenario**
+  - Consumer: Loaner Request app sends `asset_tag`
+  - Provider: Password Vault returns `u_password`
+  - Same instance used as both consumer and provider
+  - Data source: `u_password_vault` table
+
+- **B. Configure REST API (producer test)**
+  - Navigate to **System Web Services > REST > REST API Explorer**
+  - Select _Retrieve records from a table (GET)_
+  - Configure Path:
+    - tableName=`u_password_vault`
+  - Configure Query:
+    - sysparm_query=`u_asset=<asset_tag_value>`
+    - sysparm_fields=`u_password`
+  - Configure Header:
+    - Response format=`application/json`
+
+- **C. Test REST API**
+  - Select _Send_
+  - Verify:
+    - HTTP Status=`200`
+    - Correct `u_password` returned
+  - Debug if needed
+
+- **D. Create async Business Rule for REST call**
+  - In **ServiceNow Studio**, select _Create_ > _File_
+  - Select **Server Development** > `Business Rule`
+  - Configure:
+    - Name=`Retrieved Credentials`
+    - Table=`Loaner Request`
+    - Active=`true`
+    - Advanced=`true`
+  - In **When to run**:
+    - When=`async`
+    - Insert=`true`
+    - Update=`true`
+  - In **Advanced Script**:
+    - Paste RESTMessageV2 snippet from REST API Explorer
+    - Modify script:
+      - Add condition:
+        - `if (current.item_type == "cmdb_ci_computer") { ... }`
+      - Replace hardcoded asset tag:
+        - Use `current.cmdb_ci.asset_tag`
+      - Update credentials:
+        - Replace password with instance login password
+      - Replace `gs.log` with `gs.info`
+      - Parse response:
+        - `var obj = JSON.parse(response.getBody());`
+        - `var myPass = obj.result[0].u_password;`
+        - `gs.info('u_password: ' + myPass);`
+  - Select _Save_
+
+- **E. Test Business Rule**
+  - Navigate to **Loaner Request > Open**
+  - Open record and set:
+    - State=`Ready for Pickup`
+    - Item type=`Laptop`
+    - Configuration item=`LNR laptop`
+  - Select _Update_
+  - Navigate to **System Logs > Application Logs**
+  - Verify password logged
+  - Set Business Rule Active=`false`
+  - Select _Save_
+
+- **F. Add script to Email Notification**
+  - In **ServiceNow Studio**, open **Loaner Item Pick Up Notification**
+  - In **Message HTML**:
+    - Add:
+      - `<mail_script>`
+      - Paste script body (no wrapper code)
+      - `</mail_script>`
+  - Modify script:
+    - Remove raw response logging
+    - Replace `gs.info` with `template.print`
+  - Select _Save_
+  - Confirm move to Email Scripts
+
+- **G. Test email with password**
+  - Ensure record meets criteria:
+    - State=`Ready for Pickup`
+    - Item type=`Laptop`
+    - Start date within leadtime
+    - `Pick up reminder` empty
+    - Configuration item=`LNR laptop`
+  - In **ServiceNow Studio**, execute:
+    - **Scheduled Script Execution > Loaner Item Pick Up**
+    - Select _Execute Now_
+  - Navigate to **System Mailboxes > Outbound > Outbox**
+  - Open email
+  - Select _Preview Email_
+  - Verify:
+    - Password included
+    - Fields resolved correctly
+
+- **H. Complete update set**
+  - Switch scope=`Loaner Request`
+  - In **ServiceNow Studio**, go to **Deployment > Update sets**
+  - Expand **Application: Loaner Request**
+  - Open update set=`LR-Module 7`
+  - Set:
+    - State=`Complete`
+    - Description=`Module 7 labs complete`
+  - Select _Update_
+  - Close tab
+
+### Lab 8.1.1 - Automated Test Framework
+
+🎯 **Goal**: Create and execute Automated Test Framework (ATF) tests to validate user access and business rule behavior.
+
+- **A. Create an update set**
+  - Verify scope=`Loaner Request`
+  - In **ServiceNow Studio**, open **Apps > Loaner Request**
+  - Open the **Update set** widget
+  - Select _+ New_
+  - Name=`LR-Module 8`
+  - Select _Save_
+  - Select _Apply_
+
+- **B. Enable ATF execution**
+  - Switch scope=`Global`
+  - Navigate to **Automated Test Framework > Administration > Properties**
+  - Enable test/test suite execution
+  - Select _Save_
+
+- **C. Create ATF test**
+  - Switch scope=`Loaner Request`
+  - Navigate to **Automated Test Framework > Tests**
+  - Select _New_
+  - Configure:
+    - Name=`My First Loaner Request ATF Test`
+    - Application=`Loaner Request`
+    - Active=`true`
+  - Select _Save_
+
+- **D. Add Create User and Open Form steps**
+  - Select _Add Test Step_
+  - Choose `Create a User`
+    - Execution order=`1`
+    - Groups=`Loaner Request Admins`
+    - Impersonate=`true`
+    - Active=`true`
+  - Select _Submit_
+  - Add Test Step:
+    - Category=`Form`
+    - Step=`Open a New Form`
+    - Execution order=`2`
+    - Form UI=`Standard UI`
+    - Table=`Loaner Request`
+    - Active=`true`
+  - Select _Submit_
+
+- **E. Add Set Field Values step (failure scenario)**
+  - Select _Add Test Step_
+  - Category=`Form`
+  - Step=`Set Field Values`
+  - Configure:
+    - Execution order=`3`
+    - Form UI=`Standard UI`
+    - Table=`Loaner Request`
+    - Active=`true`
+    - Field values:
+      - Requested for=`Abel Tuter`
+      - Start date=`Today`
+      - End date=`Before Today`
+  - Select _Submit_
+
+- **F. Add Submit Form step**
+  - Select _Add Test Step_
+  - Category=`Form`
+  - Step=`Submit a Form`
+  - Configure:
+    - Execution order=`4`
+    - Form UI=`Standard UI`
+    - Assert type=`Form submitted to server`
+    - Active=`true`
+  - Select _Submit_
+
+- **G. Run failing test**
+  - Select _Run Test_
+  - Select _Run Test_
+  - Observe Client Test Runner window
+  - Return to main window
+  - Select _Go to Result_
+  - Review failure:
+    - Download screenshot via _Manage Attachments_
+  - Expected result:
+    - Test fails due to invalid date logic (End < Start)
+  - Optional:
+    - Ignore client errors:
+      - Select failed step
+      - Actions > _Add all client errors to ignored list_
+      - Update
+
+- **H. Modify test for passing scenario**
+  - Open test
+  - Edit **Set Field Values** step:
+    - Requested for=`Abraham Lincoln`
+    - Start date=`Today`
+    - End date=`After Today`
+  - Select _Update_
+  - Select _Run Test_ > _Run Test_
+  - Observe execution in Client Test Runner
+  - Verify:
+    - All steps pass
+
+- **I. Complete update set**
+  - In **ServiceNow Studio**, navigate to **Deployment > Update sets**
+  - Expand **Application: Loaner Request**
+  - Open update set=`LR-Module 8`
+  - Set:
+    - State=`Complete`
+    - Description=`Module 8 labs complete`
+  - Select _Update_
+  - Close tab

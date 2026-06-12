@@ -51,7 +51,7 @@
 - Service Portal
   - lexical search + semantic vector search (LLM text understanding) = hybrid search
   - Result improvement rules: fine-tuning search results
-    - boost sepcific results
+    - boost specific results
     - block some results
     - highlight selected content
 - Genius Result Cards
@@ -74,7 +74,7 @@
 ### XCC Plugin Setup and Configuration
 
 - downloads:
-  - download `External Content Connectors Application Suite plugin` from ServiceNow Store
+  - download [`External Content Connectors Application Suite plugin` from ServiceNow Store](https://store.servicenow.com/store/app/dd69bc781bd9a650396216db234bcb0b)
   - download specific connector for source system, for example SharePoint Online
 - configuration
   - example: SharePoint Online
