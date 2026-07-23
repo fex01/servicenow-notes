@@ -53,6 +53,10 @@
     - [docs: Fly](https://www.servicenow.com/docs/bundle/washingtondc-servicenow-platform/page/product/csdm-implementation/concept/csdm-implement-fly-stage.html)
   - [docs: Auto-generate product models for logical CIs](https://www.servicenow.com/docs/bundle/washingtondc-servicenow-platform/page/product/csdm-implementation/task/csdm-auto-create-prod-model-for-ci.html)
 
+### to sort
+
+- deactivate sys property to allow csdm LC Mapping for Service Offerings and other logical CIs: [Sync Life Cycle Stage and Life Cycle Status for Non-asset CIs](https://support.servicenow.com/kb?id=kb_article_view&sysparm_article=KB2477752)
+
 ### CSDM Maturity Stages
 
 1. **Foundation**
@@ -349,19 +353,16 @@ _Note_: Relationship "Consumes::Consumed by" deprecated → use "Uses::Used by"
 🎯 **Goal**: Build and model foundational CSDM elements across all domains
 
 - **A. Analyze CSDM Data Foundations Dashboard**
-
   - Navigate to **Configuration > CSDM Data Foundations Dashboard**
   - Review metrics across tabs: _Foundation_, _Crawl_, _Walk_, _Run_, _Fly_
 
 - **B. Create Foundational Data**
-
   - Create `CD-Support Group` and `CD-Change Group` in **User Administration > Groups**
     - Add _System Administrator_ to each
   - Create `CD-Parent Location` and `CD-Child Location` in **User Administration > Locations**
     - Set parent-child relationship
 
 - **C. Configure Business Applications and Capabilities**
-
   - Navigate to **CSDM > Design > Business Application**
     - Create `CD-Business Application` (COTS, Web Based)
     - Owner: _Abel Tuter_
@@ -370,19 +371,16 @@ _Note_: Relationship "Consumes::Consumed by" deprecated → use "Uses::Used by"
     - Use Relationship Editor: `Provided by (Parent)` → CD-Business Application
 
 - **D. Configure Information Object**
-
   - Navigate to **CSDM > Design > Information Object**
     - Create `CD-Information Object`
     - Relate to CD-Business Application via `Uses (Parent)`
 
 - **E. Configure Business Service and Offering**
-
   - Use **Service Portfolio Management > Service Builder**
     - Create `CD-Business Service` → Phase=`Catalog`, Status=`Operational`
     - Create `CD-Business Service Offering` with Support=`CD-Support Group`, Change=`CD-Change Group`
 
 - **F. Configure Technology Management Service and Offering**
-
   - Create `CD-Technology Management Service` and Offering using same values as above
   - Set both to Catalog/Operational
 
@@ -400,36 +398,30 @@ _Note_: Relationship "Consumes::Consumed by" deprecated → use "Uses::Used by"
 🎯 **Goal**: Visualize how CSDM improves ITSM, change, and operations outcomes
 
 - **A. Explore CSDM Data Foundations Dashboard**
-
   - Navigate to **Configuration > CSDM Data Foundations Dashboard**
   - Review metrics under all tabs and their improvement through prior labs
 
 - **B. Incident Management**
-
   - Create new incident for _Abel Tuter_
   - Enter `CD` in _Service_, _Service offering_, _Configuration item_ fields
   - Use _Open in Dependency Views_ to see relationships
   - Save incident and verify auto-populated _Assignment group_
 
 - **C. Change Management**
-
   - Create new change request
   - Enter _CD-Business Service_, _CD-Business Service Offering_, _CD-Service Instance/Application Service_
   - Use _Open in Dependency Views_ to validate relationships and identify impacted infrastructure
   - Save and confirm _Assignment group_ auto-population
 
 - **D. Unified Map**
-
   - From the change record, open **CMDB Workspace** and then Unified Map
   - Use filter and _Related items > Active incidents_ to explore relationships
 
 - **E. Enterprise Architecture**
-
   - Navigate to **Digital Portfolio Management > All Business Applications**
   - Open `CD-Business Application`, select _Show Dependency Views_
 
 - **F. Event Management Simulation**
-
   - Use **Service Operations Workspace > Event Generator**
     - Source: `SolarWinds`, Node: `CD-Windows Server`
     - Severity: `Major`, Description: `Memory exceeds expected threshold`
@@ -447,13 +439,11 @@ _Note_: Relationship "Consumes::Consumed by" deprecated → use "Uses::Used by"
 🎯 **Goal**: Create dynamic CI groups and sync foundational group data to CIs
 
 - **A. View Foundational CI Data**
-
   - Navigate to **Configuration > Servers > Windows**
   - Search for `SYD` or `CD` servers
   - Personalize list to show _Support group_, _Change group_, _Managed By group_
 
 - **B. Assign Group from CI Class Manager**
-
   - Create `CD-Managed By Group` in **User Administration > Groups**
   - Add _System Administrator_ as member
   - Navigate to **Configuration > CI Class Manager**
@@ -462,25 +452,21 @@ _Note_: Relationship "Consumes::Consumed by" deprecated → use "Uses::Used by"
   - Run **CSDM Data Sync** job and verify update on SYD servers
 
 - **C. Create CMDB Group and Dynamic CI Group**
-
   - Create `CD-Sydney Win Servers CMDB Group` in **Configuration > CMDB Groups**
     - Encoded query: `Name starts with syd OR cd`
   - Create `CD-Sydney Win Servers Dynamic CI Group` in **Configuration > Dynamic CI Groups**
     - Link to above CMDB group
 
 - **D. Associate Dynamic CI Group to Service Offering**
-
   - Use **Service Builder** → Open `CD-Technology Management Service Offering`
   - Under _Application services | contain_ field, add `CD-Sydney Win Servers Dynamic CI Group`
   - Ensure Team tab has Support/Change groups set
 
 - **E. Sync Group Data to CIs**
-
   - Run **CSDM Data Sync** job to sync group data from offering to CIs
   - Verify `SYD` servers reflect _Support_, _Change_, and _Managed By_ groups
 
 - **F. Change Management with Dynamic CI Group**
-
   - Create change request with CI = `CD-Sydney Win Servers Dynamic CI Group`
   - Confirm _Assignment group_ auto-filled
   - Verify group unpacking into _Affected CIs_
@@ -500,23 +486,19 @@ _Note_: Relationship "Consumes::Consumed by" deprecated → use "Uses::Used by"
 🎯 **Goal**: Integrate CSDM-modeled services with DPM to visualize portfolios and KPIs
 
 - **A. Add Foundational Data**
-
   - Create user `CD.DPM Solution Owner`
   - Create group `CD-DPM Solution Owner Group`, add _CD DPM Solution Owner_ and _Abel Tuter_
   - Assign roles: `sn_dpm.dpm_manager`, `portfolio_editor`
 
 - **B. Create Service Portfolio and Taxonomy Node**
-
   - Create `CD-Service Portfolio` and set owner = _CD DPM Solution Owner_
   - Create `CD-Taxonomy Node` and associate with above portfolio
 
 - **C. Associate Services to Portfolio & Taxonomy**
-
   - Open `CD-Business Service` and `CD-Technology Management Service` via Service Builder
   - Set _Portfolio_ = `CD-Service Portfolio`, _Node_ = `CD-Taxonomy Node`
 
 - **D. Explore DPM Workspace**
-
   - Navigate to **Digital Portfolio Management Workspace**
   - Explore:
     - _Home_, _Personal portfolios_, _Enterprise portfolios_
@@ -525,14 +507,12 @@ _Note_: Relationship "Consumes::Consumed by" deprecated → use "Uses::Used by"
     - Impersonate _CD DPM Solution Owner_ and _Abel Tuter_ to compare access
 
 - **E. Configure KPI Group Mappings**
-
   - Navigate to **KPI Groups**, open `Performance snapshot`
   - Add `CD-Service Portfolio` under _KPI Group Mappings_
   - Run **DPM: Daily Data Collection** job (adjust `Relative end` = 0)
   - Return to DPM Workspace, verify KPIs appear in nodes
 
 - **F. Create Custom KPI Group**
-
   - Create `CD-KPI Group` of type `Service portfolios`, order=`200`
   - Add `CD-Service Portfolio` as mapping
   - Add KPI: `DPM: Number of new incidents`, label: `New Incidents`
