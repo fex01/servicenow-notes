@@ -988,7 +988,7 @@ Back to [SNow ITOM](./sn-itom.md)
 - [course book](https://servicenow.read.inkling.com/a/b/19c4613ca7d841ee9b3cc5f1bd05302d/p/52d7650bd2bd4e8f855131b64d62dd32)
   - [TagMappingCIs.txt](https://nowlearning.servicenow.com/sys_attachment.do?sys_id=d02ccac68796421424e0bb39dabb354a)
     - create 2 x Windows Servers CIs
-    - create 3 x application Cis
+    - create 3 x application CIs
     - create Tags for the Applications and Windows Servers
 - Run the TagMappingCIs.txt as a Background Script
   - All > System Definition > Scripts - Background
@@ -1004,8 +1004,10 @@ Back to [SNow ITOM](./sn-itom.md)
     - Tag category name: `Service`
     - CI tag keys: `Service`, `Serv`
     - _Submit_
+    - add a second tag category: name `Environment`, tag keys `Environment`, `Env`
   - All > Service Mapping > Administration > Tag-based Service Families > New
     - Service family name: `Services by Service and Environment`
+    - Regularly update service candidates: `true`
     - Tag category: `Service`, `Environment`
     - _Save_
     - Related Links > _Manually update candidates_
@@ -1019,37 +1021,68 @@ Back to [SNow ITOM](./sn-itom.md)
     - Related Links > _Recalculate Service_
     - _View Map_
 
-##### L2.4: Discover Ruby on Rails Service
+##### L2.4: Discover Ruby on Rails Service - ML powered
 
 - [course book](https://servicenow.read.inkling.com/a/b/19c4613ca7d841ee9b3cc5f1bd05302d/p/5d1c9bc81a794619aba09355e2155671)
+  - prerequisite:
+    - `Service Mapping Plus`
+    - `Predictive Intelligence`
+  - Workspace Service Mapping
+    - Populate data
+    - ML powered candidates > 1 > "Application Service Suggestions"
+      - select candidate > Preview Map
+        - back
+      - Map application service
+        - Name: `Ruby on Rails ML-Based Mapping`
+        - Owner: `Abel Tutor`
+        - Map service
+    - Unified Map - no editing: Home > Mapped application services
+      - `Ruby on Rails ML-Based Mapping` | Discovery Status: _In Progress_
+      - wait / refresh until Discovery Status: _Done_
+      - select `Ruby on Rails ML-Based Mapping` > _View Map_
+    - Edit Service Map: All > Service Mapping > Services > Service Instances
+      - `Ruby on Rails ML-Based Mapping` | _View Map_
+        - right-click one rails server > show connection suggestions
+          - select connection > _Exclude_
+        - right-click one rails server > Manually add a connection
+          - would enable to manually add connections
+
+##### L2.5: Discover Ruby on Rails Service - Pattern based
+
 - Create and Discover the Ruby on Rails Service
   - All > Service Mapping > Home
     - _Additional Options_ > _Define A Single Service Map_
-      - Name: `Ruby on Rails Application`
-      - Owner: `<Service Owner>`
+      - Name: `Ruby on Rails Pattern-Based`
+      - Owner: `Abel Tutor`
       - Web Application
-        - Entry Point URL: `http://<ip>/posts`
+        - Entry Point URL: `http://192.168.7.10/posts`
         - _Add_
       - _Save_
       - Traffic based discovery: false
       - _Update_
       - _View Map_
+        - wait for Discovery to finish
+        - 5 Ruby applications found - but classified as Generic App due to no matching Pattern
 - Create Custom CI Type
   - All > Configuration > CI Class Manager
   - Hierarchie > Application Server > [right-click] > Add Child Class
     - Display Name: `Ruby on Rails Application Server`
     - Table Name: _auto-generates_
-    - _Next_ (until _Set Identification Rule_)
-    - _Replace_
-      - Dependent: true
-      - _Save_
-    - _Add_
-      - _Use attributes from main table_
-      - _Next_
-      - Criterion Attributes: Class, Configuration file
-      - Allow fallback to parent's rules: true
-      - _Save_
-    - _Next_ until and including _Done_
+    - _Next_ until _Set Identification Rule_
+      - each CI Class should have a unique identification rule to identify a class match as well as to differentiate CIs of that class
+      - _Replace_ to remove dependent Identification Rule
+        - confirm Dependent: `true`
+        - _Save_
+      - _Add_ Identification Entry
+        - _Use attributes from main table_
+        - _Next_
+          - Priority: `100``
+        - _Next_
+          - Criterion Attributes: `Class`, `Configuration file`
+          - Allow fallback to parent's rule: `true`
+        - _Save_
+      - _Next_ until and including _Done_
+    - review Parent Identifier Rule by visiting class _Application_ (Parent of Application Server) > Identification Rule
 - Create Custom Discovery Pattern
   - All > Pattern Designer > Discovery Patterns
   - New
@@ -1064,23 +1097,43 @@ Back to [SNow ITOM](./sn-itom.md)
     - _Save_
     - Identification Section > _Identify Ruby on Rails Application Server_
       - Debug Mode
-        - URL: `http://<ip>:8080/posts`
+        - Choose MID Server: `Automatic MID Server selection`
+        - Choose Entry Point Type: `HTTP(S) Endpoint`
+        - URL: `http://192.168.7.11:8080/posts`
+      - Debug Mode is active (green dot) an reads live information from the targeted machine
+    - find name of the executable at Temporary Variables > process > executable
       - step _Match Process Name_
         - Operation: Match
         - Condition: `$process.executable` | `equals` | `"ruby"`
-        - _Test_
-      - _Command Prompt_:
-        - Command: `cat /usr/local/rvm/rubies/ruby-3.0.0/config`
+        - _Test_ - success message expected
+      - _Save_
+      - validating approach for next step: select _Command Prompt_
+        - Command: `cat /usr/local/rvm/rubies/ruby-3.3.0/config`
         - _Run Command_
         - notice output and _Close_
       - step _Set Config File_
         - Operation: Set Parameter Value
         - Value: `$process.environmentVariables.MY_RUBY_HOME.value +"/config"`
+        - Name: `$config_file`
+      - _Save_
+      - step _Get Ruby Version_
+        - Operation: Parse File
+        - Select File: `$config_file`
+        - _Retrieve File Content_
+        - Define Parsing: `Regular Expression`
+          - variable: `version`
+          - Regular expression: `RUBY_PROGRAM_VERSION="([^"]+)"`
+      - _Save_
+      - step _Set Application Name_
+        - Operation: Set Parameter Value
+        - Value: `"ruby " + $version`
+        - Name: `$name`
       - _Save_
       - _Publish_
 - Test New Identification Rule and Pattern
-  - All > Service Mapping > Services > Application Services
-  - open record > View Map > Run Discovery
+  - All > Service Mapping > Services > Service Instances
+  - Ruby on Rails Pattern-Based | View Map > Run Discovery
+    - result after waiting for Discovery to finish: ruby applications are matched and no longer generic (select ruby application server, scroll to CI Type)
 - Create New Connectivity Section
   - pattern _Ruby on Rails Application_
   - Connection Section > New
@@ -1089,7 +1142,7 @@ Back to [SNow ITOM](./sn-itom.md)
   - _Save_
   - Connection Section > _Connect to Database_
     - Debug Mode
-      - URL: `http://<ip>:8080/posts`
+      - URL: `http://192.168.7.11:8080/posts`
     - step 1 _Find DBMS_
       - Operation: Parse File
       - Select File: `$process.currentDir + "/config/database.yml"`
@@ -1162,6 +1215,9 @@ Back to [SNow ITOM](./sn-itom.md)
       - Network mask (or bits): `16`
       - _Submit_
     - _Update_
+  - For Application Discovery, at least one impacted Service Instance needs to be operational
+    - All > Service Mapping > Services > Service Instances
+      - Ruby on Rails Pattern-Based | Operational status -> `Operational`
   - All > Service Mapping > Administration > Discovery Schedules
   - New
     - Name: `Ruby Application Schedule`
@@ -1176,7 +1232,59 @@ Back to [SNow ITOM](./sn-itom.md)
     - open record
     - Related Links > List CIs
 
-##### L2.5: Create a CSDM Model for Services and Link to Service Maps
+##### L2.6: Event Management
+
+- All > Service Mapping > Services > Service Instances
+  - Ruby on Rails Pattern-Based
+    - Operational status -> `Operational`
+    - Business Criticality -> `2`
+- Workspaces > Service Operations Workspace > Service Dashboard
+  - only operational Service (Instances) are visible
+  - select _Ruby on Rails Pattern-Based_ for Details popup > Service Details
+    - Related records: entry points, related Cls, affected Cls, and past changes.
+  - _Service Map_: View (not Edit) Service Map
+    - Additional Options > Advanced Map to go to Edit Service and Impact tree
+- Simulate Event for Service CI
+  - All > Event Management > Simulation > Event Generator (only on Demo instance)
+    - Source: `test`
+    - Node: `itom-rubyrails-server-1`
+    - Message key: `testkey`
+    - Severity: `Major`
+    - _Generate Event_
+      - Yes, leave page
+  - All > Event Management > Simulation > Event Generator (only on Demo instance)
+    - Source: `test`
+    - Node: `itom-rubyrails-server-2`
+    - Message key: `testkey2`
+    - Severity: `Major`
+    - _Generate Event_
+      - Yes, leave page
+- Workspaces > Service Operations Workspace > Service Dashboard
+  - _Ruby on Rails Pattern-Based_ is impacted: Severity Major
+  - select _Ruby on Rails Pattern-Based_ for Details popup > Service Map
+    - direct visibility into impacted CIs
+- modify impact of Cluster Members
+  - Workspaces > Service Operations Workspace > Service Dashboard
+  - select _Ruby on Rails Pattern-Based_ for Details popup > Service Map
+  - Additional Options > Advanced Map > Impact Tree
+    - select Ruby on Rail cluster
+    - select Impact tab in the bottom area
+      - Change the value for Application Cluster Member from 40 to 60.
+    - after a few minutes, the overall cluster becomes green
+      - now more than 60% of the cluster members need to be impacted before the cluster degrades
+  - Workspaces > Service Operations Workspace > Service Dashboard
+    - _Ruby on Rails Pattern-Based_ is no longer impacted as only 40% of cluster members have an alert
+  - All > Event Management > Simulation > Event Generator (only on Demo instance)
+    - Source: `test`
+    - Node: `itom-rubyrails-server-3`
+    - Message key: `testkey3`
+    - Severity: `Major`
+    - _Generate Event_
+      - Yes, leave page
+  - Workspaces > Service Operations Workspace > Service Dashboard
+    - _Ruby on Rails Pattern-Based_ is impacted: Severity Major
+
+##### L2.7: Create a CSDM Model for Services and Link to Service Maps
 
 ![CSDM Model](./attachments/sn-csdm-model.png)
 ![CSDM Example: Sage Payroll](./attachments/sn-csdm-example-sage-payroll.png)
@@ -1375,11 +1483,13 @@ Back to [SNow ITOM](./sn-itom.md)
 
 ##### L3.2: Discover Felinism Service
 
-(skipped - test server not available?)
-
 - [course book](https://servicenow.read.inkling.com/a/b/19c4613ca7d841ee9b3cc5f1bd05302d/p/f663939c3a624f01a0cb2a9779655e61#76529dc41bc84af9b94562948e130958)
 - Configure Credentials
-- Start Discovery of Felinism Service
+- Start Discovery of Felinism Service - same as [Lab 2.5](#l25-discover-ruby-on-rails-service---pattern-based)
+  - URL: `http://192.168.7.20/orch`
+  - Nginx load balancer is discovered but displayed as generic application because there is no matching baseline pattern
+  - use class `Nginx Web Server`, create a pattern pattern
+  - class identification rule requires Class, Configuration file, Version
 - Identify Load Balancer
 - Create Nginx Load Balancer Outbound Connection to Web Server Tier
 - Identity/Create the Apache on Windows Outbound Connection to Application Tier
