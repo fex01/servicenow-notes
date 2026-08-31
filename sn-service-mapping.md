@@ -36,6 +36,25 @@ Back to [SNow ITOM](./sn-itom.md)
   - [Mainline Exam Blueprint: Certified Implementation Specialist - Service Mapping (CIS-SM)](https://nowlearning.servicenow.com/lxp/en/credentials/certified-implementation-specialist-service-mapping-mainline?id=kb_article_view&sysparm_article=KB0011558)
   - [eBook: Service Mapping Advanced](https://servicenow.read.inkling.com/a/b/19c4613ca7d841ee9b3cc5f1bd05302d/p/18356415fd69484b9dd3100dfd444379)
 
+## Service Mapping with ACC
+
+- Use Cases
+  - Run Service Mapping without setting up and updating credentials on your instance.
+  - Full Support for IPv6
+- How does this feature work?
+  - Pattern logic is executed on MID server
+  - MID server sends "checks" to Agent Client Collector
+  - ACC executes requests and sends packaged response to MID
+- Configuration
+  - System Property: sa.topdown.mapping_with_acc_mode
+    - 0 (the default) - Top-down discovery runs using the MID Server exclusively.
+    - 1 - Top-down discovery initially attempts to run using Agent Client Collector. If no agent is available, then it defaults to using the MID Server.
+    - 2 - Top-down discovery runs using Agent Client Collector exclusively. If unsuccessful, the process terminates.
+  - Allow list: create both check based and pattern based allow lists, combine them and provide on each host
+    - All > Agent Client Collector > Configuration > Check Definitions
+      - scroll to the bottom and use Related Link `Generate allow-list content`
+    - All > Pattern Designer > Patterns allowlist for ACC
+
 ## Courses
 
 ### Service Mapping Advanced
