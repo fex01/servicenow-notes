@@ -1,0 +1,5 @@
+# PDF optimizer and PDF inventory; bundled Python may already provide these.
+pypdf>=6,<7
+Pillow>=10,<13
+# Regression fixtures only
+reportlab>=4,<5

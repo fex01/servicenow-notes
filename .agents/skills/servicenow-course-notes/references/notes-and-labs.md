@@ -1,0 +1,10 @@
+# Notes and labs
+
+- Use bullet points for content, clear unique `##` topic and `###` subtopic headings, and no table of contents. Avoid empty stubs and repeated generic headings. Keep related material together, use cross-references, and leave no unnecessary blank lines between adjacent bullets.
+- Put `## TODO` near the top. Explain whether each unresolved item needs research, an instance check, or user input. Link useful resources only when supplied or verified; preserve working links to relevant local notes. Label obsolete or deprecated functionality.
+- Include concise decision guidance, terminology, navigation, and important exceptions. A local guide/PDF link can identify the source; never use it to replace essential information.
+- Place labs under `## Labs`, each named `### Lab x.y - Title`, followed by `🎯 **Goal**: ...`. Use bullet steps, with bold functional-part labels where helpful; do not use fourth-level headings inside labs.
+- Give prerequisites and dependencies, complete UI paths, settings and literals, ordered operations, and observable outcomes. Use backticks for literals, italics for buttons/actions, and bold for navigation paths. Provide complete executable scripts and sample input, not just references to a course macro. Use actual source values; clearly label inferred or adapted examples and isolate missing details instead of inventing them.
+- Explain variable substitutions such as instance hostname, application scope and user-provided IDs. Mark optional activities and any later steps that depend on them. Give tests for positive and negative conditions, including cleanup when relevant.
+- For insecure course examples, preserve the learning objective using a clearly labeled safer adaptation with fictitious data, appropriate authentication and cleanup. Do not assert it was runtime-tested without evidence.
+- Do not compress away configuration, prerequisites or steps needed to complete a lab without the guide. Summarize repeated explanations instead.
