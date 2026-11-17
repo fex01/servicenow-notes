@@ -1,3250 +1,1029 @@
 # Application Development
 
+## TODO
+
+- [ ] Lab 9.1.1: verify the record producer's stored `Other` choice value and align its script comparison; the course script uses `Other`, while the table choice uses `other`.
+- [ ] Lab 6.1.1: confirm the training instance's effective `When` setting for `Set Reserved State`; the notes make the before-save behavior explicit because the guide's basic view does not show it.
+- [ ] Validate the labs on the target instance and release; UI labels, availability, plugins, and instance data can vary. Lab 7.2.1 uses an adapted dummy-data example and still needs end-to-end testing.
+
+## Application Development Checklist
+
+- **1. Analyze and design business logic** — [Design and requirements](#design-and-requirements), [server-side logic](#server-side-logic)
+  - [ ] Define the business problem and desired outcomes.
+  - [ ] Identify user personas and stakeholders.
+  - [ ] Identify inputs and outputs.
+  - [ ] Map process steps and exceptions.
+- **2. Design and build the data model** — [Tables and inheritance](#tables-and-inheritance), [field design](#field-design)
+  - [ ] Identify and configure tables.
+  - [ ] Define columns and their types.
+  - [ ] Define relationships between records.
+- **3. Design and create the user interface** — [Form and view design](#form-and-view-design), [UI Policies and Client Scripts](#ui-policies-and-client-scripts)
+  - [ ] Design and build the desktop and tablet interface for the intended users.
+- **4. Apply security** — [ACL decisions and matching](#acl-decisions-and-matching), [cross-scope application access](#cross-scope-application-access)
+  - [ ] Define and assign roles.
+  - [ ] Configure and test access controls.
+- **5. Automate** — [Flow Designer](#flow-designer-and-integration-hub), [scheduled scripts, events, and notifications](#scheduled-scripts-events-and-notifications)
+  - [ ] Configure flows where appropriate.
+  - [ ] Configure Scheduled Script Executions where appropriate.
+  - [ ] Configure email notifications where needed.
+- **6. Integrate** — [Import sets](#import-sets), [REST and web services](#rest-and-web-services)
+  - [ ] Plan and test data imports where needed.
+  - [ ] Configure and test web services where needed.
+- **7. Test** — [Automated Test Framework](#automated-test-framework), [diagnostic paths](#diagnostic-paths)
+  - [ ] Test requirements, user access, automation, integrations, and failure cases.
+- **8. Enhance the user interface** — [Record producer design](#record-producer-design)
+  - [ ] Add a Service Catalog experience where appropriate.
+- **Deploy and maintain** — [Source control and deployment](#source-control-and-deployment), [application properties](#application-properties)
+  - [ ] Package and deploy the application; establish ownership and operational support.
+
 ## Resources
 
 ### 📘 Courses
 
-- [ ] [Application Development Fundamentals On Demand](https://learning.servicenow.com/lxp/en/now-platform/application-development-fundamentals-on-demand?id=learning_course_prev&course_id=35eefed887bb52d03a3a84c7cebb35f8)
-- [ ] [Application Developer Skills Learning Path](https://learning.servicenow.com/lxp/en/app-engine/application-developer-skills?id=learning_path_prev&path_id=2a580f4447e96110ac2f89c2e36d4321)
-- [ ] [Retrieving Update Sets from Remote Instances](https://learning.servicenow.com/lxp/en/now-platform/retrieving-update-sets-from-remote-instances?id=learning_course_prev&course_id=68875453db77585030c91fdc1396197c)
-- [ ] [Introduction to Access Controls](https://nowlearning.servicenow.com/lxp/en/now-platform/introduction-to-access-controls?id=learning_course_prev&course_id=3c13324dc3de7d541ac0f60f05013187)
-- [ ] [Introduction to Access Analyzer](https://nowlearning.servicenow.com/lxp/en/platform-security/introduction-to-access-analyzer?id=learning_course_prev&course_id=f20cef1347c10e582a090dcbd36d43fd)
-
-### 📄 ServiceNow Documentation
-
-- [Application Scope](https://docs.servicenow.com/csh?topicname=c_ApplicationScope.html&version=latest)
-- [NowCreate: Create your own app](https://mynow.servicenow.com/now/best-practices/success-packs/create-your-own-app)
-- [Build or modify applications in ServiceNow](https://www.servicenow.com/docs/bundle/yokohama-application-development/page/build/custom-application/concept/developing-applications.html)
-- [System update sets](https://www.servicenow.com/docs/bundle/yokohama-application-development/page/build/system-update-sets/concept/system-update-sets.html)
-- [Working with update sets in ServiceNow Studio](https://www.servicenow.com/docs/bundle/yokohama-application-development/page/build/servicenow-studio/concept/working-with-update-sets-in-servicenow-studio.html)
-- [Domain scope](https://docs.servicenow.com/csh?topicname=c_DomainScope.html&version=latest)
-- [Publish app changes to the application repository from ServiceNow Studio](https://www.servicenow.com/docs/bundle/yokohama-application-development/page/build/servicenow-studio/task/qs-publish-changes-to-app-using-app-repo.html)
-- [ServiceNow application repository](https://www.servicenow.com/docs/bundle/yokohama-application-development/page/build/applications/concept/app-repo.html)
-- [ACL rule types](https://www.servicenow.com/docs/bundle/yokohama-platform-security/page/administer/contextual-security/concept/acl-rule-types.html)
-- [Create/configure an ACL rule](https://www.servicenow.com/docs/bundle/yokohama-platform-security/page/administer/contextual-security/task/t_CreateAnACLRule.html)
-- [Access Control list rules](https://www.servicenow.com/docs/bundle/yokohama-platform-security/page/administer/contextual-security/concept/access-control-rules.html)
-- [Access Analyzer](https://www.servicenow.com/docs/bundle/yokohama-platform-security/page/integrate/identity/concept/access-analyzer.html)
-- [Access Analyzer Getting Started video](https://players.brightcove.net/6274575390001/nUx4EKfUz_default/index.html?videoId=6327544848112)
-- [Delegated development](https://www.servicenow.com/docs/bundle/yokohama-application-development/page/build/applications/concept/c_DelegatedDevelopment.html)
-- [Example: granting access to configuration records](https://www.servicenow.com/docs/bundle/yokohama-application-development/page/build/applications/concept/c_ExampleGrantingAccessToConfigRecs.html)
-- [Flow Execution Details](https://www.servicenow.com/docs/bundle/yokohama-build-workflows/page/administer/flow-designer/concept/flow-execution-details.html)
-- [Integration Hub Spokes List](https://www.servicenow.com/docs/bundle/yokohama-integrate-applications/page/administer/integrationhub/reference/spokes-list.html)
-- [Ignore Cache Explained](https://www.servicenow.com/community/developer-blog/ignore-cache-checkbox-on-system-property-lt-sys-properties-gt/ba-p/2920941)
-- [When to Use Ignore Cache](https://support.servicenow.com/kb?id=kb_article_view&sysparm_article=KB1000746)
-- [Notification variables](https://docs.servicenow.com/csh?topicname=notification-variables.html&version=latest)
-
-### 🧠 Community
-
-- [Requirements: Ask Why](https://www.servicenow.com/community/in-other-news/ask-why/ba-p/2276663)
-
-### 📚 Standards
-
--
-
-## Overview
-
-### Application development checklist
-
-| Phase                                    | Checklist Item                          |
-| ---------------------------------------- | --------------------------------------- |
-| 1) Define Process                        | [ ] Business Problem                    |
-|                                          | [ ] Outcomes                            |
-|                                          | [ ] Input(s)                            |
-|                                          | [ ] Output(s)                           |
-|                                          | [ ] User personas / stakeholders        |
-|                                          | [ ] Process steps                       |
-| ---------------------------------------- | --------------------------------------- |
-| 2) Design and Build Data Model           | [ ] Tables                              |
-|                                          | [ ] Columns                             |
-|                                          | [ ] Relationships                       |
-| ---------------------------------------- | --------------------------------------- |
-| 3) Design and Create User Interface      | [ ] Desktop / Tablet                    |
-| ---------------------------------------- | --------------------------------------- |
-| 4) [Apply Security](#controlling-access) | [ ] Roles                               |
-|                                          | [ ] Access Control                      |
-| ---------------------------------------- | --------------------------------------- |
-| 5) Automate                              | [ ] Flow Designer                       |
-|                                          | [ ] Scheduled Script Execution          |
-|                                          | [ ] Email                               |
-| ---------------------------------------- | --------------------------------------- |
-| 6) Integrate                             | [ ] SOAP / REST / CSV / Microsoft Excel |
-| ---------------------------------------- | --------------------------------------- |
-| 7) Enhance User Interface                | [ ] Service Catalog                     |
-| ---------------------------------------- | --------------------------------------- |
-| 8) Test                                  | [ ] Test                                |
-
-### Application development concepts
-
-- **Cloud-based application**
-  - ServiceNow manages computing resources and provides the platform
-  - Developers configure ServiceNow and extend functionality using JavaScript
-  - Users access applications via a web browser (no installation)
-  - Delivered via the internet
-  - Built on an existing platform
-  - Provides access to data
-- **Why develop custom applications**
-  - Replace outdated or inadequate business applications and processes
-  - Extend the value of ServiceNow
-  - Extend service delivery and management across enterprise departments
-  - Increase automation and consolidate enterprise services
-  - Address gaps where existing custom apps only partially meet business or user needs
-  - Outcomes
-    - Increased responsiveness
-    - Increased productivity
-    - Improved user satisfaction
-- **Should I build it**
-  - Good fit
-    - Data modeled in a relational database
-    - Request–fulfill process pattern
-    - Form-based data interaction
-    - Reporting requirements
-    - Workflow / Flow Designer usage
-    - Extendable via JavaScript
-  - Bad fit
-    - Unstructured data (audio, video)
-    - Proprietary libraries without APIs
-    - Multi-player or graphics-engine-based applications
-    - No defined process flow
-- **Custom application examples**
-  - Timecard, Gift Card, Contract, Invoice, Accounts Payable
-  - PO Reconciliation, IP Address Management, Document Workflow
-  - Incident Response, Field Safety, Game/Venue Issue Management
-  - Customer Feedback, Insurance Claims, Truck Maintenance
-  - Lab Mouse Reports, Postal Equipment Management, Pig Lifecycle
-
-### Scoped Application Model
-
-- **Philosophy**
-  - Applications should be uninstallable
-  - Applications should not break the system
-  - Applications should not break other applications
-  - Applications should be self-contained
-  - Dependencies must be clearly defined
-  - Least-privilege access enforced
-  - Scope isolates applications from each other
-  - Out-of-scope access must be explicitly allowed
-- **Evolution of scopes**
-  - Pre-Fuji (≤ Dublin)
-    - All applications built in Global scope
-    - Deployed using Update Sets
-  - Fuji (2014)
-    - Scoped applications introduced
-  - Geneva (2015)
-    - Studio IDE introduced
-    - Delegated Development introduced
-  - Present
-    - All new applications are scoped
-    - Major apps (e.g., HR, CSM) rewritten as scoped
-- **Scopes and records**
-  - Global scope
-    - Baseline applications
-    - Legacy custom applications (no migration path)
-  - Private scoped
-    - Custom applications
-  - Scope is immutable once saved
-  - Platform warnings prevent accidental out-of-scope changes
-  - Scope switching via temporary link or Application Picker
-- **Scoped vs. Global**
-  - Scoped applications
-    - Separate namespace
-    - Sandboxed for security and stability
-    - Delegated Development support
-    - Publishable to Application Repository
-    - Restricted data access (even Admin access can be limited)
-  - Global applications
-    - All artifacts exist in Global
-  - Artifacts
-    - Access Controls, Business Rules, Script Includes, Tables, Client Scripts
-  - Baseline access
-    - Read access across app tables
-    - No write/update/delete without explicit permission
-- **Namespace**
-  - Format: `x_{company_code}_{application_id}`
-  - `x_` prefix required
-  - Company code from `glide.appcreator.company.code` (2–5 characters)
-  - Application name truncated as needed
-  - Maximum length: 18 characters
-  - Example: `x_acme_book_rooms`
-  - Reference: [Application Scope](https://docs.servicenow.com/csh?topicname=c_ApplicationScope.html&version=latest)
-- **Delegated Development**
-  - Allows non-admin users to develop, deploy, and delete scoped applications
-  - Application-specific permissions
-  - File-type access control
-  - Instance-specific user roles
-  - Optional access to security records and script fields
-  - Managed in Studio
-    - Application Details → App Settings (gear) → _Manage Developers_
-  - Permissions set per application
-- **Determining scope**
-  - General rule
-    - Use scoped applications whenever possible
-  - Use scoped for
-    - Custom applications
-    - Utilities, integrations, services
-    - Customizations to scoped applications
-  - Use global when required
-    - Legacy global customizations
-    - Pre-scoping production applications
-    - Base instance code changes
-    - Required global resources unavailable to scopes
-    - Excessive global dependencies
-
-### Application Development vs. Deployment
-
-- **Development**
-  - Incremental work during build
-  - Tool: Update Sets
-  - Supports multiple work streams
-- **Deployment**
-  - Package completed functionality
-  - Tools
-    - Update Sets
-    - Application Repository
-    - ServiceNow Store
-  - Supports formal change management
-- **Git integration**
-  - Xanadu or earlier (legacy Studio)
-    - Git Integration available
-  - Yokohama and later
-    - Git Integration not available
-    - Planned future reinstatement
-- **Course application context**
-  - Build a scoped Loaner Request application
-  - Create tables, fields, and forms
-  - Apply Access Controls
-  - Use Flow Designer
-  - Send notifications
-  - Integrate external data sources
-  - Test incrementally
-  - Publish and install via Application Repository
-- **Development approach**
-  - Analyze → Design → Develop → Test → Deploy
-  - Scrum / Agile / Sprint-based
-  - Each module delivers a shippable product
-  - Labs are sequential and interdependent
-- **Required skills**
-  - Administration
-    - Forms, lists, users, Access Controls
-    - Workflow / Flow Designer
-    - Service Catalog and Record Producers
-  - Scripting
-    - Script type selection
-    - Client vs. server APIs
-    - JavaScript mode selection
-- **JavaScript engine modes**
-  - ECMAScript 2021 (ES12)
-    - Default mode
-    - Modern syntax (`let`, `const`, `for...of`, default parameters)
-    - Partial ES2022 support
-  - ES5 Standards Mode
-    - ES5 syntax and features
-    - Native JSON support
-  - Compatibility Mode
-    - Pre-Helsinki and all Global scripts
-    - Legacy JSON behaviors supported
-    - No third-party JavaScript libraries
-- **Key takeaways**
-  - ServiceNow is a cloud-based application platform
-  - Request–fulfill apps align well with the Now Platform
-  - Choose the correct development and deployment tools
-  - Use scoped applications as the default approach
-  - Apply course patterns to real-world business solutions
-
-## Application analysis and design
-
-- **Purpose**
-  - Analyze requirements
-  - Design a scalable, maintainable ServiceNow application
-- **Understand the business problem**
-  - What needs to be automated, tracked, or improved
-  - Why the process exists
-  - What success looks like (measurable outcomes)
-  - Typical outcome drivers
-    - Efficiency gains
-    - Cost reduction
-    - Retirement of legacy tools
-- **Identify stakeholders**
-  - Requestors / Fulfillers
-    - Simple UI
-    - Desktop, tablet, mobile access
-    - Status visibility (reports, dashboards)
-    - Notifications
-    - Automation
-  - Application Administrators
-    - Security
-    - Logging and debugging
-    - Single platform for build, test, run
-  - Management
-    - Business value
-    - Centralized tooling
-    - Automation
-    - Real-time reporting
-- **Define user personas**
-  - Map personas to roles
-  - Common personas
-    - User
-    - Admin
-    - Manager
-    - Fulfiller
-    - Executive
-  - Best practice
-    - Minimum roles: User and Admin
-- **Define inputs and outputs**
-  - Inputs
-    - Source (forms, spreadsheets, integrations)
-    - Format
-    - Frequency
-    - Collision handling
-    - Coalescing strategy
-    - Retrieval method
-  - Outputs
-    - Format (reports, dashboards, email)
-    - Frequency
-    - Recipients
-- **Define the process**
-  - Break process into steps
-    - Objective
-    - Owner
-    - Actions
-  - Document using
-    - Flowcharts
-    - Swim lanes
-    - Mind maps
-  - Detailed process understanding simplifies workflow design
-- **Design the data model**
-  - Identify
-    - Tables
-    - Columns
-    - Relationships
-  - Consider reuse of platform tables
-    - `user`
-    - `task`
-    - `cmdb_ci`
-  - Data model is foundational to application behavior
-- **Design application architecture**
-  - Client-side
-    - Forms
-    - Client Scripts
-    - UI Actions
-  - Server-side
-    - Script Includes
-    - GlideAJAX
-  - Best practices
-    - Thin client-side logic
-    - Centralize reusable logic in Script Includes
-    - Prioritize maintainability and reuse
-- **Design the user experience**
-  - Supported devices
-    - Desktop
-    - Tablet
-    - Mobile
-  - Interaction models
-    - Catalog Item
-    - Record Producer
-    - Workspace
-    - Portal
-    - Mobile experience
-- **Apply security**
-  - Roles aligned to personas
-  - Access Controls for tables and records
-  - Least-privilege principle
-- **Plan automation**
-  - Flow Designer
-  - Scheduled script execution
-  - Notifications (email)
-- **Plan integrations**: SOAP, REST, CSV, MS Excel
-- **Application Development Checklist (summary)**
-  - Define business problem and outcomes
-  - Identify stakeholders and personas
-  - Define inputs, outputs, and process steps
-  - Design data model
-  - Design user interface
-  - Apply security
-  - Automate processes
-  - Integrate external systems
-  - Test
-- **ServiceNow design recommendations**
-  - Design before building
-  - Build private scoped applications
-  - Give each process its own scope
-  - Track development tasks
-
-## App Creation
-
-### Application development tools overview
-
-- **Tool selection depends on**
-  - Application complexity
-  - Developer experience
-- **Primary build tools**
-  - ServiceNow Studio
-    - Integrated development environment for custom applications
-    - Centralized, tabbed interface to create/review/update application files
-    - Opens automatically when editing a custom application
-  - App Engine Studio (AES)
-    - Guided low-code development tool
-    - Requires App Engine subscription (or packaged product)
-- **Supporting build tools**
-  - Flow Designer
-    - No/low-code automation using reusable steps
-    - Approvals, tasks, notifications, record operations
-  - Integration Hub
-    - Reusable integrations to third-party systems
-    - Callable across the Now Platform
-  - Table Builder
-    - Create/design/administer tables and forms
-  - UI Builder
-    - Build/customize workspace pages
-  - Playbooks
-    - UI layer on top of flows (visual process interaction)
-  - Creator Workflows
-    - Low-code workflow apps (connected digital workflows)
-- **References**
-  - [Build or modify applications in ServiceNow](https://www.servicenow.com/docs/bundle/yokohama-application-development/page/build/custom-application/concept/developing-applications.html)
-  - [Application Developer Skills learning path](https://learning.servicenow.com/lxp/en/app-engine/application-developer-skills?id=learning_path_prev&path_id=2a580f4447e96110ac2f89c2e36d4321)
-
-### Create a custom application (Module 3.2)
-
-- **App creation inputs (requirements → configuration)**
-  - Application configuration
-    - Name
-    - Description
-    - Scope (auto-generated)
-  - Roles
-    - Default created: Admin role + User role
-    - Option: use defaults or assign existing roles
-  - Tables
-    - Option: existing table
-    - Option: create new table
-    - Option: extend existing table
-    - Option (license-limited): upload spreadsheet/PDF to create table
-  - Table configuration
-    - Label
-    - Auto-numbering
-    - Manage access (Application Access settings)
-  - Next steps after basic creation
-    - ServiceNow Studio (add artifacts)
-    - Flow Designer (automation)
-    - Set up another app
-- **Scope naming (namespace)**
-  - Scope prefix appears on many artifacts
-  - Constructed as `x_` + `<glide.appcreator.company.code>` + truncated application name
-  - `glide.appcreator.company.code`
-    - ServiceNow-set value (not user-changeable)
-    - Typically 2–5 characters
-    - Class example: `calta`
-
-#### ServiceNow Studio usage and capabilities
-
-- **Access Studio**
-  - **App Engine > ServiceNow Studio**
-- **Open an app in Studio**
-  - Option 1: **App Engine > ServiceNow Studio** → select application
-  - Option 2: **System Applications > My Company Applications** → select _Edit in ServiceNow Studio_
-- **What Studio supports**
-  - Open/edit app files in any scope (global or custom)
-  - Tabbed navigation + app file navigator
-  - Code search
-  - Quick creation of scripts/files
-  - Deployment via Update Sets or internal Application Repository
-  - Manage global application files
-  - Testing integration (opens ATF in a Studio tab)
-- **What Studio does NOT support**
-  - Push to external source control → use Update Sets
-  - Script IP protection → manage project access
-- **Working model**
-  - Build in Studio
-  - Use the application in the main ServiceNow UI
-- New application defaults and configuration
-  - **New application contains**
-    - App details (type, scope, created date, `sys_id`)
-    - Default roles: admin + user
-    - Embedded Help Role Priority
-  - **Scope truncation behavior**
-    - Scope value can truncate app name
-    - System may append numeric suffix to maintain uniqueness (increments if needed)
-  - **Create application files**
-    - In Studio: select _Create_ → _File_ → choose file type (pop-up selector)
-    - Typical foundational artifacts
-      - Tables
-      - Access Controls
-      - Modules
-      - Forms
-
-#### Data table choices and creation patterns
-
-- **Decision importance**
-  - Extend existing table to inherit built-in behavior (“for free”)
-  - Create new table for full control of behavior
-  - Applications commonly use multiple tables
-    - Primary/base table(s) for core records
-    - Reference/lookup tables for controlled values
-- **Table options**
-  - Extend a table
-    - Copies base table structure + inherits behavior
-    - Add new fields on child table
-  - Create a table
-    - Use when no suitable base table exists
-  - Upload spreadsheet/PDF (App Engine Enterprise license only)
-- **Add a scope-specific column to an existing table (no custom table)**
-  - Studio → open app
-  - _Create_ → _File_
-  - Select _Table Column_ → _Continue_
-  - Complete fields → _Submit_
-  - Result: existing table gains an additional column in your application scope
-- **Create a custom table by extending**
-  - _Create_ → _File_ → _Table_ → _Continue_
-  - Label → enter table name
-  - Extends table → select base table
-  - _Save_ (not Submit)
-  - Columns tab → add fields
-  - _Update_
-- **Create a custom table from scratch**
-  - _Create_ → _File_ → _Table_ → _Continue_
-  - Label → enter table name
-  - Extends table → leave empty
-  - _Submit_
-- **Inspect existing business logic on a table**
-  - From list view → column context menu (ellipsis) → _Configure_ → _All_
-  - Navigator search → `<table_name>.config`
-- **Default fields on all new tables**
-  - `sys_created_by` (string) – display name of user who inserted record
-  - `sys_created_on` (glide_date_time) – timestamp on insert
-  - `sys_id` (GUID) – unique record identifier
-  - `sys_updated_on` (glide_date_time) – timestamp on update
-  - `sys_updated_by` (string) – display name of last updater
-  - `sys_mod_count` (numeric) – update count since creation
-  - If Extensible=`true`
-    - `sys_class_name` (system class name) – identifies child table that contains the record
-- **Inherited fields (when extending)**
-  - Child table inherits parent fields
-  - Field is inherited when the Table column value differs from table Name
-- **Extend vs create guidance**
-  - Extend when
-    - Similar table exists and built-in scripts/workflows are useful
-    - Approval activities needed via Task-based approvals (non-User Approval activities require Task extension)
-  - Create new when
-    - No similar table exists
-    - You want to implement behaviors yourself
-    - Table is reference-only with seeded/sample data for lookup
-  - Constraints
-    - Parent table must be Extensible to extend it
-    - Cannot extend system tables or database view tables
-
-#### Application Access and cross-scope behavior
-
-- **Application Access (runtime protection for app tables)**
-  - Protects read/write/create/delete via
-    - Scripts
-    - Web service calls
-  - Accessible
-    - `This application scope only` (complete runtime protection)
-    - `All application scopes` (allow access from other privately scoped apps)
-  - Caller Access (cross-scope request handling)
-    - `None`
-    - `Caller Tracking`
-    - `Caller Restriction`
-  - Can read / create / update / delete
-    - Controls whether scripts from other scopes can perform DB operations
-    - Never applies to current application scope
-  - Allow access to this table via web services
-    - Allows other-scope scripts to call web services against the table
-    - Calling user still needs table permissions
-  - Allow configuration
-    - Allows developers in other scopes to write scripts for this table
-- **Cross-scope privileges (permission handshake)**
-  - Use case: App B needs access to App A resources/data
-  - Requirements (both sides)
-    - App A: allow access via Application Access tab (enables requests)
-    - App B: request via Cross-scope privilege record
-  - Operational notes
-    - Run all scripts during testing to generate required cross-scope privilege records
-    - After publication, runtime requests require a valid cross-scope privilege record
-  - Risk
-    - Misconfiguration can expose sensitive data
-
-#### Application menu and modules
-
-- **Menu/module creation behavior**
-  - Application menu created once a table exists in the scope
-  - Module can be created when table is created
-  - Default module name = plural of table name (editable)
-  - Default module shows list of all records (no default records)
-  - After adding menus/modules: reload the ServiceNow browser window
-- **View modules**
-  - Studio → navigator panel → expand _Module_ → select module
-- **Create a module**
-  - Studio → _Create_ → _File_
-  - Application field = your application
-  - File type: _Module (sys_app_module)_
-  - _Continue_ → configure → _Submit_
-- **Module configuration fields**
-  - Title (module name)
-  - Application Menu (defaults to current app)
-  - Order (menu ordering)
-  - Hint (tooltip)
-  - Roles (restrict module access; blank → inherits application roles)
-  - Active (show/hide module)
-  - Override application menu roles (allow access even if user can’t see menu; module role still required)
-  - Link type (controls destination)
-  - Table (table accessed by module)
-  - View Name (view to open)
-  - Filter (list filtering)
-  - Note: link type may require additional fields (Filter/Content Page/Arguments)
-
-#### Scope visibility and avoiding scope mistakes
-
-- **Studio scope indicators**
-  - Current file scope shown bottom-left
-  - Multiple scopes can be open in Studio
-  - Best practice: verify scope before creating records
-  - Preference: Organize tab groups by scope
-    - Color-coded grouped tabs = same scope
-    - Tabs without colors = global scope
-  - Hover over tab to view file scope
-- **Main UI scope pickers**
-  - Scope menu (globe icon) available to users with roles permitting scope pickers
-  - Application scope picker
-    - Sets where changes apply (defaults to newly created application)
-    - Reference: [Application Scope](https://www.servicenow.com/docs/bundle/yokohama-application-development/page/build/applications/concept/c_ApplicationScope.html)
-  - Update set picker (admin)
-    - Reference: [Update set administration](https://docs.servicenow.com/csh?topicname=update-set-administration.html&version=latest)
-  - Domain scope picker (domain separation only)
-    - Reference: [Domain scope](https://docs.servicenow.com/csh?topicname=c_DomainScope.html&version=latest)
-
-### Application management and sharing
-
-- **Sharing methods**
-  - Publish to Application Repository
-    - Available to: all instances assigned to the same company
-    - Use: move app to test/prod within company
-  - Publish to ServiceNow Store
-    - Available to: all ServiceNow customers
-    - Use: share/sell apps externally
-  - Publish to Update Set
-    - Available to: any instance that can import the update set file
-    - Use: backup/audit snapshot; manual transfer between instances
-- **Publish to Update Set (snapshot packaging)**
-  - Captures latest version of each application file
-  - Marks update set as Complete
-  - Uses
-    - Package all app files together
-    - Export XML (same family release recommended)
-    - Move changes dev → test → prod
-  - Data note
-    - Configuration captured by default; data typically not included
-  - References
-    - [System update sets](https://www.servicenow.com/docs/bundle/yokohama-application-development/page/build/system-update-sets/concept/system-update-sets.html)
-    - [Working with update sets in ServiceNow Studio](https://www.servicenow.com/docs/bundle/yokohama-application-development/page/build/servicenow-studio/concept/working-with-update-sets-in-servicenow-studio.html)
-- **Update set deployment cautions**
-  - Newer → older family release can break functionality; may risk outage/data loss
-  - Prefer moving older → newer (still test)
-  - Similar constraints for Store apps with differing versions
-  - Manual effort expected
-    - Preview
-    - Collision resolution
-    - Commit
-- **Publish to Update Set (Studio)**
-  - Studio → App details → App settings (gear) → _Publish to Update Set..._
-  - Select _Publish_ → _Done_
-  - Review contents on Customer Updates tab
-- **Make update set retrievable from connected instance**
-  - Studio home → Deployment tab → select update set → State=`Complete`
-- **Retrieve completed update sets (target instance)**
-  - Main UI (not Studio) → **System Update Sets > Update Sources** → _New_
-  - Configure connection → _Test Connection_ → _Save_ (not Submit)
-  - Select _Retrieve Completed Update Sets_
-  - View: **System Update Sets > Retrieved Update Sets**
-  - Auto-preview
-    - `glide.update_set.auto_preview`=`true` → preview starts automatically after retrieval
-- **Training**
-  - [Retrieving Update Sets from Remote Instances](https://learning.servicenow.com/lxp/en/now-platform/retrieving-update-sets-from-remote-instances?id=learning_course_prev&course_id=68875453db77585030c91fdc1396197c)
-
-#### Application Repository (publish/install/update)
-
-- **What it is**
-  - Central repository for scoped apps published by your organization
-  - Supports install/uninstall/update as a package across company instances
-  - Visibility limited to apps published by your organization
-- **Requirements/constraints**
-  - Valid subscription
-  - Matching application scope across instances
-  - Network access
-  - Company code must match on all instances (`glide.appcreator.company.code`)
-  - Personal developer instances cannot connect
-  - Admin role required for install/update
-- **Publish to repository (versions must be unique)**
-  - Studio → App details → _Publish_
-  - Set version number (unique)
-  - Add release notes
-  - Select _Publish_ → _Done_
-- **Install / update**
-  - Install
-    - Main UI → **System Applications > My Company Applications** → Not Installed tab → _Install_
-    - Do not develop on instances where app is installed (develop in dev)
-  - Update
-    - Main UI → **System Applications > My Company Applications** → Installed tab → _Update_
-    - Badges indicate available updates; no forced updates
-- **Rollback / uninstall**
-  - Rollback
-    - Returns to previous installation
-    - Does not affect the global application record
-  - Uninstall
-    - Removes app from instance (remains in repository)
-    - Can reinstall later
-  - Steps (rollback)
-    - **System Applications > My Company Applications** → All Apps/Installed → open app (name link)
-    - Select _Rollback_ related link → _Rollback_ → _Done_
-  - Steps (uninstall)
-    - **System Applications > My Company Applications** → All Apps/Installed → open app (name link)
-    - Select _Uninstall_ related link → _OK_ → type `uninstall` → _OK_ → _Done_
-- **References**
-  - [Publish app changes to the application repository from ServiceNow Studio](https://www.servicenow.com/docs/bundle/yokohama-application-development/page/build/servicenow-studio/task/qs-publish-changes-to-app-using-app-repo.html)
-  - [ServiceNow application repository](https://www.servicenow.com/docs/bundle/yokohama-application-development/page/build/applications/concept/app-repo.html)
-
-#### ServiceNow Store (external distribution)
-
-- **What it is**
-  - Marketplace for downloading/installing ServiceNow apps
-  - Free and fee-based apps
-  - Apps certified for best-practice compliance
-  - Publishing requires review/approval (not immediate)
-  - Buyers responsible for testing and risk acceptance
-- **Publish requirements (high-level)**
-  - Build in private scope
-  - Join Technology Partner Program
-  - Certify application
-- **References**
-  - [ServiceNow Partner Program](https://www.servicenow.com/partners.html)
-  - [Partner Developer: Developing as a Build Partner](https://nowlearning.servicenow.com/lxp?id=learning_course_prev&course_id=0de03d0187526d94bfe94088dabb3554&autologin=yes)
-
-### Update sets during app development
-
-- **Why use update sets during development**
-  - Track configuration/file changes (version control concept)
-  - Store customizations and rationale (why a change was made)
-  - Export work-in-progress before a clone
-  - Support SDLC traceability (stories, problems, bugs, enhancements)
-  - Useful for
-    - Baseline app customizations
-    - Store app customizations
-- **Mental model**
-  - Create update set = start “recording”
-  - Make changes = recorded into update set
-  - Complete update set = stop “recording” and make retrievable
-- **Create a new update set (Studio)**
-  - Studio → Update Set widget → _+New_
-  - Name → _Save_ → _Apply_
-- **Complete an update set**
-  - Studio home → Deployment tab → select update set → State=`Complete`
-- **Practical usage pattern (example)**
-  - After creating new app: _Publish to Update Set_ to capture baseline
-  - Daily: save progress in update set
-  - End of sprint: publish to Application Repository
-  - Final product for external sale: publish to ServiceNow Store
-- **Recommendations**
-  - Design the data model before creating app tables
-  - Extend existing tables where possible to inherit functionality
-  - Choose deployment method based on audience (update set vs repository vs store)
-  - Add documentation/comments throughout development where possible
-
-## Application Forms
-
-- **Module outcomes**
-  - Create/modify tables
-  - Design/create forms
-  - Create view: Desktop
-  - Write/test/debug client-side + server-side scripts
-  - Complete an update set
-  - Publish updated app to the Application Repository
-- **User story**
-  - Create appropriate fields, lists, forms, and views to ensure a positive user experience
-
-- **Default lists/forms behavior**
-  - New table (no parent)
-    - Gets a default list and default form
-  - Extended table
-    - Default list/form inherits parent table fields + layout
-    - Example: extending `Task` drives inherited list/form content
-
-- **Add fields to a table (not the base table)**
-  - Label convention: capitalize only first letter of the first word
-  - Steps (Studio)
-    - Open application in ServiceNow Studio
-    - Open target table record
-    - Select _Add new field_
-    - Set Column label
-    - Set Type
-    - Configure remaining column parameters
-    - Select _Save_
-
-- **Field type selection (avoid data loss)**
-  - Changing field type later can cause data loss → choose carefully up front
-  - Avoid free-form text unless required
-    - Do not use string for dates
-    - Do not use string for people/object references
-  - Prefer constrained/typed fields
-    - Choice list + Reference to limit values
-    - Date/Date-Time for correct formatting
-  - Common field types
-    - Date/Time (calendar widget)
-    - Reference (records from another table)
-    - True/False (checkbox)
-    - Decimal (e.g., `12.34`)
-    - String
-  - Reference: [Database field types](https://docs.servicenow.com/csh?topicname=r_DatabaseFieldTypes.html&version=latest)
-
-- **When to create new fields**
-  - Prefer reuse when possible (especially when extending a table)
-  - Options and tradeoffs
-    - Use existing fields unchanged
-      - Pro: no maintenance
-      - Con: may not match process perfectly
-    - Retitle existing fields (change Label)
-      - Pro: label matches process
-      - Con: column name ≠ label (can confuse)
-    - Consolidate fields
-      - Pro: simpler form
-      - Con: risk oversimplifying requirements
-  - Label change scope
-    - Changing a field label affects only the current table (not parent tables)
-
-- **Delete fields**
-  - Can delete user-defined fields
-  - Cannot delete inherited fields
-  - Deleting a field does not delete table records
-  - Steps
-    - Table Columns list → select gear icon for field → select Delete field icon → confirm Delete → _Save_
-  - Note (Table Builder)
-    - To delete a column, delete existing data in that column first
-
-- **Form design (UX rules of thumb)**
-  - Keep forms short; users read top → bottom
-  - Place key identifiers (record number/name) at top
-  - Use sections to break up long forms
-  - Use two-column layouts near top of a form/section
-  - Use full-width single-column for long text fields
-  - Use meaningful labels; avoid ambiguous labels like “Date”
-  - Use Hint/Annotation/Help for longer guidance (keep labels short)
-  - Differentiate desktop vs mobile needs (validate on tablet/smartphone)
-
-- **Form sections as tabs (user preference)**
-  - Tabs appear only when there are 2+ sections
-  - Default platform behavior: sections displayed as tabs
-  - Disable tabbed sections
-    - User avatar → _Preferences_ → _Display_ → disable “display form sections as tabs” (slider left)
-
-- **Change a field label (Form Builder)**
-  - Studio → Form section → open form
-  - Select field in Form Builder
-  - Right-side config panel → Label
-  - Select _Save_
-
-- **Tooltips (field Hint)**
-  - Keep to ~one line (brief, quick visibility)
-  - Steps
-    - Open table form (main UI)
-    - Right-click field → _Configure Label_
-    - Set Hint (mouse-over text)
-    - _Save_
-
-- **Real-time user feedback (client-side)**
-  - Use Client Scripts + UI Action scripts for targeted feedback
-  - Common APIs
-    - `g_form.showFieldMsg()` (message under field, blue background)
-    - `g_form.addInfoMessage()` (top-of-form message, blue background)
-    - `g_form.addErrorMessage()` (top-of-form message, red background)
-    - `alert()` (OK dialog)
-    - `confirm()` (OK/Cancel dialog)
-
-- **Field Styles (visual emphasis)**
-  - Use tasteful, businesslike styling
-  - Create a Style record (Studio)
-    - _Create_ → _File_ → _Style_ → _Continue_
-    - Set Table + Field name
-    - Optional: Value (for styling a specific choice value)
-    - Style field: CSS commands
-    - _Submit_
-  - Examples (CSS)
-    - `font-weight:bold;`
-    - `text-decoration:underline;`
-    - `font-style:italic;`
-    - `text-align:center;` / `text-align:right;`
-    - `font-size:18px;`
-    - `background-color:blue;`
-    - `color:yellow;`
-
-- **Form Builder (what it’s for)**
-  - Add/configure form elements (fields, formatters, embedded lists)
-  - Select views and apply layouts to views
-  - Apply policies/rules and preview changes
-  - Access
-    - Record → Configure → _Form Builder_ (opens new window)
-    - Also available via Related Links / Table Builder (Forms tab)
-
-- **Views (form/list variants)**
-  - View = saved configuration of fields + order for same record (form or list)
-  - Use case: show the right fields to the right audience (ESS, ITIL, mobile)
-  - Naming
-    - Name = database name
-    - Title = user-friendly label
-    - Default view shows no view name next to form title
-  - Scripting benefit
-    - Client Scripts and UI Policy scripts can run selectively by View
-  - Permission
-    - Users need `view_changer` role to change views
-
-- **Work with views (Form Builder)**
-  - Create view
-    - Form Builder → Select a form view → _+ Add_ → enter name → _Create_ → configure
-  - Modify view
-    - Select view from “Select a form view” → configure
-  - Duplicate view
-    - Ellipses next to current view → _Duplicate this form view_ → name → _Create_ → configure
-  - Delete view
-    - Main UI → **System UI > Forms** → filter by table + view → open → _Delete_ → confirm
-
-- **View Rules (server-enforced view selection)**
-  - Forces a view from the server (URL query string cannot override)
-  - Conditions
-    - Condition builder (contextual user/record relationship)
-    - JavaScript condition
-    - Server-side JavaScript can set `answer` to the view name
-    - Complex logic can use `switch/case`
-
-- **Scripting in ServiceNow (why)**
-  - Enhance user experience
-  - Extend/add functionality
-  - Common examples
-    - Set cursor focus on load
-    - Send notifications
-    - Log/debug output
-    - Validate data
-    - Prompt users (alerts/confirmations/messages)
-    - Add widgets to forms/lists
-  - Reference: [Scripting](https://www.servicenow.com/docs/bundle/yokohama-api-reference/page/script/topic/c_Script.html)
-
-- **Client-side vs server-side execution**
-  - Client-side (browser)
-    - UI Policies
-    - Client Scripts
-  - Server-side (platform)
-    - Business Rules
-    - Scheduled Jobs
-    - Script Actions
-  - Each script type has its own trigger (“when”) + logic (“what”)
-    - Trigger fields vary by script type
-    - Description: document purpose/requirement/author context
-    - Messages: localization keys (maps to `sys_ui_message`)
-    - Script: logic executed when trigger/conditions are met
-
-- **UI Policies (client-side form behavior)**
-  - Typical actions (no code required for basics)
-    - Mandatory, Visible, Read-only, Hide fields (via UI Policy Actions)
-  - Performance guidance
-    - Prefer Condition Builder over scripts
-  - Re-evaluation limitation
-    - Conditions re-check only when user manually changes a field on a form
-    - Not evaluated for changes via UI Action/context menu/import/web services/list editor
-    - Use Data Policies (non-scriptable) to enforce mandatory/read-only off-form
-  - Create UI Policy (key fields)
-    - Table, Application (scope), Active
-    - Short description (pseudo-name; appears in debugging)
-    - Order (executes low → high)
-    - When to Apply conditions (Condition Builder)
-    - Save required before Actions/Script fields appear
-  - UI Policy Actions
-    - Field name
-    - Mandatory / Visible / Read only
-    - Clear field value (checkbox)
-  - Advanced view fields
-    - Global (all views) vs View (specific)
-    - Reverse if false + Execute if false
-    - On load (form load + change)
-    - Inherit (applies to extended tables)
-  - UI Policy scripting (Advanced view)
-    - Run scripts → Execute if true / Execute if false
-    - Can handle complex conditions, data changes, show/hide sections (sections require scripts)
-
-- **Client Scripts (browser)**
-  - Use cases
-    - React to field changes, validate values, set attributes, show/hide sections, modify choices
-  - Types
-    - `onChange` (field value changes)
-    - `onLoad` (form load; use sparingly—impacts load time)
-    - `onSubmit` (save/update/submit validation; may lead to form reload → onLoad runs again)
-  - Trigger/config fields
-    - Name (use consistent naming scheme)
-    - Table
-    - UI Type (Desktop/Tablet, Mobile, or both)
-    - Type (onChange/onLoad/onSubmit/onCellEdit)
-    - Field Name (required for onChange/onCellEdit)
-    - Active
-    - Inherited (apply to extended tables)
-    - Global vs View (scope to specific view; script only acts on fields in that view)
-
-- **UI Policies vs Client Scripts (selection cues)**
-  - Prefer UI Policies when Condition Builder can handle it (better performance)
-  - Use Client Scripts when you need
-    - onSubmit validation
-    - prior value access
-    - list field value changes
-    - complex scripted logic not suited to policy actions
-
-- **Client-side APIs**
-  - `g_form` (GlideForm)
-    - Form/field methods (desktop/tablet vs mobile differences)
-  - `g_user` (GlideUser)
-    - Current user properties + role checks
-    - Impersonation affects results (runs client-side)
-
-- **Script editor assistance**
-  - Ctrl+Space for contextual help/autocomplete in editor
-  - Reference: [Syntax editor keyboard shortcuts and actions](https://www.servicenow.com/docs/bundle/yokohama-api-reference/page/script/general-scripting/reference/r_SyntxEdtrKybrdSrtctsActn.html)
-- **API documentation**
-  - Developer site: `developer.servicenow.com`
-  - Navigation: Reference → APIs → select API type → select class → select method
-
-- **Scoped vs global client scripts (API availability differences)**
-  - Scoped scripts wrapped in an IIFE → some APIs modified/unavailable
-  - Property to enable certain globals per application
-    - `glide.script.block.client.globals`=`false` (enables some blocked globals)
-    - Exception: GlideRecord cannot be re-enabled client-side
-      - Use GlideAjax instead of GlideRecord client-side
-  - Inaccessible APIs (scoped client)
-    - GlideRecord, `window`, `document`
-    - Prototype: `$`, `$$`
-    - jQuery: `jQuery`, `$j`
-    - `$F` (Sizzle shortcut)
-  - Modified APIs
-    - GlideAjax, GlideForm, GlideDialogWindow
-
-- **Server-side script types (common triggers)**
-  - Access Controls (operation-based)
-  - Script Actions (event-driven)
-  - Business Rules (DB access: Insert/Update/Delete/Query; Before/After/Display/Async)
-  - Script Includes (on call)
-  - Scheduled Jobs (schedule-driven)
-  - UI Actions (user click)
-  - Workflow / Flow (condition-driven)
-- **Server-side API references**
-  - Scoped: <https://developer.servicenow.com/dev.do#!/reference/api/xanadu/server>
-  - Global: <https://developer.servicenow.com/dev.do#!/reference/api/xanadu/server_legacy/>
-
-- **Business Rules (execution order matters)**
-  - Server-side automation triggered by database access
-  - Additional reference: [Types of Business Rules](https://www.servicenow.com/community/itsm-forum/types-of-business-rules-with-example/m-p/712624)
-
-- **Client ↔ server data passing**
-  - Display Business Rule populates `g_scratchpad` (values must be strings)
-  - Client scripts can read `g_scratchpad`
-  - Note: `g_scratchpad` not available on mobile
-
-- **ServiceNow recommendations**
-  - Create as few new fields as possible
-  - Design lists/forms for usability (fields + sections)
-  - Use scripts to enhance UX (but keep client logic efficient)
-  - Test on tablet + smartphone (not only desktop)
-  - Use Application Repository to move applications between instances
-
-## Controlling Access
-
-### Access Control
-
-- **Purpose (user story)**
-  - Ensure only appropriate users can access or manipulate data
-- **Access can be restricted at**
-  - Application menus
-  - Modules
-  - Records (rows)
-  - Fields (columns)
-- **User behavior to expect**
-  - Users may attempt access via:
-    - **System Definition > Tables** (table visibility ≠ record access)
-    - `<table_name>.list` in Application Navigator
-  - Outcomes when access is restricted
-    - List loads but hides rows → “Number of rows removed… by Security constraints”
-    - Page blocked → “Security constraints prevent access to request page”
-
-- **Security model**
-  - Deny by default
-  - Access Control rules define required permissions for an operation
-
-- **Menu access (role-based)**
-  - Without role → menu not visible in navigator
-  - With role → menu visible
-  - Configure (Studio)
-    - Application Menu → select menu → _Edit User Roles_ (pencil) → move roles to Selected → _Done_ → _Save_
-
-- **Module access (role-based)**
-  - Without role → module not visible
-  - With role → module visible (record visibility still depends on ACLs)
-  - Configure (Studio)
-    - Module → select module → Visibility → _Edit User Roles_ (pencil) → assign roles → _Done_ → _Save_
-  - `Override application menu roles`
-    - Allows access to module even if user can’t see the application menu
-    - User may then see the menu plus the authorized module(s)
-
-- **Record and field ACL management**
-  - Requirement to create/edit ACLs in Studio
-    - Must elevate to `security_admin`
-    - If elevated but still blocked, _Save_ any application file to refresh Studio permissions
-  - CRUD ACLs
-    - Basic table CRUD ACLs can be generated automatically during table creation
-    - Description auto-populates when ACLs are created
-  - Modify an ACL (high-level)
-    - Elevate Role → `security_admin`
-    - Open app in Studio → Security → Access Control → select rule → edit → _Save_
-  - Create vs write default behavior
-    - Wildcard create (`*.*` create) reuses write permissions
-    - Create permissions == write unless an explicit create ACL is defined
-
-- **Find the right ACLs to edit**
-  - List view → Configure → _Security Rules_ (shows evaluated ACLs for a record)
-  - Customize the ACL list to show **Description** for faster identification
-
-- **Row vs field ACL types**
-  - `table.None`
-    - Row (record) access gate for list/form
-    - If denied at row level → field ACLs cannot grant access
-  - `table.field`
-    - Secures a single field
-    - If row allowed but field denied → field not visible
-  - `table.*`
-    - Secures all fields without field-specific ACLs
-    - Acts as a broad include/exclude control
-
-- **Using `table.None`, `table.field`, `table.*` (practical patterns)**
-  - Allow both roles full row access
-    - `table.None` Read includes RoleA OR RoleB
-  - Deny one role from a specific field (without impacting other fields)
-    - `table.None` Read includes RoleA OR RoleB
-    - `table.u_field` Read includes RoleA only
-  - Make RoleB see only one field while RoleA sees everything
-    - Use `table.*` carefully (it can exclude other roles from all non-explicit fields)
-    - Successful pattern requires field ACL to include both roles when needed
-      - `table.None` Read: RoleA OR RoleB
-      - `table.*` Read: RoleA
-      - `table.u_field_3` Read: RoleA OR RoleB
-- **Star guidance**
-  - Want to **exclude** many fields easily → use `table.*`
-  - Want to **include** fields selectively without broad exclusion → avoid `table.*`
-- **Learning resources**
-  - [Introduction to Access Controls](https://nowlearning.servicenow.com/lxp/en/now-platform/introduction-to-access-controls?id=learning_course_prev&course_id=3c13324dc3de7d541ac0f60f05013187)
-  - [Super Access Control World - ACL Basics](https://nowlearning.servicenow.com/lxp?id=learning_course_prev&course_id=afb281609716ce94a916b4be2153afba)
-
-- **ACL evaluation order**
-  - ![ACL Matching](./attachments/sn-acl-matching.png)
-  - Table-level evaluated first (most specific → most general)
-    - If fail table ACL → deny all fields
-  - Field-level evaluated next (most specific → most general)
-    - If pass table ACL but fail field ACL → deny that field
-  - Field-level processing stops at first successful match
-  - Object hierarchy lookup (example pattern)
-    - Explicit rule on self → explicit field rule on parent(s) → wildcard on self → wildcard on parent(s)
-  - Example search path for `incident.number`
-    - Table-level (`table.none`): `incident` → `task` → `*`
-    - Field-level (`table.field`, `table.*`): `incident.number` → `task.number` → `*.number` → `incident.*` → `task.*` → `*.*`
-  - References
-    - [ACL rule types](https://www.servicenow.com/docs/bundle/yokohama-platform-security/page/administer/contextual-security/concept/acl-rule-types.html)
-    - [Create/configure an ACL rule](https://www.servicenow.com/docs/bundle/yokohama-platform-security/page/administer/contextual-security/task/t_CreateAnACLRule.html)
-    - [Access Control list rules](https://www.servicenow.com/docs/bundle/yokohama-platform-security/page/administer/contextual-security/concept/access-control-rules.html)
-
-- **ACL rule configuration checks (all must pass)**
-  - Role list (user has one listed role, or list empty)
-  - Security attributes (Conditions Builder; empty = true)
-  - Condition field (empty = true)
-  - Script (advanced; returns/sets `answer=true`, or empty = true)
-  - Evaluation order: role → security attribute → condition → script
-
-- **ACL scripting**
-  - Executes server-side
-  - Performance guidance: avoid GlideRecord queries where possible
-  - Useful methods
-    - GlideSystem user methods: `hasRole()`, `getUserName()`, `getUserID()`
-    - GlideRecord: `isNewRecord()`
-
-- **Debugging ACLs**
-  - Field-level debugging
-    - Shows bug icon next to fields secured by ACLs
-    - Clicking shows evaluated ACLs + pass/fail results
-  - Enable/disable
-    - **System Security > Debugging > Debug Security Rules**
-    - **System Security > Debugging > Stop Debugging**
-  - Studio option
-    - Studio home → Resources → _Script Debugger_
-  - Debug output meaning
-    - Ordered by evaluation: roles → security attribute → condition → script
-    - Color codes
-      - Green/Blue check = passed
-      - Red X = failed
-      - Blue = cached
-      - Gray = skipped (blocked by higher ACL)
-
-- **Access Analyzer (tooling)**
-  - Store app to summarize access permissions and diagnose why a user/group/role can/can’t access resources
-  - References
-    - [Access Analyzer](https://www.servicenow.com/docs/bundle/yokohama-platform-security/page/integrate/identity/concept/access-analyzer.html)
-    - [Access Analyzer Getting Started video](https://players.brightcove.net/6274575390001/nUx4EKfUz_default/index.html?videoId=6327544848112)
-    - [Introduction to Access Analyzer](https://nowlearning.servicenow.com/lxp/en/platform-security/introduction-to-access-analyzer?id=learning_course_prev&course_id=f20cef1347c10e582a090dcbd36d43fd)
-  - Delegated development reference
-    - [Delegated development](https://www.servicenow.com/docs/bundle/yokohama-application-development/page/build/applications/concept/c_DelegatedDevelopment.html)
-
-- **Server-side security checks (preferred over client-side role checks)**
-  - GlideSystem (server-side)
-    - `getUser()`, `getUserDisplayName()`, `getUserNameByUserID()`, `getUserID()`, `hasRole()`
-  - GlideRecord (server-side)
-    - `canCreate()`, `canRead()`, `canWrite()`, `canDelete()`
-
-### Application access (cross-scope runtime protection)
-
-- **What it is**
-  - Table-by-table runtime protection evaluated in addition to ACLs
-  - Controls out-of-scope access via
-    - Scripts (server-side)
-    - Web services API
-    - CRUD permissions on table data
-- **Key behavior**
-  - Applies to server-side scripts from other scopes
-  - Does not apply to scripts executing in the same scope
-  - If `Accessible from`=`All application scopes`
-    - Default: read-only allowed
-    - Web service + configuration options become selectable only in this mode
-- **Runtime enforcement**
-  - Unauthorized script access is blocked without throwing runtime errors
-  - Disallowed operations are skipped; instance continues normally
-
-- **Web service access only**
-  - Prevents user UI login
-  - `Internal Integration user` can bypass Web Services Security (WSS) system property setting
-  - If unchecked → user cannot access the data
-
-- **Allow configuration (cross-scope artifact creation)**
-  - Allows other scopes to create configuration records for the table, e.g.
-    - Dictionary entries
-    - UI Actions
-    - Client Scripts
-  - Note: other metadata types can impact out-of-scope tables where `Can read` is allowed
-  - Reference: [Example: granting access to configuration records](https://www.servicenow.com/docs/bundle/yokohama-application-development/page/build/applications/concept/c_ExampleGrantingAccessToConfigRecs.html)
-
-- **Caller Access (restricted caller tracking/approval)**
-  - Options
-    - `-None-` (approved/denied based on `Accessible from`)
-    - Caller Tracking
-      - Auto-approved
-      - Logged in Restricted Caller Access table
-      - Status=`Allowed`
-    - Caller Restriction
-      - Manual approval required
-      - Logged in Restricted Caller Access table
-      - Status=`Requested`
-  - Requires plugin
-    - Scoped Application Restricted Caller Access (`com.glide.scope.access.restricted_caller`)
-  - Requires role
-    - Application admin or `admin` to set
-
-### Protection policies (IP protection on install/migration)
-
-- **Purpose**
-  - Protect artifact logic (IP) when:
-    - Migrated via Application Repository
-    - Installed from ServiceNow Store
-  - Does not restrict developers on the dev instance from viewing/editing artifacts
-  - Not applied when migrating via Update Sets
-- **Applies to**
-  - UI Actions
-  - Script Includes
-- **Options**
-  - `-None-` (viewable + editable)
-  - Read-only (viewable, not editable)
-  - Protected (not viewable)
-- **Dev instance guidance**
-  - Use roles/ACLs to restrict artifact visibility/editing (not protection policies)
-
-### ServiceNow recommendations
-
-- Plan security early in development
-- Create user + admin roles for application modules
-- Prefer role-based controls for maintainability
-- Avoid client-side role checks (e.g., `g_user.hasRole()`) for security decisions
-- Test features against security settings
-  - Impersonate different users to validate expected access
-- Use Application Access to control what tables/artifacts are available to other scopes
-
-## Automation
-
-### Flow Designer
-
-- **Purpose**
-  - Automate request processing (repeatable, error-free)
-- **Flow building blocks**
-  - Properties
-  - Trigger (record-based or time-based)
-  - Action(s) (operations; reusable)
-  - Optional conditions (control when/how actions run)
-  - Data Panel (variables as “pills”; drag/drop into inputs/outputs)
-- **Trigger types (examples)**
-  - Application: MetricBase, Service Catalog
-  - Record: Created, Updated, Created or Updated
-  - Scheduled: Daily, Weekly, Monthly, Run Once, Repeat
-- **Create a flow (Studio)**
-  - _Create_ → Application set correctly → Automation → _Flow_ → _Continue_ (opens Flow Designer tab)
-- **Testing (built-in)**
-  - Manual tests prompt for input data and run the flow (even if trigger conditions are not met)
-  - No rollback; generates execution records + flow context (runtime values/state)
-  - Use non-production instances
-- **Execution details**
-  - After test: “View the execution details”
-  - More actions (⋮) → _Executions_
-  - Docs: [Flow execution details](https://www.servicenow.com/docs/bundle/yokohama-build-workflows/page/administer/flow-designer/concept/flow-execution-details.html)
-
-### Integration Hub
-
-- **Purpose**
-  - Extends Flow Designer with low/no-code integrations; reusable integration actions
-- **Requirement**
-  - Plugin: `com.glide.hub.integrations`
-- **Spokes**
-  - Scoped apps that package Flow Designer actions for a system/record type
-  - Activated with their parent application (e.g., Visual Task Board → VTB Spoke)
-  - Examples (default): Benchmarks, Connect, Customer Service, Field Service, ITSM, Security Operations, Visual Task Board
-  - Some spokes require Integration Hub subscription
-  - Docs: [Integration Hub Spokes List](https://www.servicenow.com/docs/bundle/yokohama-integrate-applications/page/administer/integrationhub/reference/spokes-list.html)
-
-### Application properties (configurable settings)
-
-- **Purpose**
-  - Central admin-managed configuration values; retrievable in scripts
-- **Constraint**
-  - No properties for reference fields → use reference tables instead
-- **Build workflow**
-  - Create System Property Category → add properties → set order → expose via module
-- **System Property Category**
-  - Name appears in URL (avoid special characters; spaces allowed)
-  - Title renders at top of properties page (supports HTML/links)
-- **Property setup**
-  - Typical: admin-configurable
-  - Use `Ignore cache` to avoid stale cached values
-  - References
-    - [Ignore Cache Explained](https://www.servicenow.com/community/developer-blog/ignore-cache-checkbox-on-system-property-lt-sys-properties-gt/ba-p/2920941)
-    - [When to Use Ignore Cache](https://support.servicenow.com/kb?id=kb_article_view&sysparm_article=KB1000746)
-- **Ordering**
-  - Properties display lowest→highest `Order`
-- **Properties module**
-  - Create Module [`sys_app_module`] that opens the properties UI
-  - Set Read/Write roles = application admin role
-  - Arguments syntax
-    - `system_properties_ui.do?sysparm_title=<title>&sysparm_category=<category_name>`
-    - `%20` optional for spaces
-  - Optional Separator module (Arguments text appears on separator line; no title → renders as a line)
-
-### Scheduled Script Executions (time-based scripts)
-
-- **Purpose**
-  - Run server-side logic on a schedule (not user/record-change triggered)
-- **Trigger configuration**
-  - `Run` sets periodicity; 24-hour time; available date/day/time fields depend on Run
-  - Time zone behavior
-    - No TZ specified → scheduler uses the scheduling user’s time zone
-    - `Use System Time Zone` → uses instance time zone
-- **Execution characteristics**
-  - Server-side; no `current/previous` record context by default
-  - Condition Script variables available to the main script
-- **Testing**
-  - _Execute Now_ available only after saving
-- **Visibility**
-  - **System Scheduler > Scheduled Jobs > Today's Scheduled Jobs**
-  - **System Scheduler > Scheduled Jobs > Scheduled Jobs**
-  - Ready (red) = overdue (Next action time passed); typically runs soon unless delay is large
-
-### Events (Event Queue + decoupled responses)
-
-- **Definition**
-  - Event = entry in Event Queue; requires response logic to do work
-- **Workflow**
-  - Register Event → generate Event → respond (Email Notification and/or Script Action)
-- **Register (Event Registry)**
-  - Key fields
-    - Suffix / Event name (auto)
-    - Table
-    - Priority (lower = higher)
-    - Queue (blank=default; custom queues lowercase_with_underscores)
-    - Description (keep accurate as meaning changes)
-    - Caller Access (restricted caller access)
-- **Generate (server-side)**
-  - `gs.eventQueue("<event_name>", object, parm1, parm2);`
-  - `object`: `current`, `previous`, or GlideRecord
-  - Conventions if parms unused: `parm1`=`gs.getUserID()`, `parm2`=`gs.getUserName()`
-- **Inspect**
-  - **System Logs > Events**
-    - Created vs Processed, duration (ms), state, queue, parm1/parm2 resolved values
-
-### Email Notifications (outbound email)
-
-- **Triggers**
-  - Record insert/update OR Event fired (Events optional for notifications)
-- **Core fields**
-  - Name (use naming standard), Table, Category (avoid Uncategorized), Description
-  - Type (EMAIL/Meeting invitation), Active, Digest
-  - Send when: Triggered / Event is fired / Record is inserted or updated
-  - Conditions, Weight
-- **Weight rules**
-  - Same record + same recipients → highest weight sent
-  - Same highest non-zero weight → all with that value sent
-  - Weight `0` → always sent
-- **Recipients**
-  - Users (users or any email), Groups, Users/groups in field
-  - Advanced: Exclude delegates, Send to event creator, Event parm1/parm2 contains recipient, Subscribable
-  - Testing prerequisite: impersonate user → Preferences → Notifications > General → Allow Notifications active
-- **Content**
-  - Email template (Subject inherited; template Message replaced by notification Message)
-  - Dynamic values
-    - `${field}` (dot-walk: `${ref.field}`)
-    - `${event.parm1}`, `${event.parm2}`
-  - SMS alternate (140 chars)
-  - Size limit: 26 MB incl. MIME encoding (attachments expand ~137%)
-  - Docs: [Notification variables](https://docs.servicenow.com/csh?topicname=notification-variables.html&version=latest)
-- **Record links**
-  - Triggering: `${URI}` (LINK), `${URI_REF}` (display value)
-  - Related: `${ref.URI}`, `${ref.URI_REF}`
-- **Test**
-  - _Preview Notification_ (pick Event Creator + Preview Record; review recipients/subject/body)
-
-### Script Actions (respond to Events)
-
-- **Purpose**
-  - Server-side logic triggered by Event occurrence
-- **Objects**
-  - `current` (from `gs.eventQueue()` object)
-  - `event.parm1`, `event.parm2`
-- **Config**
-  - Name, Event name, Active
-  - Condition Script (must be true to execute)
-  - Script (server-side)
-
-### Script Includes (reusable server-side library)
-
-- **Purpose**
-  - Reusable server-side JavaScript functions; not executed unless called
-  - Centralizes logic for maintainability/debugging
-  - `initialize()` runs on instantiation; commonly loads properties via `gs.getProperty(<name>, <default>)`
-- **Naming rules**
-  - Script Include name must match class name
-  - Allowed: letters + numbers; not allowed: spaces + special characters
-- **Protection policy (Store installs only)**
-  - `--None--` (view/edit), Read-only (view), Protected (hidden)
-- **Note**
-  - Legacy `gs.include('ScriptIncludeName')` may appear in baseline scripts; explicit include no longer required
-
-### Recommended patterns
-
-- Prefer Flow Designer/Workflow for process orchestration; reserve scripts for gaps/complexity
-- Use application properties for admin-managed configuration
-- Use Scheduled Script Executions + Events + Notifications for time-based automation + messaging
-- Store reusable server-side logic in Script Includes (document params/returns)
+- [Application Development Fundamentals On Demand](https://learning.servicenow.com/lxp/en/now-platform/application-development-fundamentals-on-demand?id=learning_course_prev&course_id=35eefed887bb52d03a3a84c7cebb35f8)
+- [Application Development Fundamentals participant guide - Australia](https://servicenow.read.inkling.com/a/b/39150f3ad6644504ae8d102a643a728a/p/6cd650d8bd71445fa5686fcb013c438a) · [local PDF](./course-ebooks/application-development-fundamentals-australia.pdf)
+- [Application Developer Skills learning path](https://learning.servicenow.com/lxp/en/app-engine/application-developer-skills?id=learning_path_prev&path_id=2a580f4447e96110ac2f89c2e36d4321)
+- [Introduction to Access Controls](https://nowlearning.servicenow.com/lxp/en/now-platform/introduction-to-access-controls?id=learning_course_prev&course_id=3c13324dc3de7d541ac0f60f05013187)
+- [Retrieving Update Sets from Remote Instances](https://learning.servicenow.com/lxp/en/now-platform/retrieving-update-sets-from-remote-instances?id=learning_course_prev&course_id=68875453db77585030c91fdc1396197c)
+- [Introduction to Access Analyzer](https://nowlearning.servicenow.com/lxp/en/platform-security/introduction-to-access-analyzer?id=learning_course_prev&course_id=f20cef1347c10e582a090dcbd36d43fd)
+
+### 📄 Documentation
+
+- [Application scope](https://www.servicenow.com/docs/r/application-development/c_ApplicationScope.html) · [Namespace identifier](https://www.servicenow.com/docs/r/application-development/c_NamespaceIdentifier.html)
+- [NowCreate: Create your own app](https://mynow.servicenow.com/now/best-practices/success-packs/create-your-own-app) · [Delegated development](https://www.servicenow.com/docs/bundle/yokohama-application-development/page/build/applications/concept/c_DelegatedDevelopment.html)
+- [ServiceNow Studio source control](https://www.servicenow.com/docs/r/application-development/servicenow-studio-classic/source-control-integration.html) · [Update sets in Studio](https://www.servicenow.com/docs/r/application-development/servicenow-studio-classic/working-with-update-sets-in-servicenow-studio.html)
+- [JavaScript engine](https://www.servicenow.com/docs/r/api-reference/scripts/c_JS_engine_upgrade.html) · [ES12 for individual scripts](https://www.servicenow.com/docs/r/api-reference/scripts/set-es12-mode-scripts.html)
+- [ACL overview](https://www.servicenow.com/docs/r/platform-security/access-control/exploring-access-control-list.html) · [Deny-Unless ACL](https://www.servicenow.com/docs/r/platform-security/access-control/acl-denial-behavior.html)
+- [Application access settings](https://www.servicenow.com/docs/r/application-development/c_ApplicationAccessSettings.html) · [Script Includes](https://www.servicenow.com/docs/r/api-reference/scripts/c_ScriptIncludes.html)
+- [Access Analyzer](https://www.servicenow.com/docs/bundle/yokohama-platform-security/page/integrate/identity/concept/access-analyzer.html) · [Flow execution details](https://www.servicenow.com/docs/bundle/yokohama-build-workflows/page/administer/flow-designer/concept/flow-execution-details.html) · [Notification variables](https://docs.servicenow.com/csh?topicname=notification-variables.html&version=latest)
+- [REST authentication](https://www.servicenow.com/docs/r/api-reference/web-services/c_OutboundRESTAuth.html) · [Basic authentication profile](https://www.servicenow.com/docs/r/api-reference/web-services/t_ConfigureRESTMsgBasicAuth.html)
+- [Property cache-flush troubleshooting](https://support.servicenow.com/kb?id=kb_article_view&sysparm_article=KB0822644) · [When to Use Ignore Cache](https://support.servicenow.com/kb?id=kb_article_view&sysparm_article=KB1000746)
+
+### Related notes
+
+- [Scripting](./sn-scripting.md) · [Flow Designer](./sn-flow-designer.md) · [Automated Test Framework](./sn-atf.md) · [App Engine Studio](./sn-app-engine-studio.md)
+
+## Foundations and Application Scope
+
+### Development lifecycle and fit
+
+- Work in increments: analyze → design → build → test → deploy; identify owners and operational support before release.
+- A typical platform fit has relational records, a request/fulfill process, forms, access controls, automation, and reporting. Validate business value and platform/licensing constraints before building.
+- Use the [application development checklist](#application-development-checklist) to plan work and find related notes.
+- Design for personas and measurable outcomes rather than matching a solution to a preconceived feature.
+
+### Application scope and namespace
+
+- Scope associates an application's artifacts with a namespace and controls access from other applications. Private scope is the normal choice for new custom applications; Global remains relevant for existing global artifacts and dependencies.
+- Namespace pattern: `x_<company_code>_<application_id>`; the generated name can be truncated. The instance company prefix is held in `glide.appcreator.company.code`.
+- Scope selection matters at creation time; select the correct application before creating files. The namespace of existing application artifacts cannot simply be renamed in place; plan any transition/rebuild separately.
+- Out-of-scope warnings indicate the artifact belongs to another application. Switching scope for a specific change is different from moving the artifact.
+- Delegated development grants non-admins application-specific file, scripting, security, and deployment permissions. Grant only the file types and actions required.
+
+## Application Design and Data Model
+
+### Design and requirements
+
+- Define the business problem, desired outcomes, stakeholders, and personas. For each process, capture inputs and source, outputs and recipients, frequency, state changes, exceptions, and owner.
+- Document entities, fields, relationships, retention, integration ownership, and expected data volume. Design UI and access around personas.
+- Use acceptance criteria and test cases to verify both expected behavior and denied access. See [ATF notes](./sn-atf.md).
+
+### Tables and inheritance
+
+- **Extend** an extensible table when its data and behavior fit; child tables inherit fields and applicable parent behavior. Use dictionary overrides where needed and verify inherited automation and reference qualifiers.
+- **Create a new table** when no suitable parent exists or independent behavior is needed; review custom-table entitlement and performance limits.
+- Default fields include `sys_id`, `sys_created_on`, `sys_created_by`, `sys_updated_on`, `sys_updated_by`, and `sys_mod_count`; extensible tables also use `sys_class_name`.
+- Inspect existing logic from a list's column menu → _Configure_ → _All_, or navigate to `<table_name>.config`. Use `Columns` and the table column to distinguish inherited fields.
+- Table `Controls` can configure auto-numbering, extensibility, modules, and generated ACLs. Application Access is separate from user authorization; see [Cross-scope application access](#cross-scope-application-access).
+
+### Field design
+
+- Choose appropriate types early: `Reference` for related records, `Choice` for constrained values, `Date/Time` for timestamps, and numeric types for numbers. Type changes and field deletion can affect data.
+- Prefer reuse where semantics fit. Relabeling can clarify a form but leaves the underlying column name unchanged; avoid changing parent behavior unintentionally.
+- Removing a field from a form changes layout; deleting a column is a data-model change and can remove its stored values. Inherited fields cannot be deleted from the child as if locally defined.
+- Form Builder: Studio → _Create_ → `File` → `Data` → `Form` → select table → _Open_; add or arrange fields, sections, and formatters → _Save_.
+
+## Studio and Application Files
+
+### Studio workflow
+
+- ServiceNow Studio organizes application files, app details, scope, source control, and deployment; use the main instance UI to work with application data.
+- Create a scoped app: **All > ServiceNow Studio** → _Create_ → `App` → `On your own` → _Continue_ → name, description, and `Scoped` → review generated roles → _Continue_.
+- Create an artifact: Studio → _Create_ → `File` → choose application/scope, category, and file type → _Continue_ → configure → _Submit_.
+- Studio interfaces and available features vary by release and installed Store app; check the instance before applying a release-specific path.
+
+### Application menus and modules
+
+- Menu roles control access to the application menu; module roles add navigation restrictions. Hiding navigation does not secure records; use ACLs.
+- Common link types: `New Record`, `List of Records` (optional filter), `URL (from Arguments)`, `Separator`, and `Map Page`.
+- `Override application menu roles` changes menu/module visibility behavior; test as the intended user. Module ordering is controlled by `Order`.
+
+## Forms, Views, and Client Logic
+
+### Form and view design
+
+- Keep forms short, use descriptive labels and contextual help, place primary identifiers near the top, group related fields, and use full-width rows for longer text.
+- A view is a saved layout for the same underlying records; it is not a security boundary. Use views for personas and devices, and enforce data access with ACLs.
+- In Form Builder, select a view → _Add_, _Duplicate this form view_, or edit its layout → _Save_. A View Rule can select a view using conditions or server-side script.
+- Typical feedback APIs: `g_form.showFieldMsg()`, `g_form.hideFieldMsg()`, `g_form.addInfoMessage()`, and `g_form.addErrorMessage()`.
+
+### UI Policies and Client Scripts
+
+- **UI Policies** apply conditional client-side behavior to fields. UI Policy Actions set `Mandatory`, `Visible`, and `Read only`; `Leave alone` preserves a property and `Reverse if false` reverses configured actions.
+- Configure table, view applicability, condition, `On load`, order, and optional true/false scripts; test both transitions and initial form load.
+- **Client Scripts** handle `onLoad`, `onChange`, `onSubmit`, or `onCellEdit` behavior. Configure UI type, table, and field/view as applicable; keep client logic responsive.
+- `g_form` controls the form; `g_user` provides user information. Never rely on client-side role checks to enforce security.
+- A display Business Rule can pass server values through `g_scratchpad` to an onLoad Client Script. `g_form.getReference(field, callback)` is asynchronous; use sparingly and consider GlideAjax for tailored server data.
+- Detailed APIs and patterns: [Scripting notes](./sn-scripting.md).
+
+## Server-side Logic
+
+### JavaScript modes
+
+- Modes: ECMAScript 2021 (`ES12`), ES5 Standards, and Compatibility. Check the application **and individual script** settings and the supported-feature table; the platform supports a subset of each standard.
+- Since Xanadu, ES12 is enabled by default for newly created scripts regardless of the application's configured mode; global applications can enable ES12 for individual scripts. Existing scripts and applications may retain older modes.
+- Test behavior before changing the mode of existing scripts; do not assume all Global scripts run in Compatibility mode.
+
+### Business Rules and reusable logic
+
+- Business Rules run server-side on configured table operations: `before` for validation/current-record changes; `after` for reactions after save; `async` for deferred work; `display` to prepare `g_scratchpad`.
+- Configure operations, conditions, order, and advanced script as required. In a before rule, `current.setAbortAction(true)` rejects the database action.
+- Avoid `current.update()` in Business Rules: it can trigger recursion. Changes to `current` in before rules are saved with the transaction.
+- Script Includes centralize reusable server-side logic; the class/function name must match the record name. Configure `Accessible from`, active state, and protection policy deliberately.
+- Protection policy affects installed/downloaded application files: `None`, `Read-only`, or `Protected`; it does not replace source-instance authorization.
+- More examples: [Business Rules and Script Includes](./sn-scripting.md).
+
+## Security and Cross-Scope Access
+
+### ACL decisions and matching
+
+- ACLs secure an object and operation with roles, security attributes, data conditions, and/or script. All configured requirements of an individual rule must pass.
+- `Deny-Unless` is evaluated before `Allow-If`; a failing applicable Deny-Unless denies access. A passing Deny-Unless is not the same as a general grant; evaluate applicable Allow-If rules and the documented fallback behavior.
+- Record access is evaluated before field access. `<table>.--None--` targets the record, `<table>.<field>` a field, and `<table>.*` a wildcard field rule; matching rules follow table inheritance and specificity; a successful field evaluation stops further field matching.
+- Example field search for `incident.number`: `incident.number` → `task.number` → `*.number` → `incident.*` → `task.*` → `*.*`; verify actual evaluation with the platform's security debugger.
+- Role requirements within one ACL are alternatives; other configured requirements on that rule must also pass. Multiple matching rules and decision types require their own evaluation—do not infer denial from one Allow-If failure alone.
+- Menu/module roles govern navigation, not direct table or field access. Test records and fields using users with each relevant role, including a user who should be denied.
+
+### ACL administration and troubleshooting
+
+- Elevate `security_admin` before creating/editing ACLs; remove elevation after use. In Studio, save an application file to refresh permissions if the file type is not yet visible after elevation.
+- On a list, _Configure_ → _Security Rules_ to inspect relevant rules. Use **System Security > Debugging > Debug Security Rules** and _Stop Debugging_ when finished.
+- [Access Analyzer](https://www.servicenow.com/docs/bundle/yokohama-platform-security/page/integrate/identity/concept/access-analyzer.html) helps investigate effective access; check release and Store-app availability.
+- Server-side checks such as `gs.hasRole()` and GlideRecord `canCreate()`, `canRead()`, `canWrite()`, and `canDelete()` support authorized server logic; client checks are not enforcement.
+
+### Cross-scope application access
+
+- ACLs restrict **users**; Application Access restricts **other application scopes**. Both can matter for an operation.
+- Table `Application Access`: `Accessible from` is `This application scope only` or `All application scopes`; `Can read/create/update/delete` govern cross-scope operations, not the application's own scope.
+- `Allow access to this table via web services` controls service access in conjunction with caller permissions; `Allow configuration` governs cross-scope configuration.
+- `Caller Access`: `None`, `Caller Tracking`, or `Caller Restriction`; inspect Restricted Caller Access records and approve requests only when appropriate.
+
+## Automation and Notifications
+
+### Flow Designer and Integration Hub
+
+- Flows combine a trigger, actions, flow logic, data pills, and optional subflows. Triggers can be record-based, scheduled, or application-based.
+- Test with representative records → inspect execution details and action inputs/outputs → activate. Flow tests can create or update records; use a non-production instance.
+- `Wait for Condition` pauses until record criteria match; `Create Task` can wait for completion; `Update Record` modifies the selected record.
+- Integration Hub provides reusable integration actions packaged in spokes; availability and licensing vary. See [Flow Designer notes](./sn-flow-designer.md).
+
+### Application properties
+
+- Use properties for relatively stable configuration, not high-frequency state. Read a property with `gs.getProperty('<scope>.<name>', '<default>')`; control read/write roles.
+- Property category → add and order System Properties → expose with a role-protected module. URL pattern: `system_properties_ui.do?sysparm_title=<title>&sysparm_category=<category>`.
+- `Ignore cache` changes cache-flush behavior when a property is updated; it is not simply a stale-value switch. Frequent changes can still affect performance. Consult the linked support guidance and test operational impact.
+
+### Scheduled scripts, events, and notifications
+
+- Scheduled Script Executions run server-side on a schedule or on demand, without an automatic record `current` context. Save before _Execute Now_; inspect **System Scheduler > Scheduled Jobs**.
+- Register an event → queue it using `gs.eventQueue('<event_name>', record, parm1, parm2)` → respond through a notification and/or Script Action. Inspect **System Logs > Events**.
+- Notification configuration: `When to send`, `Who will receive`, and `What it will contain`. Common substitutions: `${field}`, `${event.parm1}`, `${URI}`, and `${URI_REF}`.
+- Check the recipient's notification preferences, preview a representative record, and inspect **System Logs > Emails**. A Script Action receives the event and record and runs server-side.
+
+## Integration and Data Import
+
+### Import sets
+
+- Load source data into a staging table → create a Transform Map → map source fields to target fields → set coalesce for record matching → transform → inspect import-set rows, errors, and target records.
+- Confirm target access, data types, duplicates, business-rule behavior, and rollback/repair strategy before a production import.
+
+### REST and web services
+
+- Outbound REST: create a REST Message and HTTP method; configure endpoint, authentication profile, headers, query parameters, and variable substitutions; test status **and response body** before using a script.
+- Methods: `GET` read, `POST` create, `PUT` replace, `PATCH` modify, `DELETE` remove. Parse JSON/XML according to the actual response; handle empty results and failures.
+- REST API Explorer: **System Web Services > REST > REST API Explorer**. Choose operation, table/path, query, fields, and headers → _Send_. Use non-production for any operation that can alter records.
+- Build complex filters on a list and copy the breadcrumb query to `sysparm_query`; use `sysparm_fields` to limit returned fields.
+- Use an appropriate Basic Auth or OAuth profile rather than embedding credentials in scripts. Avoid logging or emailing passwords; the course's credential example is an isolated training exercise only.
+
+## Testing and Troubleshooting
+
+### Automated Test Framework
+
+- ATF tests consist of ordered test steps and can create users, impersonate, open forms, set values, submit, and assert results. ATF rolls back tracked test changes, including changes made in the same session; excluded tables (including `sys_email` and ECC queue tables and their extensions) and external effects persist. See [ATF rollback exclusions](https://www.servicenow.com/docs/r/application-development/automated-test-framework-atf/atf-excluded-from-rollback.html).
+- Enable execution only on an appropriate non-production instance: **Automated Test Framework > Administration > Properties**. Run tests and inspect step results, client errors, and screenshots.
+- Test Management supports manual test plans and execution. Detailed ATF administration and patterns: [ATF notes](./sn-atf.md).
+
+### Diagnostic paths
+
+- Access: **System Security > Debugging > Debug Security Rules**, Access Analyzer, and impersonation.
+- Automation: Flow Designer execution details and action outputs; **System Logs > Events** for queued events; **System Logs > Emails** for notifications.
+- Imports: import-set row states and transform results; integrations: response status/body and permitted outbound logs; avoid sensitive values in logs.
+
+## Source Control and Deployment
+
+### Choosing a mechanism
+
+- **Git source control**: track application metadata, branch, commit, and collaborate during development. Current Studio supports source-control operations for scoped/global applications on non-production instances; capabilities and UI vary by release.
+- **Update sets**: group and migrate captured configuration changes; check contents, dependencies, preview, resolve collisions, then commit on the target. Ordinary business data is generally not captured by default.
+- **Application repository**: publish versioned application packages for installation/update across an organization's instances. **ServiceNow Store** is for approved broader distribution.
+- A branch isolates work; a stash temporarily shelves local changes. Source control is not itself a production deployment mechanism.
+
+### Publishing and retrieving
+
+- Publish an app to an update set: Studio → app details → _More Options_ → _Settings_ → _Publish to Update Set_ → version and description → _Publish_; inspect `Customer Updates`.
+- Publish to repository: Studio → app details → _More Options_ → _Publish_ → review version and release notes → _Publish_. On the target, **System Applications > My Company Applications** → `Not Installed` → _Install_; for upgrades use `Installed` and select the version → _Update_ → _Install_.
+- Retrieve a completed update set on the target using **System Update Sets > Update Sources** → configured source → _Retrieve Completed Update Sets_; inspect **Retrieved Update Sets**, preview, resolve issues, and commit.
+- Selected demo records can be packaged as application files from a list's column options → _Create Application Files_ → choose `Load When`; validate data and dependencies on the target.
+- Avoid assuming update sets, repository packages, and Git contain identical data or dependencies. Test version compatibility and rollback in non-production.
+
+## Service Catalog and Record Producers
+
+### Record producer design
+
+- A record producer is a catalog item that creates a target-table record from questions; a standard catalog item typically produces requested items. Choose a producer for a guided submission experience and a form/list when users need record editing or list behavior.
+- Create from the target table's _Add to Service Catalog_ related link → configure selected fields; use Catalog Builder to adjust questions, help, layout, and destination.
+- Catalog UI Policies and Catalog Client Scripts operate on **variables**. A producer script runs server-side before insert: `producer` contains submitted variables and `current` is the new target record. Do not call `current.update()`.
+- A module can open the producer with link type `URL (from Arguments)` and `com.glideapp.servicecatalog_cat_item_view.do?v=1&sysparm_id=<producer_sys_id>`.
 
 ## Labs
 
-### Application Requirements Template
+- **Baseline**: Application Development Fundamentals **Australia** participant guide; lab numbers below refer to this edition. Older notes used different numbering and update-set checkpoints—do not combine steps by number alone.
+- Labs are sequential and use a non-production training instance. UI names and external service screens can vary by release; full scripts are included where the course uses macros.
 
-Application Overview
+- Lab scripts below use the course instance's scope `x_cdltd_loaner_r_0`; if your instance generates a different scope or table name, substitute it consistently in scripts, event names, roles, REST-message names, and property names.
 
-- **Application Name**: {Name}
-- **Lab / Phase**: {Lab ID or Phase}
-- **Purpose**: {One-line summary of what the application does}
-- **Business Problem**:
-  - {Current pain points}
-  - {Why the existing approach fails}
-- **High-Level Solution**:
-  - {What the application will replace or improve}
-  - {How it addresses the problem}
+### Lab 2.2.1 - The Loaner Request application
 
-Desired Outcomes
+🎯 **Goal**: Examine the requirements, process, data model, and interface design for the application built in later labs.
 
-- {Outcome 1}
-- {Outcome 2}
-- {Outcome 3}
-- {Operational improvements}
-- {Automation goals}
-
-Example
-
-- Single system for submitting and tracking requests
-- Reduced missed deadlines
-- Retirement of spreadsheets
-- Improved requestor satisfaction
-- Automation wherever possible
-
----
-
-Stakeholders
-
-- **Requestors / Fulfillers**
-  - {UX expectations}
-  - {Access requirements}
-  - {Visibility needs}
-  - {Notification needs}
-- **Administrators**
-  - {Logging / debugging}
-  - {Security}
-  - {Platform consolidation}
-- **Management**
-  - {Business value}
-  - {Reporting / dashboards}
-  - {Automation}
-- **Approvers**
-  - {Approval logic}
-  - {Centralization}
-- **Process Owners**
-  - {Process consistency}
-  - {Governance}
-
-Personas & Roles
-
-- **Employee Self Service (ESS)** _(No role)_
-  - Submit requests via Service Catalog
-- **User / Requester**
-  - Create records
-  - Read records where referenced
-  - Limited modules and views
-- **Administrator / Fulfiller**
-  - Full CRUD access
-  - Access to all modules and views
-
----
-
-Inputs (Data Sources)
-
-- **User Input – Form**
-  - Frequency: As needed
-  - Duplicate allowed: No
-  - Unique key: System-generated `Number`
-- **User Input – Service Catalog**
-  - Frequency: As needed
-  - Duplicate allowed: No
-  - Unique key: System-generated `Number`
-- **Spreadsheet Import**
-  - Format: `.xls`
-  - Frequency: One-time
-  - Method: Import Set
-
-Processes
-
-- **Manage Request Tasks**
-  - Owner: {Role or Name}
-  - Create pre-fulfillment task after submission
-  - Create post-fulfillment task after completion
-- **Notify Ready for Pickup**
-  - Scheduled check (daily)
-  - Condition: Start date within next 24 hours
-  - Action: Email requestor
-- **Send Return Reminder**
-  - Scheduled check (daily)
-  - Condition: Upcoming return date
-  - Action: Email requestor
-- **Notify Overdue**
-  - Scheduled check (daily)
-  - Condition: Overdue items
-  - Action: Repeated daily email until resolved
-
-Visualizations: Flow Diagrams or similar for each process
-
-Data Model
-
-Primary Table: {Request Table Name}
-
-- Number — String
-- Requested for — Reference to User
-- Configuration Item — Reference to CMDB
-- Assignment Group — Reference to Group
-- Assigned to — Reference to User
-- State — Choice
-- Start date — Date/Time
-- End date — Date/Time
-- Item type — Choice
-- Location — String
-- Short description — String
-- Description — String
-
-Child Table: {Task Table Name}
-
-- Number — String
-- Parent — Reference to Request
-- Assigned to — Reference to User
-- State — Choice
-- Priority — Choice
-- Short description — String
-- Additional comments — String
-
-Referenced User Data
-
-- User name — String
-- Manager — Reference to User
-- Notifications — Boolean
-- Email — String
+- **A. Review the design**
+  - Business problem: requests for laptops, phones, and projectors are managed through email and spreadsheets, are difficult to track, and can be missed.
+  - Outcomes: one request location, timely fulfillment, retired spreadsheets, higher requester satisfaction, and automation wherever possible.
+  - Personas: `Employee Self-Service` can submit through an available producer or catalog item; `User/Requester` creates requests, sees `Create New` and `Open`, reads records where `Requested for` is the user, and uses Self Service view; `Administrator/Fulfiller` sees all modules and views and can create, read, edit, and delete requests.
+  - Inputs: form and catalog submissions as needed, unique by platform-assigned number; a one-time `.xls` import, unique by request ticket number.
+  - Outputs: pickup, return, and overdue email to `Requested for`; weekly statistics to the CTO; on-demand statistics for authorized users.
+  - Process: create pre-deployment and post-deployment tasks; check for pickup, return, and overdue items; notify the requester and repeat overdue reminders until return.
+  - Data model: `Loaner Request` has `Number`, `Requested for` (reference to User), `Configuration item` (reference to CMDB), `Assignment Group` (reference to Group), `Assigned to` (reference to User), `State`, `Start date`, `End date`, `Item type`, `Location to be used`, `Depot`, `Short description`, and `Description`.
+  - `Loaner Task` includes `Number`, `Assigned to` (User reference), `State`, `Priority`, `Short description`, `Description`, `Work notes`, `Additional Comments`, and `Parent` (Loaner Request reference). The requested-for User data includes `User name`, `Email`, `Manager` (User reference), and `Notifications`.
 
 ### Lab 3.2.1 - Create an application
 
-🎯 **Goal**: Create the initial foundation of a custom, scoped application in ServiceNow Studio and review the generated application files.
+🎯 **Goal**: Create a scoped Loaner Request application and inspect its generated files.
 
-- **A. Create the scoped application in Studio**
-  - In the Application Navigator, search for `Studio` and open **ServiceNow Studio** (either available module)
-  - In Studio, select the _Create_ icon (next to the navigator panel) or select the _Create_ button
-  - Select `App`
-  - Configure the application:
-    - Name=`Loaner Request`
-    - Description=`App that enables users to check out loaner equipment.`
-    - Scope=`Scoped` (selected)
-  - Select _Continue_
-  - At the roles step:
-    - Leave the automatically defined default admin and user roles as-is
-  - Select _Continue_
-  - Select _Go to app dashboard_
-
-- **B. Open the app and review generated files**
-  - Select the _Refresh_ icon to refresh the app list
-  - Select the `Loaner Request` application from the list
-  - Review the application files created so far in Studio
-  - To view application details at any time:
-    - Select _App details_ (link in the navigation panel)
+- **A. Create the application**
+  - Open **All > ServiceNow Studio** → _Create_ → `App` → `On your own` → _Continue_.
+  - Set `Name = Loaner Request`, `Description = App that enables users to check out loaner equipment.`, and `Scope = Scoped`; select _Continue_.
+  - Leave the generated admin and user roles in place → _Continue_ → _View app details_.
+  - Refresh the Apps list, select `Loaner Request`, and review its application details and generated files.
 
 ### Lab 3.3.1 - Create application files
 
-🎯 **Goal**: Create and configure the core application files for the Loaner Request app, including a table, modules, roles, and user access.
+🎯 **Goal**: Create the Loaner Request table, navigation modules, and a user group.
 
-- **A. Create the application table**
-  - In **ServiceNow Studio**, select _Create_ > _File_
-  - Application=`Loaner Request`
-  - Select **Data**
-  - Select **Table**
-  - Select _Continue_
-  - Configure the table:
-    - Label=`Loaner Request`
-    - Name=Auto-populated
-    - Extends table=`Task`
-    - Create mobile module=Unchecked
-  - Select the **Controls** tab
-    - Enable Auto-number
-      - Prefix=`LNR`
-      - Number=`2000`
-      - Number of digits=`6`
-    - Update **User role**:
-      - Use lookup to select the application user role created earlier (`x_…loaner…user`)
-  - Select _Submit_
+- **A. Create the table**
+  - In Studio, _Create_ → `File` → select application `Loaner Request` → `Data` → `Table` → _Continue_.
+  - Set `Label = Loaner Request`, `Extends table = Task`, and clear `Create mobile module`; leave the generated name.
+  - On `Controls`, select `Auto-number`; set `Prefix = LNR`, `Number = 2000`, `Number of digits = 6`, and `User role = x_cdltd_loaner_r_0.user`; retain `Create access controls` → _Submit_.
+  - Close the welcome dialog → _More Options_ → `Advanced view` → `Application Access`; verify `Accessible from = All application scopes`, `Can read = selected`, and `Allow access to this table via web services = selected`.
+  - Review `Columns` for inherited Task fields and automatically created fields; refresh the Studio navigator to view the generated artifacts.
+- **B. Inspect scope**
+  - In the main instance, refresh the browser → open the scope selector → inspect the `Loaner Request` scope record.
+  - In Studio, open **Apps > Loaner Request > App details** → _More Options_ → _Settings_ to inspect the application record.
+- **C. Create navigation modules**
+  - In Studio, _Create_ → `File` → application `Loaner Request` → `User Interface` → `Module [sys_app_module]` → _Continue_.
+  - Create `Create New`: `Application menu = Loaner Request`, `Order = 200`, `Link type = New Record`, `Table = Loaner Request` → _Submit_.
+  - Repeat with `Link type = List of Records`, `Table = Loaner Request`, and `Application menu = Loaner Request`:
+    - `Open`: `Order = 400`; filter `Active is true`.
+    - `Open - Unassigned`: `Order = 500`; filter `Active is true AND Assigned to is empty`.
+    - `Closed`: `Order = 600`; filter `Active is false`.
+  - Open **User Interface > Module > Loaner Requests**, change `Title` to `All`, and position it after `Open`.
+  - Refresh the main navigator; search `Loaner Request`. If missing, refresh menus or switch to `Global` scope and back.
+- **D. Test and create the group**
+  - Open **Loaner Request > Create New**; create open and `Closed Complete` records, then test the `All`, `Open`, and `Closed` modules.
+  - Open **User Administration > Groups** → _New_; set `Name = Loaner Request Users` and a description → _Save_.
+  - On `Roles`, _Edit_ → move `x_cdltd_loaner_r_0.user` to the selected list → _Save_. On `Group Members`, _Edit_ → add `Beth Anglin` → _Save_ → _Update_.
 
-- **B. Verify Application Access**
-  - Open the **Application Access** tab
-  - Verify settings:
-    - Can read=Selected
-    - Allow access to this table via web services=Selected
-  - Review default behavior:
-    - Access Controls created during table creation
-    - Accessible from=`All application scopes`
-    - Web services access=Enabled
-  - Switch to **Columns**:
-    - Note inherited columns from `Task`
-    - Note system fields (e.g., _Created_, _Created by_)
-    - Note `Number` column from Auto-number
-  - Refresh the Application Navigator
-  - Select _Show parent categories_
-  - Review generated files under **Data**, **Security**, **User Interface**, **Other**
-  - Note roles created with the application:
-    - `x_…loaner…user`
-    - `x_…loaner…admin`
-  - Note Application Menu creation:
-    - Created because a list module option is available during table creation
+### Lab 3.4.1 - Link the application to source control (optional)
 
-- **C. View and verify application scope**
-  - In the main ServiceNow window (not Studio), refresh the browser
-  - Hover over the **Scope Selection Menu** (globe icon)
-  - Verify current scope is not Global (red ring indicator)
-  - Select **Loaner Request** scope
-  - Open and review the **Scope record**
-  - In Studio:
-    - Navigate to **Apps > Loaner Request > App details**
-    - Verify scope displayed in bottom-left
-    - Select _App settings_ (gear icon)
-    - View the application record
+🎯 **Goal**: Link the scoped application to a private GitHub repository.
 
-- **D. Create application modules**
-  - In **ServiceNow Studio**, select _Create_ > _File_
-  - Application=`Loaner Request`
-  - Select **User Interface**
-  - File type=`Module [sys_app_module]`
-  - Select _Continue_
-  - Configure module:
-    - Title=`Create New`
-    - Application menu=`Loaner Request`
-    - Order=`200`
-    - Link type=`New Record`
-    - Table=`Loaner Request`
-  - Select _Submit_
-  - Create additional modules:
-    - **Open**
-      - Application menu=`Loaner Request`
-      - Order=`400`
-      - Link type=`List of Records`
-      - Table=`Loaner Request`
-      - Filter=`Active is true`
-    - **Open - Unassigned**
-      - Application menu=`Loaner Request`
-      - Order=`500`
-      - Link type=`List of Records`
-      - Table=`Loaner Request`
-      - Filter=`Active is true` AND `Assigned to is empty`
-    - **Closed**
-      - Application menu=`Loaner Request`
-      - Order=`600`
-      - Link type=`List of Records`
-      - Table=`Loaner Request`
-      - Filter=`Active is false`
-  - Note access behavior:
-    - Modules inherit role requirements from the application
-    - Required role=`x_…loaner…user`
-
-- **E. Review and adjust modules**
-  - In the main browser window, search for `Loaner Request` in the Navigator
-  - Verify module order (200–600)
-  - Open each module:
-    - _Create New_ opens a new Loaner Request form
-    - Other modules open list views
-  - In **ServiceNow Studio**, navigate to:
-    - **User Interface > Application Menu > Loaner Request**
-  - Review modules in the related list
-  - Open the default **Loaner Requests** module
-    - Update:
-      - Title=`All`
-      - Order=`300`
-  - Select _Update_
-  - Close completed tabs in Studio to reduce clutter
-
-- **F. Test application behavior**
-  - In the main browser window, navigate to **Loaner Request > Create New**
-  - Create test records:
-    - Several with State=`Closed Complete`
-    - Several with State=`Open`
-  - Test modules:
-    - _All_
-    - _Open_
-    - _Closed_
-  - Troubleshoot and correct issues if needed
-
-- **G. Create a user group**
-  - Navigate to **User Administration > Groups**
-  - Select _New_
-  - Configure:
-    - Name=`Loaner Request Users`
-    - Description=`<your description>`
-  - Select _Save_
-  - In **Roles** related list:
-    - Select _Edit_
-    - Add the Loaner Request user role (`x_…loaner…user`)
-    - Select _Save_
-
-- **H. Add a user to the group**
-  - Open the **Group Members** related list
-  - Select _Edit_
-  - Add user=`Beth Anglin`
-  - Select _Save_
-  - Select _Update_
-
-### Lab 3.4.1 - Publish to update set
-
-🎯 **Goal**: Publish all application changes created so far into a new update set and review the captured files.
-
-- **A. Publish the application to an update set**
-  - In **ServiceNow Studio**, open **Apps > Loaner Request > App details**
-  - Select the _App settings and related links_ gear icon (upper right)
-  - Select _Publish to Update Set..._
-  - Verify:
-    - Version=`1.0.0`
-  - Update Description:
-    - `Loaner Request app - module 3`
-  - Select _Publish_
-  - When publishing completes, select _Done_
-
-- **B. Review published files**
-  - Scroll down in the application record
-  - Open the **Customer Updates** related list
-  - Review the files included in the update set
-
-### Lab 3.4.2 - Publish to the application repository
-
-🎯 **Goal**: Publish the Loaner Request application to the Application Repository and understand how to install it on another instance.
-
-- **A. Publish the application to the Application Repository**
-  - In **ServiceNow Studio**, from the main landing page, select the **Deployment** tab
-  - Select the **Applications** tab
-  - Select the `Loaner Request` application to open the app details
-  - Select _Publish_ (upper right)
-  - Review:
-    - Version
-    - Release notes
-  - Select _Publish_
-  - Select _Done_
-  - Note: The application is now available to other instances in the same stack
-
-- **B. Install the application on a second instance**
-  - Log in to the target (second) instance
-  - Navigate to **System Applications > My Company Applications**
-  - Select the **Not Installed** tab
-  - Locate the `Loaner Request` application
-  - Select _Install_
-  - Select _Install_ again to confirm
-  - When installation completes, select _Close_
-  - Select the **Installed** tab
-  - Verify the application appears in the list
+- **A. Create a repository and token**
+  - In GitHub, select _New repository_: `Repository name = adf_loaner_request`, `Visibility = Private`; leave README, `.gitignore`, and license initialization unchecked → _Create repository_.
+  - Copy the HTTPS repository URL: `https://github.com/<github-username>/adf_loaner_request.git`.
+  - Open **Profile > Settings > Developer settings > Personal access tokens > Fine-grained tokens** → _Generate new token_.
+  - Set a descriptive token name and expiration; under `Repository access`, choose `Only select repositories` → `adf_loaner_request`. Under `Repository permissions`, set `Contents = Read and write` → _Generate token_ → copy the token for the next step.
+- **B. Link the app**
+  - In ServiceNow, open **Connections & Credentials > Credentials** → _New_ → `Basic Auth Credentials`; set `Name = GitHub`, `User name = <github-username>`, `Password = <personal-access-token>`, and `Active = selected` → _Submit_.
+  - In ServiceNow Studio, open **Apps > Loaner Request > App details > Source control** → _Link to source control_; enter the HTTPS URL, `Branch = main`, and `Credential = GitHub` → _Link to source control_ → _Close_.
+  - Refresh the GitHub repository; select `main` and verify its initial commit and application files. The course instance sets its Git default-branch properties to `main`.
+  - The [course-linked Studio walkthrough](https://www.servicenow.com/community/developer-advocate-blog/source-control-in-servicenow-studio-complete-walkthrough/ba-p/3356303) also shows a repository initialized with a README and an instance-specific branch. If using that branch instead of `main`, select it in GitHub to inspect the application files.
 
 ### Lab 4.1.1 - Working with fields and views
 
-🎯 **Goal**: Create an update set, configure fields and form layout for the Loaner Request application, and create a Self Service (ESS) view.
+🎯 **Goal**: Configure the Loaner Request form and a Self Service view.
 
-- **A. Create an update set**
-  - In **ServiceNow Studio**, open **Apps > Loaner Request > App details**
-  - Open the **Update set** widget
-  - Select _+ New_
-  - Name=`LR-Module 4`
-  - Select _Save_
-  - Select _Apply_
+- **A. Configure the Default form**
+  - In Studio, _Create_ → `File` → `Data` → `Form` → select `Loaner Request` → _Open_ → complete the Table Builder introduction.
+  - Remove `Parent`, `Priority`, and `Active` from the form; _Save_.
+  - Add `Requested for`: `requested_for`, type `Reference`, reference `User [sys_user]`, `Mandatory = selected`.
+  - Add `Start date` (`start_date`) and `End date` (`end_date`): type `Date/Time`, `Mandatory = selected`; place them on the form and _Save_.
+  - Add `Item type` (`item_type`, `Choice`); configure `Laptop = cmdb_ci_computer`, `Mobile Phone = cmdb_ci_mobile_device`, `Projector = cmdb_ci_projector`; `Show choices as = Dropdown` → _Apply_ → _Save_. Refresh Studio and set default `cmdb_ci_computer`.
+  - Add `Depot` (`depot`, `Choice`) with `New York = ny`, `London = london`, `Buenos Aires = ba`, `Santa Clara = sc`, `Singapore = singapore`, `Sydney = sydney`, and `Other = other`; use `Dropdown` and default `sc` → _Save_.
+  - Switch scope to `Global`; edit inherited `State` choices to `Requested = 13`, `Reserved = 14`, `Deployment Prep = 15`, `Ready for Pickup = 16`, `Checked Out = 17`, `Post Deployment = 18`, and `Closed Complete = 3`. Use `Dropdown`, confirm the override, and _Save_. Switch back to `Loaner Request`; set default `13` → _Save_.
+    - mark other choices as inactive
+  - Add `Location to be used` (`location_to_be_used`, `String`); place above `Depot`. Arrange the top section as left column `Number`, `Requested for`, `Configuration item`, `Assigned to`; right column `State`, `Start date`, `End date`, `Item type`, `Location to be used`, `Depot`; place `Short description` and `Description` full-width below.
+  - Add `Log` section: `Additional comments`, `Work notes`, and `Activities (filtered)` formatter. Add a two-column `Statistics` section: left `Opened`, `Updated`, `Closed`; right `Opened by`, `Updated by`, `Closed by`, `Active` → _Save_.
+- **B. Create and test the Self Service view**
+  - Next to `Default view`, _More actions_ → _Duplicate this form view_; enter `ESS` → _Create_. The existing view's title displays as `Self Service`.
+  - Configure two columns: left `Number`, `Requested for`, `Start date`, `End date`; right `State`, `Item type`, `Location to be used`. Retain a merged section with `Short description`, `Description`, and `Activity formatter`; remove the remaining fields and sections → _Save_.
+  - Open an existing Loaner Request → Form Header context menu → **View > Self Service**; verify the layout. If existing records show numeric state `1`, select a valid state and save each affected record.
 
-- **B. Add table fields and modify the form**
-  - In the main browser window, open **Loaner Request > Create New**
-  - Identify changes vs desired state:
-    - Remove fields:
-      - `Parent`
-      - `Priority`
-      - `Active`
-    - Add fields:
-      - `Requested for`
-      - `Start date`
-      - `End date`
-      - `Item type`
-      - `Location to be used`
-      - `Depot`
-  - In **ServiceNow Studio**, select _Create_ > _File_
-  - Application=`Loaner Request`
-  - Select **Data**
-  - File type=`Form`
-  - Select _Continue_
-  - Search for table=`Loaner Request`
-  - Select _Open_
-  - Navigate Table Builder screens, select _Get started_
+### Lab 4.2.1 - Create a UI Policy
 
-- **C. Remove fields from the form**
-  - In the Form Editor, locate each field to remove
-  - Hover field > select _Delete field_
-  - Remove:
-    - `Parent`
-    - `Priority`
-    - `Active`
-  - Select _Save_
+🎯 **Goal**: Show and require the Other field only when Depot is Other, with a single explanatory message.
 
-- **D. Add “Requested for” field**
-  - Select _+ Add a field in the table_
-  - Configure:
-    - Column label=`Requested for`
-    - Column name=`requested_for`
-    - Type=`Reference`
-    - Table to reference=`User`
-    - Mandatory=`true`
-  - Select _Add_
-  - Select _Done_
-  - Drag `Requested for` to desired form location
-  - Select _Save_
-
-- **E. Add Start date and End date fields**
-  - Select _+ Add a field in the table_
-  - Configure **Start date**:
-    - Column label=`Start date`
-    - Column name=`start_date`
-    - Type=`Date/Time`
-    - Mandatory=`true`
-  - Select _Add another one_
-  - Configure **End date**:
-    - Column label=`End date`
-    - Column name=`end_date`
-    - Type=`Date/Time`
-    - Mandatory=`true`
-  - Select _Add_
-  - Select _Done_
-  - Drag both fields onto the form
-  - Position:
-    - `Start date` above `End date`
-    - `Configuration item` above `Assigned to`
-  - Select _Save_
-
-- **F. Add Item type choice field**
-  - Select _+ Add a field in the table_
-  - Configure:
-    - Column label=`Item type`
-    - Column name=`item_type`
-    - Type=`Choice`
-  - Select _Add_
-  - Select _Done_
-  - Drag `Item type` to correct location
-  - Edit **Choices**:
-    - Laptop=`cmdb_ci_computer`
-    - Mobile Phone=`cmdb_ci_mobile_device`
-    - Projector=`cmdb_ci_projector`
-  - Show choices as=`Dropdown`
-  - Select _Apply_
-  - Set Default value=`cmdb_ci_computer`
-  - Select _Save_
-
-- **G. Add Depot choice field**
-  - Select _+ Add a field in the table_
-  - Configure:
-    - Column label=`Depot`
-    - Column name=`depot`
-    - Type=`Choice`
-  - Drag field to correct form location
-  - Configure **Choices**:
-    - New York=`ny`
-    - London=`london`
-    - Buenos Aires=`ba`
-    - Santa Clara=`sc`
-    - Singapore=`singapore`
-    - Sydney=`sydney`
-    - Other=`other`
-  - Show choices as=`Dropdown`
-  - Select _Apply_
-  - Set Default value=`sc`
-  - Select _Save_
-
-- **H. Configure State field**
-  - Edit **State** field choices:
-    - Requested=`13` (default)
-    - Reserved=`14`
-    - Deployment Prep=`15`
-    - Ready for Pickup=`16`
-    - Checked Out=`17`
-    - Post Deployment=`18`
-    - Closed Complete=`3`
-  - Remove existing choices:
-    - Mark inactive
-    - _More actions_ > _Delete choice_
-  - Show choices as=`Dropdown`
-  - Select _Apply_
-  - Confirm override creation
-  - Set Default value=`13`
-  - Select _Save_
-
-- **I. Add Location to be used field**
-  - Select _+ Add a field in the table_
-  - Configure:
-    - Column label=`Location to be used`
-    - Column name=`location_to_be_used`
-    - Type=`String`
-  - Select _Add_
-  - Select _Done_
-  - Drag field to correct form location
-  - Adjust top section layout as needed
-  - Select _Save_
-
-- **J. Create Log and Statistics sections**
-  - Add new Section below existing sections
-  - Rename section=`Log`
-  - Drag fields into Log:
-    - `Additional comments`
-    - `Work notes`
-  - Create new Section=`Statistics`
-  - Configure two columns with fields:
-    - `Opened` / `Opened by`
-    - `Updated` / `Updated by`
-    - `Closed` / `Closed by`
-    -          / `Active`
-  - Select _Save_
-
-- **K. Create the ESS (Self Service) view**
-  - From **Default** view:
-    - _More actions_ > _Duplicate this form view_
-  - View name entered=`ESS`
-  - Select _Create_
-  - Note resulting View name=`Self Service`
-  - Configure two-column layout:
-    - `Number` / `State`
-    - `Requested for` / `Item type`
-    - `Start date` / `Configuration item`
-    - `End date` / `Assignment group`
-    - (blank) / `Assigned to`
-  - Keep merged section (one column):
-    - `Short description`
-    - `Description`
-  - Remove all other fields and sections
-  - Select _Save_
-
-- **L. Test the Self Service view**
-  - Open an existing Loaner Request record
-  - Right-click form header > _View_ > _Self Service_
-  - Verify layout
-  - Switch back to _Default_ view if needed
-  - Fix records with State=`1`:
-    - Select a valid State
-    - Complete mandatory fields
-    - Save
-  - Repeat for all affected records
+- **A. Add the field and policy**
+  - Open the Loaner Request Default form in Studio → add `Other` (`other`, `String`) below `Depot` → _Save_.
+  - Select `Other` → `UI Policies` → _Add a UI Policy_. Set `Short Description = Make ‘Other’ field visible and mandatory – Loaner Request`, `Order = 100`, and `Active = selected`.
+  - In `Advanced settings`, select `Apply to all views`, `On load`, and `Reverse if false`; clear `Inherit`. Set condition `Depot is Other`.
+  - Add action `Field name = Other`, `Mandatory = True`, `Visible = True`, `Read only = Leave alone` → _Add UI Policy_ → _Save_.
+- **B. Add and test scripts**
+  - Open **Client Development > UI Policy > Make 'Other' field visible and mandatory** → `Advanced view` → `Script`; select `Run scripts`, `Run scripts in UI type = All`.
+  - Set true script to `function onCondition() { g_form.showFieldMsg('other', 'Where will you pick up the loaner?', 'info'); }`.
+  - Set false script to `function onCondition() { g_form.hideFieldMsg('other'); }` → _Update_.
+  - In a Loaner Request Default view, switch `Depot` to `Other`, away, and back; verify visibility, mandatory state, and exactly one message.
 
 ### Lab 4.2.2 - Scripting
 
-🎯 **Goal**: Create client scripts and business rules to automate field behavior, pass server data to the client via `g_scratchpad`, and validate date logic.
+🎯 **Goal**: Set client fields, pass display data to the client, and validate dates on the server.
 
-- **A. Create client script: Set Loaner Item Type**
-  - In **ServiceNow Studio**, select _Create_ > _File_
-  - Application=`Loaner Request`
-  - Select **Client Development**
-  - File type=`Client Script`
-  - Select _Continue_
-  - Configure:
-    - Name=`Set Loaner Item Type`
-    - Table=`Loaner Request [x_..._loaner_request]`
-    - UI Type=`Desktop`
-    - Type=`onChange`
-    - Field name=`Configuration item`
-    - Description=`Set Item type field automatically for mobiles`
-  - Populate script using macro:
-    - Delete default Script contents
-    - Type `SetloanertemType` and press `<tab>`
-  - Select _Submit_
-  - Test:
-    - Open a Loaner Request record
-    - Set `Configuration item` to `Blackberry`
-    - Verify `Item type` auto-sets to `Mobile Phone` and becomes read-only
-  - Script behavior (reference notes):
-    - If CI name matches `/.*blackberry.*/i`, `/.*iphone.*/i`, or `/.*android.*/i`:
-      - Set `item_type`=`cmdb_ci_mobile_device` (display `Mobile Phone`)
-      - `item_type` read-only=`true`
-    - Else if CI name matches `/.*macbook.*/i`:
-      - Set `item_type`=`cmdb_ci_computer` (display `Laptop`)
-      - `item_type` read-only=`true`
-    - Else:
-      - `item_type` read-only=`false`
-  - Note on regex usage:
-    - Regex `/.../i` avoids case sensitivity (e.g., `iphone` vs `iPhone`)
+- **A. Set item type on change**
+  - Studio → _Create_ → `File` → `Client Development` → `Client Script`; set `Name = Set Loaner Item Type`, `Table = Loaner Request`, `UI Type = Desktop`, `Type = onChange`, `Field name = Configuration item`, and `Description = Set Item type field automatically for mobiles.`
+  - Replace the default script with the following course example → _Submit_. It uses an asynchronous `g_form.getReference` callback and case-insensitive matching:
+    ```javascript
+    function onChange(control, oldValue, newValue, isLoading, isTemplate) {
+      if (isLoading) return;
+      g_form.getReference("cmdb_ci", checkName);
+      /* This grabs the record for the configuration item, 
+    then performs the below function using that record. 
+    See additional note below for usage tips. */
+      function checkName(ci) {
+        var name = ci.name + "";
+        // Check the name of the CI using regular expressions;
+        // Set and lock Item type field based on the CI name.
+        if (
+          name.match(/.*blackberry.*/i) ||
+          name.match(/.*iphone.*/i) ||
+          name.match(/.*android.*/i)
+        ) {
+          g_form.setValue("item_type", "cmdb_ci_mobile_device", "Mobile Phone");
+          g_form.setReadOnly("item_type", true);
+        } else if (name.match(/.*macbook.*/i)) {
+          g_form.setValue("item_type", "cmdb_ci_computer", "Laptop");
+          g_form.setReadOnly("item_type", true);
+        } else {
+          g_form.setReadOnly("item_type", false);
+        }
+      }
+      /***** 
+    Yes, g_form.getReference() fell from grace as a recommended practice some releases ago. 
+    However, it is still broadly used in a pinch to fetch a single record without using the rigors of 
+    GlideAJAX; a quick code search will confirm hundreds of occurrences. 
+    Use with caution! For more information: 
+    https://developer.servicenow.com/dev.do#!/reference/api/vancouver/client/c_GlideFormAPI#r_GlideForm-GetReference_S_F?navFilter=getR
+    *****/
+    }
+    ```
+  - Test a matching configuration item in a Loaner Request and verify the item type and read-only state.
+- **B. Pass location using a display rule**
+  - Create `Business Rule`: `Name = Set Scratchpad Values`, `Table = Loaner Request`, `Active = selected`, `Advanced = selected`, `When = display`, `Order = 100`.
+  - Set the Business Rule `Script` to the following → _Submit_:
+    ```javascript
+    (function executeRule(current, previous /*null when async*/) {
+      g_scratchpad.city = current.requested_for.city;
+      g_scratchpad.country = current.requested_for.country;
+      // Hooray for dotwalking!
+      // By writing these values to the scratchpad, a client script can easily fetch them.
+    })(current, previous);
+    ```
+  - Create `Client Script`: `Name = Set Loaner Location`, `Table = Loaner Request`, `UI Type = All`, `Type = onLoad`, `Description = Automatically set 'Location to be used' field value based on user location.` Set `Script` to the following → _Submit_:
+    ```javascript
+    function onLoad() {
+      // This uses the dotwalking superpowers of the Scratchpad to use the requestor's city & state as the default location to be used. Make sure whomever you use for testing has values in their user record for this!
+      if (g_form.getValue("location_to_be_used") != "") {
+        return;
+      }
+      var city = g_scratchpad.city;
+      var country = g_scratchpad.country;
+      if (city && country) {
+        g_form.setValue("location_to_be_used", city + ", " + country);
+      } else if (city) {
+        g_form.setValue("location_to_be_used", city);
+      } else if (country) {
+        g_form.setValue("location_to_be_used", country);
+      }
+      if (city || country) {
+        g_form.showFieldMsg(
+          "location_to_be_used",
+          "Value set automatically - you may override by editing",
+          "info",
+        );
+      }
+    }
+    ```
+  - In `sys_user.list`, add and populate `City` and `Country code` for a test user. In **Loaner Request > All**, add `Requested for` and `Location to be used` through column controls → _Configure_ → _List Layout_. Set a blank-location record's `Requested for` in the list, save, and open the record to verify the location.
+- **C. Validate dates**
+  - Create `Business Rule`: `Name = Validate Start and End Dates`, `Table = Loaner Request`, `Active = selected`, `Advanced = selected`, `When = before`, `Insert = selected`, `Update = selected`.
+  - Set `Script` to the following → _Submit_. For `end_date < start_date`, it displays an error and aborts the transaction:
+    ```javascript
+    (function executeRule(current, previous /*null when async*/) {
+      if (current.end_date < current.start_date) {
+        gs.addErrorMessage("End date must be on or after start date!");
+        current.end_date = "";
+        current.setAbortAction(true);
+        // This rejects the submission of the record if you set the end date before the start date
+        // Food for thought: why was script used here rather than a scriptless business rule?
+      }
+    })(current, previous);
+    ```
+  - Create a record with end before start; verify that submission is rejected. Test equal start and end timestamps and verify that they are accepted. Open the Default form's `Policies and rules` to inspect related logic.
 
-- **B. Create Display Business Rule: Set Scratchpad Values**
-  - In **ServiceNow Studio**, select _Create_ > _File_
-  - Select **Server Development**
-  - File type=`Business Rule`
-  - Configure:
-    - Name=`Set Scratchpad Values`
-    - Table=`Loaner Request [x_..._loaner_request]`
-    - Active=`true`
-    - Advanced=`true`
-    - When=`display`
-    - Order=`100`
-  - On **Advanced** tab, populate script using macro:
-    - Delete default Script contents
-    - Type `SetScratchpadValues` and press `<tab>`
-  - Verify script sets:
-    - `g_scratchpad.city = current.requested_for.city`
-    - `g_scratchpad.country = current.requested_for.country`
-  - Select _Submit_
+### Lab 4.3.1 - Publish to Update set
 
-- **C. Create client script: Set Loaner Location**
-  - In **ServiceNow Studio**, select _Create_ > _File_
-  - Application=`Loaner Request`
-  - Select **Client Development**
-  - File type=`Client Script`
-  - Select _Continue_
-  - Configure:
-    - Name=`Set Loaner Location`
-    - Table=`Loaner Request [x_..._loaner_request]`
-    - UI Type=`All`
-    - Type=`onLoad`
-    - Description=`Automatically set Location to be used field value based on user location.`
-  - Populate script using macro:
-    - Delete default Script contents
-    - Type `SetLoanerLocation` and press `<tab>`
-  - Select _Submit_
-  - Script behavior (reference notes):
-    - If `location_to_be_used` is not empty: do nothing
-    - Read from scratchpad:
-      - `var city = g_scratchpad.city`
-      - `var country = g_scratchpad.country`
-    - Set `location_to_be_used` to:
-      - `city + ', ' + country` (if both)
-      - `city` (if only city)
-      - `country` (if only country)
-    - If city or country present:
-      - Show info message on field: `Value set automatically - you may override by editing`
+🎯 **Goal**: Package the current Loaner Request application into an update set.
 
-- **D. Test scratchpad + onLoad script behavior**
-  - Open `sys_user.list`
-  - Personalize list: add `City` and `Country code`
-  - Edit a user record:
-    - Set `City` and `Country code` to known values (if blank)
-  - Navigate to **Loaner Request > All**
-  - Add columns to the list:
-    - Use _Column controls_ > _Configure_ > _List Layout_
-    - Add `Requested for`
-    - Add `Location to be used`
-    - Select _Save_
-  - On the list (not the form):
-    - Locate a Loaner Request record where `Location to be used` is empty
-    - Set `Requested for` to the user you updated (with City/Country code)
-    - Save the row
-  - Open the record
-  - Verify `Location to be used` populated from the user’s `City` and `Country code`
+- **A. Publish and inspect**
+  - Studio → **Apps > Loaner Request > App details** → _More Options_ → _Settings_ → _Publish to Update Set_.
+  - Verify `Version = 1.0.0`; set `Description = Loaner Request app - module 4.` → _Publish_ → _Done_.
+  - Review the `Customer Updates` related list for captured files.
 
-- **E. Create Business Rule: Validate Start and End Dates**
-  - In **ServiceNow Studio**, select _Create_ > _File_
-  - Select **Server Development**
-  - File type=`Business Rule`
-  - Configure:
-    - Name=`Validate Start and End Dates`
-    - Table=`Loaner Request [x_..._loaner_request]`
-    - Active=`true`
-    - Advanced=`true`
-    - When=`before`
-    - Insert=`true`
-    - Update=`true`
-  - On **Advanced** tab, populate script using macro:
-    - Delete default Script contents
-    - Type `ValidateStartEndDates` and press `<tab>`
-  - Script behavior (reference notes):
-    - If `end_date < start_date`:
-      - `gs.addErrorMessage('End date must be later than start date!')`
-      - `current.end_date = ''`
-      - `current.setAbortAction(true)`
-  - Select _Submit_
-  - Test:
-    - Create a new Loaner Request
-    - Set `End date` earlier than `Start date`
-    - Verify error messages:
-      - `End date must be later than start date!`
-      - `Invalid update`
+### Lab 4.3.2 - Publish to the application repository
 
-- **F. View policies and rules from Form Builder**
-  - In **ServiceNow Studio**, open the form:
-    - **Form > x\_...\_loaner_request**
-    - Ensure **Default** view
-  - Open **Policies and Rules** for the form to review associated:
-    - UI Policies
-    - Access control rules
-    - Client Scripts
-    - Business Rules
-    - Workplace view rules
+🎯 **Goal**: Publish the scoped application and review installation on another instance.
 
-### Lab 4.2.3 - Complete the update set
-
-🎯 **Goal**: Mark the Module 4 update set as complete so it can be retrieved by a connected instance.
-
-- **A. Complete the update set in Studio**
-  - In **ServiceNow Studio**, return to the main landing page
-  - Select the **Deployment** tab
-  - Select the **Update sets** tab
-  - Expand **Application: Loaner Request**
-  - Select update set=`LR-Module 4`
-  - Set:
-    - State=`Complete`
-    - Description=`Module 4 labs complete`
-  - Select _Update_
-  - Close the `LR-Module 4` update set tab
-
-### Lab 4.2.4 - Publish and install the updated app via the application repository
-
-🎯 **Goal**: Publish the updated application (optionally including demo data) to the Application Repository, then update the installed application on a second instance.
-
-- **A. Include demo data as application files (optional)**
-  - In the main ServiceNow browser window, navigate to **Loaner Request > All**
-  - Hover over the `Number` column header > select _Column options_
-  - Select _Create Application Files_
-  - Set Load When=`New Install and Upgrades`
-  - Select _OK_
-
-- **B. Publish the updated app to the Application Repository**
-  - In **ServiceNow Studio**, from the main landing page, select the **Deployment** tab
-  - Select the **Applications** tab
-  - Select the `Loaner Request` application
-  - Select _Publish_
-  - Review details
-  - Select _Publish_
-  - When complete, select _Done_
-
-- **C. Update the app on a second instance**
-  - Log in to the second instance
-  - Navigate to **System Applications > My Company Applications**
-  - Select the **Installed** tab
-  - Refresh the browser window (allow 1–2 minutes for version info to update)
-  - Open the version number dropdown
-  - Select the updated version
-  - Select _Update_
-  - Select _Install_
-  - When complete, select _Close_
-  - Return to the **Installed** tab and verify the updated app is listed
-  - If prompted to map applications with custom tables:
-    - Select _Install_
-    - Select _Close_
-
-- **D. Verify update and demo data**
-  - Navigate to **Loaner Request > All**
-  - Verify Loaner Request records appear in the list
-  - If records do not appear:
-    - Debug and re-test
+- **A. Commit and publish**
+  - Optional: Studio app details → **Source control > Commit changes** → select changed files → _Continue_ → `Commit comment = Loaner Request application with module 4 labs completed.` → _Commit files_ → _Close_.
+  - App details → _More Options_ → _Publish_ → review version and release notes → _Publish_ → _Done_.
+- **B. Install on a second instance**
+  - The training instance has no full Dev/Test/Prod stack; review rather than execute this part there.
+  - On a destination instance, open **System Applications > My Company Applications > Not Installed** → locate `Loaner Request` → _Install_ → _Install_ → _Close_; verify under `Installed`.
 
 ### Lab 5.1.1 - Configure application security
 
-🎯 **Goal**: Implement role-based security for the Loaner Request application, including access to modules, records, fields, and views, and complete the update set.
+🎯 **Goal**: Restrict navigation, records, and views for administrator, requester, and non-user personas.
 
-- **A. Create an update set**
-  - In **ServiceNow Studio**, open **Apps > Loaner Request**
-  - Open the **Update set** widget
-  - Select _+ New_
-  - Name=`LR-Module 5`
-  - Select _Save_
-  - Select _Apply_
+- **A. Configure roles and groups**
+  - In Studio, **Loaner Request > Security > Role > x_cdltd_loaner_r_0.admin** → `Contains Roles` → _Edit_ → add `x_cdltd_loaner_r_0.user` → _Save_ → _Update_.
+  - In **User Administration > Groups**, create `Loaner Request Admins` with description `Loaner Request application users with the Loaner Request Admin role.` → _Save_; add the application admin role on `Roles` → _Save_ → _Update_.
+  - In **User Administration > Users**, add `System Administrator` and `Fred Luddy` to `Loaner Request Admins`; remove Fred's platform `admin` role. The prior lab placed `Beth Anglin` in `Loaner Request Users`.
+- **B. Restrict modules**
+  - In Studio, open **User Interface > Module > All**; under `Visibility`, replace the application user role with `x_cdltd_loaner_r_0.admin`. Repeat for `Closed` and `Open - Unassigned`; the module form autosaves.
+- **C. Configure ACLs**
+  - In Studio's user menu, _Elevate role_ → select `security_admin` → _Update_.
+  - Open **Security > Access Control > x_cdltd_loaner_r_0_loaner_request**; locate the `read` ACL and replace the required user role with `x_cdltd_loaner_r_0.admin` → _Update_. Repeat for `delete`.
+  - _Create_ → `File` → `Access Control` → _Continue_; create `Type = record`, `Operation = read`, `Decision type = Allow if`, `Name = Loaner Request / --None--`, `Active = selected`, `Admin overrides = selected`, required role `x_cdltd_loaner_r_0.user`, condition `Requested for is (dynamic) Me` → _Submit_ → verify → _Continue_.
+  - Create another record/read `Allow if` ACL for `Loaner Request / --None--`, with `Active`, `Admin overrides`, and `Advanced` selected; require `x_cdltd_loaner_r_0.user`; set `Advanced Condition` to `current.isNewRecord();` → _Submit_ → verify → _Continue_.
+  - Confirm the original `create` and `write` ACLs still require the user role. Remove `security_admin` elevation through the user menu.
+- **D. Force a view and test**
+  - _Create_ → `File` → `View Rule [sysrule_view]`; set `Name = Users see only ESS view`, `Table = Loaner Request`, `Device type = Browser`, `Active = selected`, `Advanced = selected`.
+  - Inside `overrideView()`, use `if (!gs.hasRole('x_cdltd_loaner_r_0.admin')) { answer = 'ess'; }` → _Submit_.
+  - Impersonate `Fred Luddy`: verify all modules, all records, create/edit/delete, and all views. Impersonate `Beth Anglin`: verify `Create New` and `Open`, creation, own requested-for records, and Self Service view. Impersonate `Abel Tuter`: verify no application access. End impersonation.
+  - Optional: commit changed files with `Loaner Request application with Lab 5.1.1 completed.`
 
-- **B. Configure roles, groups, and users**
-  - In **ServiceNow Studio**, navigate to:
-    - **Loaner Request app > Role > x\_...loaner...admin**
-  - In **Contains Roles** related list:
-    - Select _Edit_
-    - Add role=`x_...loaner...user`
-    - Select _Save_
-    - Select _Update_
-  - In main browser, navigate to **User Administration > Groups**
-  - Select _New_
-  - Configure:
-    - Name=`Loaner Request Admins`
-    - Description=`Loaner Request application users with admin role`
-  - Select _Save_
-  - In **Roles** related list:
-    - Select _Edit_
-    - Add role=`x_...loaner...admin`
-    - Select _Save_
-    - Select _Update_
-  - Navigate to **User Administration > Users**
-  - Open user=`System Administrator`
-    - In **Groups**:
-      - Select _Edit_
-      - Add `Loaner Request Admins`
-      - Select _Save_
-      - Select _Update_
-  - Open user=`Fred Luddy`
-    - In **Roles**:
-      - Select _Edit_
-      - Remove `admin`
-      - Select _Save_
-    - In **Groups**:
-      - Select _Edit_
-      - Add `Loaner Request Admins`
-      - Select _Save_
-      - Select _Update_
+### Lab 5.2.1 - Set application access (optional)
 
-- **C. Secure application modules**
-  - In **ServiceNow Studio**, open module=`All`
-  - In **Roles**:
-    - Remove `x_...loaner...user`
-    - Add `x_...loaner...admin`
-    - Select _Done_
-    - Select _Update_
-  - Repeat for modules:
-    - `Closed`
-    - `Open - Unassigned`
-  - Leave other modules unchanged
+🎯 **Goal**: Test cross-scope read and update permissions with a Global scheduled script.
 
-- **D. Secure record and field access (ACLs)**
-  - In main browser:
-    - Select profile > _Elevate role_
-    - Enable `security_admin`
-    - Select _Update_
-  - In **ServiceNow Studio**, navigate to:
-    - **Access Control > Loaner Request**
-  - Edit **Read ACL**:
-    - Remove role=`x_...loaner...user`
-    - Add role=`x_...loaner...admin`
-    - Select _Update_
-  - Edit **Delete ACL**:
-    - Ensure only role=`x_...loaner...admin`
-  - Create new **Read ACL (Condition-based)**:
-    - Type=`record`
-    - Operation=`read`
-    - Decision=`Allow if`
-    - Admin Overrides=`true`
-    - Name=`Loaner Request / --None--`
-    - Active=`true`
-    - Requires role=`x_...loaner...user`
-    - Condition:
-      - `Requested for` `is (dynamic)` `Me`
-    - Select _Submit_
-  - Create new **Read ACL (Script-based)**:
-    - Type=`record`
-    - Operation=`read`
-    - Decision=`Allow if`
-    - Admin Overrides=`true`
-    - Active=`true`
-    - Advanced=`true`
-    - Requires role=`x_...loaner...user`
-    - Script:
-      - `current.isNewRecord();`
-    - Select _Submit_
-  - In main browser:
-    - Disable `security_admin` via _Elevate role_
-
-- **E. Create View Rule (force ESS view)**
-  - In **ServiceNow Studio**, select _Create_ > _File_
-  - File type=`View Rule [sysrule_view]`
-  - Configure:
-    - Name=`Users see only ESS view`
-    - Active=`true`
-    - Advanced=`true`
-    - Table=`Loaner Request`
-    - Device type=`Browser`
-  - Script:
-    - `if(!gs.hasRole('x_...loaner...admin')){`
-    - `  answer = 'ess';`
-    - `}`
-  - Select _Submit_
-
-- **F. Validate security behavior (impersonation testing)**
-  - Impersonate **Fred Luddy (admin/fulfiller)**:
-    - Can create records
-    - Sees all modules
-    - Can read/edit/delete all records
-    - Can access all views
-  - Impersonate **Beth Anglin (user/requester)**:
-    - Can create records
-    - Sees modules:
-      - `Create New`
-      - `Open`
-    - Can read records where `Requested for = Me`
-    - Forced to `Self Service (ESS)` view
-  - Impersonate **Abel Tuter (non-user)**:
-    - No access to application or records
-
-- **G. Complete the update set**
-  - End impersonation
-  - In **ServiceNow Studio**, go to **Deployment > Update sets**
-  - Expand **Application: Loaner Request**
-  - Open update set=`LR-Module 5`
-  - Set:
-    - State=`Complete`
-    - Description=`Module 5 labs complete`
-  - Select _Update_
-  - Close update set tab
-
-### Lab 5.2.1 - Set application access
-
-🎯 **Goal**: Test and understand cross-scope application access by executing a Fix Script from Global scope with and without update permissions on the Loaner Request table.
-
-- **A. Prepare table application access settings**
-  - Ensure user=`System Administrator` (no elevated privileges)
-  - In **ServiceNow Studio**, navigate to **Table > Loaner Request**
-  - From _Additional actions_, select _Advanced view_
-  - In **Application Access** tab, verify:
-    - Accessible from=`All application scopes`
-    - Can read=`true`
-    - Can create=`false`
-    - Can update=`false`
-    - Can delete=`false`
-    - Allow access via web services=`true`
-  - Select _Update_
-  - In main browser, navigate to **Loaner Request > All**
-  - Verify sufficient records exist (create ≥4 active records if needed)
-
-- **B. Create Fix Script in Global scope**
-  - In main browser, switch scope=`Global`
-  - Navigate to **System Definition > Fix Scripts**
-  - Select _New_
-  - Name=`Update LNRs from Global`
-  - Add script:
-    - `gs.invalidateCache();`
-    - `var loanerRecs = new GlideRecord('x_..._loaner_request');`
-    - `loanerRecs.addQuery('state','!=',3);`
-    - `loanerRecs.setLimit(3);`
-    - `loanerRecs.query();`
-    - `while(loanerRecs.next()){`
-    - `  loanerRecs.setValue('state',3);`
-    - `  loanerRecs.update();`
-    - `}`
-  - Select _Save_ (not Submit)
-
-- **C. Test without cross-scope update access**
-  - Select _Run Fix Script_
-  - Select _Proceed_
-  - Observe output:
-    - Error message: `Security restricted: Write operation... refused due to cross-scope access policy`
-  - Select _Close_
-  - Navigate to **Loaner Request > All**
-  - Verify:
-    - No records updated to `Closed Complete`
-
-- **D. Enable update access and re-test**
-  - Switch scope back to `Loaner Request`
-  - In **ServiceNow Studio**, open **Table > Loaner Request**
-  - Select _Advanced view_
-  - In **Application Access**:
-    - Set Can update=`true`
-  - Select _Update_
-  - Refresh browser
-  - Return to Fix Script
-  - Select _Run Fix Script_
-  - Select _Proceed_
-  - Observe:
-    - No "Security restricted" message
-  - Select _Close_
-  - Navigate to **Loaner Request > All**
-  - Verify:
-    - Up to 3 records updated to `Closed Complete`
-
-- **E. Reset application access**
-  - In **ServiceNow Studio**, open **Table > Loaner Request**
-  - In **Application Access**:
-    - Set Can update=`false`
-  - Select _Update_
+- **A. Prepare access and records**
+  - End impersonation and elevation. In Studio, **Data > Table > Loaner Request** → _Additional actions_ → `Advanced view` → `Application Access`.
+  - Set `Accessible from = All application scopes`, `Caller Access = Caller Tracking`, `Can read = selected`, `Can create/update/delete = cleared`, and `Allow access to this table via web services = selected` → _Update_.
+  - In **Loaner Request > All**, ensure at least four active requests exist.
+- **B. Test Global caller access**
+  - Studio → _Create_ → `File` → application/scope `Global` → `Scheduled Script Execution`; set `Name = Update LNRs from Global`, `Run = On Demand`.
+  - Set `Script` to the following → _Submit_. The query limits the exercise to three non-closed records:
+    ```javascript
+    /*  
+    Run this script from Global scope both BEFORE _and_ AFTER 
+    checking "Can update" from the Loaner Request Table's Application Access section.
+    */
+    // This method _should_ address occasional instance "bad behavior" during this demo.
+    gs.invalidateCache();
+    // Look up open LNR records
+    var loanerRecs = new GlideRecord("x_cdltd_loaner_r_0_loaner_request");
+    loanerRecs.addQuery("state", "!=", 3); // not Closed Complete
+    loanerRecs.setLimit(3); // let's not get carried away...
+    loanerRecs.query();
+    // We're in Global scope — in other words, "out of scope." Can we close the LNR records?
+    while (loanerRecs.next()) {
+      loanerRecs.setValue("state", 3); // mark Closed Complete
+      loanerRecs.update(); // save the records
+    }
+    // No dice closing them out? Try checking the "Can update" box on the Loaner Table, then try again!
+    ```
+  - Open Loaner Request app details → _More Options_ → _Settings_ → `Restricted Caller Access Privileges`; execute the scheduled script using _Execute Now_. Refresh the privilege list and **Loaner Request > All**; verify records were not closed while `Can update` was cleared.
+  - Return to the table's `Application Access`, select `Can update` → _Update_; _Execute Now_ again. Verify the records change and a write privilege appears.
+  - Clear `Can update` → _Update_ to restore the prior setting.
 
 ### Lab 6.1.1 - Flow Designer to manage deployment states
 
-🎯 **Goal**: Build a Flow Designer automation to manage Loaner Request lifecycle for laptops and create supporting table and business rule.
+🎯 **Goal**: Automate laptop preparation and post-deployment tasks for a Loaner Request.
 
-- **A. Create an update set**
-  - In **ServiceNow Studio**, open **Apps > Loaner Request**
-  - Open the **Update set** widget
-  - Select _+ New_
-  - Name=`LR-Module 6`
-  - Select _Save_
-  - Select _Apply_
-
-- **B. Create Loaner Task table**
-  - In **ServiceNow Studio**, select _Create_ > _File_
-  - Select **Data** > `Table`
-  - Select _Continue_
-  - Configure:
-    - Label=`Loaner Task`
-    - Extends table=`Task`
-    - Create module=`true`
-    - Create mobile module=`false`
-    - Add module to menu=`Loaner Request`
-  - In **Controls** tab:
-    - Create access controls=`true`
-    - User role=`x_...loaner...admin`
-  - Select _Submit_
-
-- **C. Create Flow: Loaner Laptop**
-  - In **ServiceNow Studio**, select _Create_ > _File_
-  - Select **Automation** > `Flow`
-  - Select _Continue_
-  - Configure:
-    - Flow name=`Loaner Laptop`
-    - Application=`Loaner Request`
-    - Description=`Basic flow for assigning work on a loaner laptop`
-    - Protection=`None`
-    - Run As=`User who initiates session`
-  - Select _Build flow_
-
-- **D. Configure Flow Trigger**
-  - Select _Add a trigger_
-  - Trigger type=`Created or Updated`
-  - Table=`Loaner Request`
-  - Conditions:
-    - `Item type` `is` `Laptop`
-    - `State` `is` `Reserved`
-  - Run Trigger=`Once`
-  - Select _Done_
-  - Select _Save_
-
-- **E. Add Wait For Condition actions**
-  - Add action: **Wait For Condition**
-    - Record=`Loaner Request Record`
-    - Condition=`State is Deployment Prep`
-  - Select _Done_
-  - Select _Save_
-  - Add second **Wait For Condition**:
-    - Record=`Loaner Request Record`
-    - Condition=`State is Post Deployment`
-  - Select _Done_
-  - Select _Save_
-
-- **F. Add Create Task actions**
-  - Add action: **Create Task**
-    - Table=`Loaner Task`
-    - Add field:
-      - Parent=`Loaner Request Record`
-    - Priority=`3 - Moderate`
-    - Short description=`Prepare the laptop for deployment`
-    - Wait=`true`
-    - Annotation=`Deployment Prep`
-  - Select _Done_
-  - Select _Save_
-  - Add second **Create Task**:
-    - Table=`Loaner Task`
-    - Parent=`Loaner Request Record`
-    - Priority=`3 - Moderate`
-    - Short description=`Perform the post deployment tasks`
-    - Wait=`true`
-    - Annotation=`Post Deployment`
-  - Select _Done_
-  - Select _Save_
-
-- **G. Add Update Record actions**
-  - Add action: **Update Record**
-    - Record=`Loaner Request Record`
-    - Field:
-      - State=`Ready for Pickup`
-    - Annotation=`Ready for Pickup`
-  - Select _Done_
-  - Select _Save_
-  - Add second **Update Record**:
-    - Record=`Loaner Request Record`
-    - Field:
-      - State=`Closed Complete`
-    - Annotation=`Closed Complete`
-  - Select _Done_
-  - Select _Save_
-  - Arrange flow order:
-    - Trigger
-    - Wait (Deployment Prep)
-    - Create Task (Deployment Prep)
-    - Update Record (Ready for Pickup)
-    - Wait (Post Deployment)
-    - Create Task (Post Deployment)
-    - Update Record (Closed Complete)
-
-- **H. Modify Loaner Task State field**
-  - In **ServiceNow Studio**, select _Create_ > _File_
-  - File type=`Form`
-  - Table=`Loaner Task`
-  - Select _Open_
-  - Select `State` field
-  - Edit **Choices**:
-    - Open=`1`
-    - Work in Progress=`2`
-    - Closed Complete=`3`
-  - Remove all other choices
-  - Select _Apply_
-  - Confirm override
-  - Set Default=`1`
-  - Select _Save_
-
-- **I. Prepare for testing**
-  - Flow trigger conditions:
-    - `Item type = Laptop`
-    - `State = Reserved`
-  - Add related list:
-    - Open Loaner Request record
-    - Right-click header > _Configure > Related Lists_
-    - Add `Loaner Task > Parent`
-    - Select _Save_
-
-- **J. Test the flow**
-  - In Flow Designer, select _Test_
-  - Create new record:
-    - Requested for=`<value>`
-    - State=`Reserved`
-    - Start date=`<value>`
-    - End date=`<value>`
-    - Item type=`Laptop`
-  - Select _Run Test_
-  - Open execution details
-  - Validate progression:
-    - Flow pauses at `Wait for Deployment Prep`
-  - Update record:
-    - Set State=`Deployment Prep`
-    - Save
-  - Refresh flow execution
-  - Close Loaner Task records
-  - Update record:
-    - State=`Post Deployment`
-    - Save
-  - Close Loaner Tasks
-  - Verify:
-    - State auto-updates to `Closed Complete`
-  - Activate flow:
-    - Select _Activate_
-    - Confirm activation
-
-- **K. Create Business Rule: Set Reserved State**
-  - In **ServiceNow Studio**, select _Create_ > _File_
-  - File type=`Business Rule`
-  - Configure:
-    - Name=`Set Reserved State`
-    - Table=`Loaner Request`
-    - Active=`true`
-    - When:
-      - Insert=`true`
-      - Update=`true`
-    - Conditions:
-      - State=`Requested`
-      - Configuration item=`changes`
-      - Configuration item=`is not empty`
-  - In **Actions** tab:
-    - Set field:
-      - State=`Reserved`
-  - Select _Submit_
-  - Test:
-    - Update record:
-      - State=`Requested`
-      - Set `Configuration item`
-    - Save
-  - Verify:
-    - State updates to `Reserved`
-    - Flow triggers if `Item type = Laptop`
+- **A. Create the task table**
+  - End impersonation and elevation; select `Loaner Request` scope. In Studio, _Create_ → `File` → `Data` → `Table`.
+  - Set `Label = Loaner Task`, `Extends table = Task`, `Create module = selected`, `Create mobile module = cleared`, `Add module to menu = Loaner Request`; on `Controls`, select `Auto-number` and `Create access controls`, and set `User role = x_cdltd_loaner_r_0.admin` → _Submit_. Do not add fields.
+- **B. Create the flow and trigger**
+  - _Create_ → `File` → `Automation` → `Flow`; set `Flow name = Loaner Laptop`, `Application = Loaner Request`, `Description = Basic flow for assigning work on a loaner laptop.`, `Protection = --None--`, `Run As = User who initiates session`, and leave `Run with roles` empty → _Build flow_.
+  - _Add a trigger_ → `Record > Created or Updated`; set `Table = Loaner Request`, condition `Item Type is Laptop AND State is Reserved`, `Run Trigger = Once` → _Add Filter_ → _Done_.
+- **C. Add actions**
+  - Add `ServiceNow Core > Wait For Condition`: `Record = Trigger > Loaner Request Record`, `Condition = State is Deployment Prep`.
+  - Add `Create Task`: `Table = Loaner Task`, `Parent = Loaner Request Record`, `Priority = 3 - Moderate`, `Short description = Prepare the laptop for deployment.`, `Wait = selected`, annotation `Deployment Prep`.
+  - Add `Update Record`: `Record = Loaner Request Record`, `State = Ready for Pickup`, annotation `Ready for Pickup`.
+  - Add another `Wait For Condition` for the same record, `State is Post Deployment`; add a second `Create Task` with the same table, parent, priority, and wait setting, `Short description = Perform the post deployment tasks.`, annotation `Post Deployment`.
+  - Add `Update Record` for the request, `State = Closed Complete`, annotation `Closed Complete`. Arrange the six actions in the stated sequence; the guide's illustration confirms this order.
+- **D. Configure task states**
+  - Studio → _Create_ → `File` → `Form` → select `Loaner Task` → _Open_. Switch scope to `Global`; select inherited `State` → `Choices` → _Edit_. Keep `Open = 1`, `Work in Progress = 2`, and `Closed Complete = 3` → _Apply_ → confirm override → _Save_.
+  - Switch back to `Loaner Request`; verify the default is `Open` (`1`) → _Save_.
+- **E. Test and activate**
+  - On a Loaner Request form, Form Header → **Configure > Related Lists** → add `Loaner Task --> Parent` → _Save_.
+  - In the flow, _Test_ → create a request with `Requested for = <user>`, `State = Reserved`, valid start/end dates, and `Item type = Laptop` → _Submit_ → select the record → _Run Test_.
+  - In execution details, open the request and set `State = Deployment Prep`; close the generated task as `Closed Complete`; set request state to `Post Deployment`; close the second task; refresh execution details and confirm the request reaches `Closed Complete`.
+  - After a successful test, _Activate_ → confirm _Activate_.
+- **F. Set Reserved automatically**
+  - Create `Business Rule`: `Name = Set Reserved State`, `Table = Loaner Request`, `Active = selected`, `Insert = selected`, `Update = selected`; filter `State is Requested AND Configuration item changes AND Configuration item is not empty`. For explicit timing, select `Advanced` and set `When = before`: this is an implementation choice for changing the current record before saving, since the course's basic-view screenshot does not expose `When`.
+  - On `Actions`, set `State = Reserved` → _Submit_. Test by changing an empty configuration item to a populated value on a `Requested` record; a laptop can then trigger the flow.
 
 ### Lab 6.2.1 - Create application properties
 
-🎯 **Goal**: Create and manage application properties for the Loaner Request application, including category, properties, module, and access control.
+🎯 **Goal**: Create and secure configurable reminder intervals and a properties module.
 
-- **A. Create System Property Category**
-  - In **ServiceNow Studio**, select _Create_ > _File_
-  - Select **Properties**
-  - File type=`System Property Category`
-  - Select _Continue_
-  - Configure:
-    - Name=`Loaner Request`
-    - Title=`Loaner Request Properties`
-    - Add informational text (e.g., admin guidance)
-  - Apply formatting to Title
-  - Select _Submit_
-
-- **B. Create System Properties**
-  - In **ServiceNow Studio**, select _Create_ > _File_
-  - Select **Properties**
-  - File type=`System Property`
-  - Select _Continue_
-  - Create property:
-    - Suffix=`pickup.leadtime`
-    - Description=`Number of hours before a reservation starts to send a reminder`
-    - Type=`integer`
-    - Value=`24`
-    - Read roles=`x_...loaner...admin`
-    - Write roles=`x_...loaner...admin`
-  - Select _Submit_
-  - Create additional properties:
-    - Suffix=`return.remindtime`
-      - Description=`Number of hours before a reservation ends to send a reminder`
-      - Type=`integer`
-      - Value=`24`
-      - Read/Write roles=`x_...loaner...admin`
-    - Suffix=`overdue.remindtime`
-      - Description=`Number of hours between overdue reminders`
-      - Type=`integer`
-      - Value=`24`
-      - Read/Write roles=`x_...loaner...admin`
-
-- **C. Configure property category and ordering**
-  - Open **Loaner Request System Property Category**
-  - In **Properties** related list:
-    - Select _Edit_
-    - Move all three properties to selected list
-    - Select _Save_
-  - Set Order values:
-    - `<scope>.pickup.leadtime`=`100`
-    - `<scope>.return.remindtime`=`200`
-    - `<scope>.overdue.remindtime`=`300`
-  - Select _Update_
-
-- **D. Create Properties module**
-  - In **ServiceNow Studio**, select _Create_ > _File_
-  - Select **User Interface** > `Module`
-  - Configure:
-    - Title=`Properties`
-    - Application Menu=`Loaner Request`
-    - Order=`800`
-  - In **Visibility**:
-    - Roles=`x_...loaner...admin`
-    - Active=`true`
-  - In **Link Type**:
-    - Link type=`URL (from Arguments)`
-    - URL=`system_properties_ui.do?sysparm_title=Loaner Request Properties&sysparm_category=Loaner Request`
-  - Select _Submit_
-
-- **E. Create separator module**
-  - Create another **Module**
-  - Configure:
-    - Title=`Admin tools`
-    - Application Menu=`Loaner Request`
-    - Order=`700`
-  - In **Visibility**:
-    - Roles=`x_...loaner...admin`
-    - Active=`true`
-  - In **Link Type**:
-    - Link type=`Separator`
-  - Select _Submit_
-
-- **F. Test application properties**
-  - Refresh browser
-  - Search `Loaner Request` in Application Navigator
-  - Open **Properties** module
-  - Verify:
-    - All 3 properties visible
-    - Correct order (100, 200, 300)
-  - Modify a property value
-  - Select _Save_
-  - Re-open module
-  - Verify updated value persists
-
-- **G. Validate role-based access**
-  - Impersonate `Beth Anglin`
-  - Verify:
-    - Cannot see `Properties` module
-    - Cannot see `Admin tools` separator
-  - End impersonation
+- **A. Create category and properties**
+  - Studio → _Create_ → `File` → application `Loaner Request` → `Properties > System Property Category`; set `Name = Loaner Request`, `Title = Loaner Request Properties` → _Submit_.
+  - Create three `Properties > System Property` files; each has `Type = integer`, `Value = 24`, and read/write roles `x_cdltd_loaner_r_0.admin`:
+    - `Suffix = pickup.leadtime`; description `Number of hours before a reservation starts to send a reminder to the requester.`
+    - `Suffix = return.remindtime`; description `Number of hours before a reservation ends to send a reminder to the requester.`
+    - `Suffix = overdue.remindtime`; description `Number of hours to wait between overdue reminders.`
+  - In the category's `Properties` related list, _Edit_ → add the three properties → _Save_; set orders `pickup.leadtime = 100`, `return.remindtime = 200`, `overdue.remindtime = 300` → _Update_.
+- **B. Create modules and test**
+  - Create a `Module` with `Title = Properties`, `Application Menu = Loaner Request`, `Order = 800`, `Roles = x_cdltd_loaner_r_0.admin`, `Active = selected`, `Link type = URL (from Arguments)`, and `Arguments = system_properties_ui.do?sysparm_title=Loaner Request Properties&sysparm_category=Loaner Request` → _Submit_.
+  - Create a separator module: `Title = Admin tools`, same application menu and admin role, `Order = 700`, `Active = selected`, `Link type = Separator` → _Submit_.
+  - Refresh the main browser, open **Loaner Request > Properties**, verify order and save/reopen a changed value. Impersonate Beth and verify neither admin-only module is visible; end impersonation.
 
 ### Lab 6.3.1 - Scheduled Script Execution and email
 
-🎯 **Goal**: Automate pickup reminders using a Scheduled Script Execution that generates events and sends email notifications.
+🎯 **Goal**: Detect requests ready for pickup, queue an event, and notify the requester.
 
-- **A. Add Pick up reminder field**
-  - In **ServiceNow Studio**, navigate to **Form > Loaner Request (Default view)**
-  - Hover over `Other` field > select _+ Add_
-  - Select _+ Add a field in the table_
-  - Configure:
-    - Column label=`Pick up reminder`
-    - Column name=`pick_up_reminder`
-    - Type=`Date/Time`
-  - Select _Add_
-  - Select _Done_
-  - Select _Save_
-
-- **B. Register Event**
-  - In **ServiceNow Studio**, select _Create_ > _File_
-  - Select **Server Development**
-  - File type=`Event Registration`
-  - Select _Continue_
-  - Configure:
-    - Suffix=`pickUp`
-    - Table=`Loaner Request`
-    - Fired by=`Scheduled Script Execution: Loaner Item Pick Up`
-    - Description=`Trigger email reminder for pickup`
-  - Select _Submit_
-
-- **C. Create Scheduled Script Execution**
-  - In **ServiceNow Studio**, select _Create_ > _File_
-  - Select **Server Development**
-  - File type=`Scheduled Script Execution`
-  - Select _Continue_
-  - Configure:
-    - Name=`Loaner Item Pick Up`
-    - Active=`true`
-    - Run=`Periodically`
-    - Repeat Interval=`1 hour`
-  - Populate script:
-    - Type `ScheduledScriptExecution` + `<tab>`
-  - Script behavior:
-    - Reads property=`<scope>.pickup.leadtime`
-    - Converts hours → milliseconds
-    - Queries `Loaner Request` where:
-      - `State = 16` (Ready for Pickup)
-      - `pick_up_reminder is empty`
-      - `start_date <= noticeTime`
-    - For each record:
-      - Set `pick_up_reminder = current time`
-      - Update record
-      - Fire event=`<scope>.pickUp`
-  - Select _Submit_
-
-- **D. Test Scheduled Script Execution**
-  - Prepare test records:
-    - State=`Ready for Pickup`
-    - Start date within lead time window
-    - `pick_up_reminder`=`empty`
-  - In Studio, open Scheduled Script Execution
-  - Select _Execute Now_
-  - In main browser:
-    - Navigate to **System Logs > Events**
-    - Filter: Name contains `loaner`
-  - Verify event=`pickUp` generated
-
-- **E. Create Email Notification**
-  - In **ServiceNow Studio**, select _Create_ > _File_
-  - Select **Automation**
-  - File type=`Notification`
-  - Select _Continue_
-  - Configure:
-    - Name=`Loaner Item Pick Up`
-    - Table=`Loaner Request`
-    - Category=`Targeted Communication`
-    - Active=`true`
-  - In **When to send**:
-    - Send when=`Event is fired`
-    - Event name=`<scope>.pickUp`
-  - Select _Advanced view_
-  - In **Who will receive**:
-    - Unlock field
-    - Add `Requested for`
-    - Lock field
-  - In **What it will contain**:
-    - Subject=`Your loaner ${item_type} is ready for pick up`
-    - Message HTML:
-      - `Dear ${requested_for},`
-      - `The ${item_type} (${cmdb_ci}) is available for pick up at ${depot}.`
-      - `Reservation starts ${start_date}`
-      - `Return by ${end_date}`
-  - Select _Update_
-  - Select _Preview Notification_
-  - Update again if needed
-
-- **F. Test Notification**
-  - Ensure test record:
-    - Requested for=`George Washington`
-    - State=`Ready for Pickup`
-    - Start date within leadtime
-    - `pick_up_reminder`=`empty`
-  - Execute Scheduled Script:
-    - Select _Execute Now_
-  - Navigate to **System Logs > Emails**
-  - Verify email sent
-  - Open email:
-    - Select timestamp
-    - Select _Preview Email_
-  - Verify field values resolved correctly
+- **A. Add a reminder field and register the event**
+  - Studio → **Data > Form > Loaner Request** → Default view; add `Pick up reminder` (`pick_up_reminder`, `Date/Time`) below `Other` → _Save_.
+  - _Create_ → `File` → `Server Development > Event Registration`; set `Suffix = pickUp`, `Table = Loaner Request`, `Fired by = Scheduled Script Execution: Loaner Item Pick Up`, `Description = Used to trigger an email to remind a user to pick up their loaner item.` → _Submit_.
+- **B. Create and test the scheduled script**
+  - Create `Server Development > Scheduled Script Execution`: `Name = Loaner Item Pick Up`, `Active = selected`, `Run = Periodically`, `Repeat Interval = 1 hour`; set `Script` to the following → _Submit_:
+    ```javascript
+    var pickUpLeadTime =
+      gs.getProperty("x_cdltd_loaner_r_0.pickup.leadtime", 24) * 60 * 60 * 1000;
+    var noticeTime = new GlideDateTime();
+    noticeTime.add(pickUpLeadTime);
+    // The above block ensures the GlideRecord query finds the records that are due up in the span specified by the leadtime property
+    var readyRec = new GlideRecord("x_cdltd_loaner_r_0_loaner_request");
+    readyRec.addQuery("state", 16);
+    readyRec.addQuery("pick_up_reminder", "");
+    readyRec.addQuery("start_date", "<=", noticeTime);
+    readyRec.query();
+    // the above GR query looks for LNR records which:
+    // (1) are in state "Ready for Pickup"
+    // (2) haven't already generated a reminder
+    // (3) are within the acceptable span for pickup
+    var rightNow = new GlideDateTime();
+    while (readyRec.next()) {
+      readyRec.pick_up_reminder = rightNow;
+      // update each LNR so we don't spam the requesters (see line 9, above)
+      readyRec.update();
+      gs.eventQueue(
+        "x_cdltd_loaner_r_0.pickUp",
+        readyRec,
+        readyRec.number,
+        gs.getUserName(),
+      );
+      // fire the event to trigger the email notification!
+    }
+    ```
+  - The script reads `x_cdltd_loaner_r_0.pickup.leadtime` (default `24` hours), finds `state = 16`, empty `pick_up_reminder`, and `start_date` within the lead time; it stamps the reminder and queues `x_cdltd_loaner_r_0.pickUp`.
+  - Create or update qualifying records → _Execute Now_ → **System Logs > Events**; filter `Name contains loaner` and verify the events.
+- **C. Create and test the notification**
+  - Create `Notification [sysevent_email_action]`: `Name = Loaner Item Pick Up`, `Table = Loaner Request`, `Category = Targeted Communication`, `Active = selected`.
+  - `When to send`: `Send when = Event is fired`, `Event name = x_cdltd_loaner_r_0.pickUp`. In `Advanced view`, `Who will receive`: move `Requested for` to `Users/Groups in fields`.
+  - `What it will contain`: `Subject = Your loaner ${item_type} is ready for pick up`; enter the following in `Message HTML` → _Update_ → _Preview Notification_:
+    - `Dear ${requested_for},`
+    - `The ${item_type} (${cmdb_ci}) is available for pick up at ${depot}.`
+    - `Your reservation is scheduled to begin ${start_date}. Please return the item to the same location you picked it up by ${end_date}.`
+    - `You will receive a return reminder notification.`
+  - Test with `Requested for = George Washington` or another user with notifications enabled, `State = Ready for Pickup`, `Start date` within the lead time, and empty `Pick up reminder`; _Execute Now_. Open **System Logs > Emails**, select the created email → _Preview Email_ and verify substitutions.
 
 ### Lab 6.4.1 - Script include
 
-🎯 **Goal**: Use a Script Include to centralize pickup reminder logic, extend the application for return and overdue reminders, and complete the Module 6 update set.
+🎯 **Goal**: Move reminder logic into reusable functions and call them from a scheduled script.
 
-- **A. Create and examine the Script Include**
-  - In **ServiceNow Studio**, select _Create_ > _File_
-  - Select **Server Development**
-  - File type=`Script Include`
-  - Select _Continue_
-  - Configure:
-    - Name=`LoanerUtils`
-    - API Name=Auto-populated
-    - Accessible from=`This application scope only`
-    - Active=`true`
-  - Replace the default script:
-    - Delete existing Script contents
-    - Type `LoanerUtils`
-    - Press `<tab>`
-  - Select _Submit_
-  - Review key functions:
-    - `initialize()`
-      - Loads property values such as `pickup.leadtime`
-      - Stores values in object properties (for example, `this.pickupLeadTime`)
-    - `getNullPickupReminders()`
-      - Returns Loaner Request records in `Ready for Pickup`
-      - Filters to records with empty `Pick up reminder`
-      - Filters to records within the pickup lead-time window
-    - `sendPickupReminder()`
-      - Sets `Pick up reminder` to current date/time
-      - Queues pickup event to trigger email notification
-  - Compare with previous Scheduled Script logic:
-    - Query/filter logic moved into `getNullPickupReminders()`
-    - Reminder update + event generation moved into `sendPickupReminder()`
-    - Scheduled job becomes more modular and reusable
+- **A. Create the Script Include**
+  - Studio → _Create_ → `File` → `Server Development > Script Include`; set `Name = LoanerUtils`, `Accessible from = This application scope only`, `Active = selected`; leave the generated API name.
+  - Replace the default script with this course example → _Submit_. It contains the pickup, return, and overdue helper methods:
 
-- **B. Update Scheduled Script Execution to use the Script Include**
-  - In **ServiceNow Studio**, open **Loaner Item Pick Up** Scheduled Script Execution
-  - Replace the script with:
-    - `var lutil = new LoanerUtils();`
-    - `var plist = [];`
-    - `plist = lutil.getNullPickupReminders();`
-    - `for (var i=0; i<plist.length; i++) {`
-    - `   lutil.sendPickupReminder(plist[i]);`
-    - `}`
-  - Select _Update_
+    ```javascript
+    var LoanerUtils = Class.create();
+    LoanerUtils.prototype = {
+      initialize: function () {
+        this.appScopeName = gs.getCurrentScopeName();
+        this.loanerTableName = this.appScopeName + "_loaner_request";
+        this.pickupLeadTime =
+          gs.getProperty(this.appScopeName + ".pickup.leadtime", 24) *
+          60 *
+          60 *
+          1000;
+        this.returnRemindTime =
+          gs.getProperty(this.appScopeName + ".return.remindtime", 24) *
+          60 *
+          60 *
+          1000;
+        this.overdueRemindTime =
+          gs.getProperty(this.appScopeName + ".overdue.remindtime", 24) *
+          60 *
+          60 *
+          1000;
+        this.pickupEvent = this.appScopeName + ".pickUp";
+        this.returnEvent = this.appScopeName + ".return";
+        this.overdueEvent = this.appScopeName + ".overdue";
+      },
+      getNullPickupReminders: function () {
+        var a = [];
+        var noticeTime = new GlideDateTime();
+        noticeTime.add(this.pickupLeadTime);
+        var pLoaners = new GlideRecord(this.loanerTableName);
+        pLoaners.addQuery("state", 16); // i.e., "Ready for Pickup"
+        pLoaners.addQuery("pick_up_reminder", "");
+        pLoaners.addQuery("start_date", "<=", noticeTime); // Basically, Start Date in the past
+        pLoaners.query();
+        while (pLoaners.next()) {
+          a.push(pLoaners.getUniqueValue()); // pump these records into an array, then use sendPickupReminder() to fire the events
+        }
+        return a;
+      },
+      sendPickupReminder: function (id) {
+        var spLoaner = new GlideRecord(this.loanerTableName);
+        if (!spLoaner.get(id)) {
+          gs.error(
+            ">>>ERROR: LoanerUtils: sendPickupReminder(): FAILED TO RETRIEVE RECORD",
+          );
+          return;
+        }
+        spLoaner.pick_up_reminder = new GlideDateTime().getDisplayValue();
+        spLoaner.update();
+        gs.eventQueue(
+          this.pickupEvent,
+          spLoaner,
+          spLoaner.start_date,
+          spLoaner.end_date,
+        );
+        return;
+      },
+      getNullReturnReminders: function () {
+        var a = [];
+        var noticeTime = new GlideDateTime();
+        noticeTime.add(this.returnRemindTime);
+        var rLoaners = new GlideRecord(this.loanerTableName);
+        rLoaners.addQuery("state", 17); // State "Checked Out"
+        rLoaners.addQuery("return_reminder", "");
+        rLoaners.addQuery("end_date", "<=", noticeTime);
+        rLoaners.query();
+        while (rLoaners.next()) {
+          a.push(rLoaners.getUniqueValue());
+        }
+        return a;
+      },
+      sendReturnReminder: function (id) {
+        var srLoaner = new GlideRecord(this.loanerTableName);
+        if (!srLoaner.get(id)) {
+          gs.error(
+            ">>>ERROR: LoanerUtils: sendReturnReminder(): FAILED TO RETRIEVE RECORD",
+          );
+          return;
+        }
+        srLoaner.return_reminder = new GlideDateTime().getDisplayValue();
+        srLoaner.update();
+        gs.eventQueue(
+          this.returnEvent,
+          srLoaner,
+          srLoaner.start_date,
+          srLoaner.end_date,
+        );
+        return;
+      },
+      getOverdueRequests: function () {
+        var a = [];
+        var rightNow = new GlideDateTime().getDisplayValue();
+        var oLoaners = new GlideRecord(this.loanerTableName);
+        oLoaners.addQuery("end_date", "<=", rightNow);
+        oLoaners.addQuery("state", 17);
+        oLoaners.query();
+        while (oLoaners.next()) {
+          a.push(oLoaners.getUniqueValue());
+        }
+        return a;
+      },
+      timeToRemindOverdue: function (id) {
+        var remindLoaner = new GlideRecord(this.loanerTableName);
+        if (!remindLoaner.get(id)) {
+          gs.error(
+            ">>>ERROR: LoanerUtils: timeToRemindOverdue(): FAILED TO RETRIEVE RECORD",
+          );
+          return false;
+        }
+        var noticeTime = new GlideDateTime();
+        noticeTime.subtract(this.overdueRemindTime);
+        var baseDate =
+          remindLoaner.last_overdue_reminder == ""
+            ? remindLoaner.end_date
+            : remindLoaner.last_overdue_reminder;
+        return baseDate <= noticeTime;
+      },
+      sendOverdueReminder: function (id) {
+        var soLoaner = new GlideRecord(this.loanerTableName);
 
-- **C. Test pickup reminder logic**
-  - Prepare one or more Loaner Request records that meet criteria:
-    - State=`Ready for Pickup`
-    - `Start date` within next `24` hours
-    - `Pick up reminder` is empty
-  - In **ServiceNow Studio**, open **Loaner Item Pick Up** Scheduled Script Execution
-  - Select _Execute Now_
-  - Verify in **System Logs > Events**:
-    - Pickup event generated for expected Loaner Requests
-  - Verify in **System Logs > Emails**:
-    - Pickup reminder email sent
-  - Open affected Loaner Request record(s)
-  - Verify:
-    - `Pick up reminder` populated with current date/time
+        if (!soLoaner.get(id)) {
+          gs.error(
+            ">>>ERROR: LoanerUtils: setLastOverdueReminder(): FAILED TO RETRIEVE RECORD",
+          );
+          return;
+        }
+        ++soLoaner.overdue_count;
+        soLoaner.last_overdue_reminder = new GlideDateTime().getDisplayValue();
+        soLoaner.update();
+        gs.eventQueue(
+          this.overdueEvent,
+          soLoaner,
+          soLoaner.start_date,
+          soLoaner.end_date,
+        );
+        return;
+      },
+      type: "LoanerUtils",
+    };
+    ```
 
-- **D. Extend the form for return and overdue reminders**
-  - In **ServiceNow Studio**, open **Form > Loaner Request** in **Default** view
-  - Add a new section:
-    - Section name=`Reminders`
-    - Layout=`Two columns`
-  - Create and add fields to the `Reminders` section:
-    - Column label=`Return reminder`
-    - Column name=`return_reminder`
-    - Type=`Date/Time`
-    - Column label=`Overdue reminder`
-    - Column name=`last_overdue_reminder`
-    - Type=`Date/Time`
-    - Column label=`Overdue count`
-    - Column name=`overdue_count`
-    - Type=`Integer`
-  - Move existing field:
-    - `Pick up reminder` into `Reminders` section
-  - Select _Save_
-
-- **E. Register return and overdue events**
-  - In **ServiceNow Studio**, create Event Registrations using the existing `pickUp` event as the model
-  - Create event:
-    - Suffix=`return`
-    - Table=`Loaner Request`
-    - Fired by=`Scheduled Script Execution` for return reminder job
-    - Description=Reminder email for upcoming return
-  - Create event:
-    - Suffix=`overdue`
-    - Table=`Loaner Request`
-    - Fired by=`Scheduled Script Execution` for overdue reminder job
-    - Description=Reminder email for overdue return
-
-- **F. Create Scheduled Script Executions for return and overdue reminders**
-  - Use **Loaner Item Pick Up** Scheduled Script Execution as the model
-  - Create scheduled job for return reminders:
-    - Determine Loaner Requests with `End date` within reminder window
-    - Generate `return` event
-    - Update `Return reminder` field with reminder sent date/time
-  - Create scheduled job for overdue reminders:
-    - Determine overdue Loaner Requests
-    - Generate `overdue` event
-    - Update `Overdue reminder` field with reminder sent date/time
-    - Increment `Overdue count`
-  - Use `LoanerUtils` functions where applicable
-  - Save and test each job
-
-- **G. Create email notifications for return and overdue reminders**
-  - Use **Loaner Item Pick Up** notification as the model
-  - Create notification for event=`<scope>.return`
-    - Table=`Loaner Request`
-    - Recipient=`Requested for`
-    - Subject/body reflect upcoming return reminder
-  - Create notification for event=`<scope>.overdue`
-    - Table=`Loaner Request`
-    - Recipient=`Requested for`
-    - Subject/body reflect overdue reminder
-  - Preview and test both notifications
-  - Verify field values resolve correctly in email content
-
-- **H. Test return and overdue reminder flows**
-  - Create or modify Loaner Request records to meet return reminder criteria
-  - Execute return reminder scheduled job
-  - Verify:
-    - `return` event created
-    - email sent
-    - `Return reminder` field populated
-  - Create or modify Loaner Request records to meet overdue reminder criteria
-  - Execute overdue reminder scheduled job
-  - Verify:
-    - `overdue` event created
-    - email sent
-    - `Overdue reminder` field populated
-    - `Overdue count` incremented
-  - Debug and re-test as needed
-
-- **I. Complete the update set**
-  - In **ServiceNow Studio**, close open tabs
-  - Return to main landing page
-  - Select **Deployment**
-  - Open **Update sets** tab
-  - Expand **Application: Loaner Request**
-  - Open update set=`LR-Module 6`
-  - Set:
-    - State=`Complete`
-    - Description=`Module 6 labs complete`
-  - Select _Update_
-  - Close the tab
+  - The initializer reads the scoped pickup, return, and overdue properties; pickup methods find ready records without a reminder, stamp the record, and queue the pickup event.
+- **B. Call and test**
+  - Open `Loaner Item Pick Up` Scheduled Script Execution; replace its script with `var lutil = new LoanerUtils(); var plist = lutil.getNullPickupReminders(); for (var i = 0; i < plist.length; i++) { lutil.sendPickupReminder(plist[i]); }` → _Update_.
+  - Create or modify a qualifying pickup request for a notification-enabled user → _Execute Now_; verify **System Logs > Events**, **System Logs > Emails**, and the populated `Pick up reminder` field.
+  - Optional: commit changes with `Loaner Request application with module 6 labs completed.`
+- **C. Return and overdue challenge (optional)**
+  - On the Default Loaner Request form, create a two-column `Reminders` section. Add `Return reminder` (`return_reminder`, `Date/Time`), `Last overdue reminder` (`last_overdue_reminder`, `Date/Time`), and `Overdue count` (`overdue_count`, `Integer`); move `Pick up reminder` there → _Save_.
+  - Studio → _Create_ → `File` → `Server Development > Event Registration`; create each suffix `return` and `overdue` on `Table = Loaner Request`, using a description and `Fired by` value identifying the corresponding scheduled job. Their fully qualified event names use the application scope.
+  - Create an active `Scheduled Script Execution` named `Loaner Return Reminder`, `Run = Periodically`, `Repeat Interval = 1 hour`; use the following example → _Submit_:
+    ```javascript
+    var utils = new LoanerUtils();
+    var ids = utils.getNullReturnReminders();
+    for (var i = 0; i < ids.length; i++) {
+      utils.sendReturnReminder(ids[i]);
+    }
+    ```
+  - Create another active hourly `Scheduled Script Execution` named `Loaner Overdue Reminder`; use the following example → _Submit_. The helper checks the configured repeat interval before queuing an overdue reminder:
+    ```javascript
+    var utils = new LoanerUtils();
+    var ids = utils.getOverdueRequests();
+    for (var i = 0; i < ids.length; i++) {
+      if (utils.timeToRemindOverdue(ids[i])) {
+        utils.sendOverdueReminder(ids[i]);
+      }
+    }
+    ```
+  - Create an active `Notification` for each event on `Table = Loaner Request`; select `Send when = Event is fired`, choose the matching scoped `return` or `overdue` event, and add `Requested for` under `Users/Groups in fields`. Supply subjects and messages identifying `${number}`, `${item_type}`, and `${end_date}`; _Submit_. These names and hourly schedules are a concrete example for the guide's open-ended challenge.
+  - Test a notification-enabled requester with `State = Checked Out`, an end date within `return.remindtime`, and an empty `Return reminder`; _Execute Now_ on `Loaner Return Reminder` and verify the record, **System Logs > Events**, and **System Logs > Emails**. For overdue, use a past end date and a blank or sufficiently old `Last overdue reminder`; execute the overdue job and verify the timestamp, count, event, and email. Re-run before the interval expires and confirm no additional overdue reminder is queued.
 
 ### Lab 7.1.1 - Importing records from a spreadsheet
 
-🎯 **Goal**: Import data from an Excel spreadsheet into a new table using Import Sets and Transform Maps.
+🎯 **Goal**: Load spreadsheet rows into a new Password Vault table through an import set.
 
-- **A. Create an update set**
-  - In **ServiceNow Studio**, open **Apps > Loaner Request**
-  - Open the **Update set** widget
-  - Select _+ New_
-  - Name=`LR-Module 7`
-  - Select _Save_
-  - Select _Apply_
-
-- **B. Download and prepare source data**
-  - Navigate to **All > Self-Service > Knowledge**
-  - Open **ADF Knowledge Base**
-  - Download `Passwords` Excel file
-  - Open `passwords.xlsx`
-  - Review data (Asset tags and Passwords)
-
-- **C. Prepare related CMDB records**
-  - Set scope=`Global`
-  - Navigate to **Configuration > Base Items > Computers**
-  - Filter:
-    - Asset tag `is one of` `<paste asset tags from Excel>`
-  - Update records:
-    - Modify `Name` (e.g., prefix with `LNR`)
-  - Save changes
-
-- **D. Create Password Vault table**
-  - Navigate to **System Definition > Tables**
-  - Select _New_
-  - Configure:
-    - Label=`Password Vault`
-    - Name=`u_password_vault`
-    - Create module=`true`
-    - Create mobile module=`false`
-    - Add module to menu=`Create New`
-    - New menu name=`Password Vault`
-  - In **Controls** tab:
-    - Create access controls=`true`
-    - User role=`admin`
-  - In **Application Access**:
-    - Accessible from=`All application scopes`
-    - Can read=`true`
-    - Allow access via web services=`true`
-  - Select _Save_
-  - In **Columns**:
-    - Add field:
-      - Column label=`Password`
-      - Type=`String`
-    - Add field:
-      - Column label=`Asset`
-      - Type=`String`
-  - Select _Update_
-
-- **E. Load data via Import Set**
-  - Navigate to **System Import Sets > Load Data**
-  - Configure:
-    - Import set table=`Create table`
-    - Label=`Password Import File`
-    - Table name=`u_password_import_file`
-    - Source=`File`
-    - File=`passwords.xlsx`
-  - Select _Submit_
-
-- **F. Create Transform Map**
-  - Select _Create transform map_
-  - Configure:
-    - Name=`Password Transform Map`
-    - Source table=`Password Import File`
-    - Active=`true`
-    - Run business rules=`false`
-    - Target table=`Password Vault`
-  - Select _Save_
-  - Select _Auto Map Matching Fields_
-  - Verify field mappings:
-    - Ensure `Password` → `Password`
-    - Ensure `Asset` → `Asset`
-  - Correct mappings if needed
-
-- **G. Transform data**
-  - Select _Transform_
-  - Select _Transform_ again to execute
-
-- **H. Validate import**
-  - Open Import Set record (`ISET...`)
-  - Review **Import Set Rows**
-  - Navigate to **Password Vault > Password Vaults**
-  - Verify:
-    - Records created
-    - Asset and Password values populated correctly
+- **A. Prepare source and table**
+  - Switch to `Global` scope. Open **Configuration > Base Items > Computers**; choose a disposable test computer, prefix its name with `LNR`, and record its unique `Asset tag`. If needed, create a test computer with `Name = LNR Test Laptop` and `Asset tag = LNR-TEST-001`.
+  - Create `passwords.xlsx` with column headers `Asset` and `Password`; add one row containing the test computer’s exact asset tag and `TRAINING-ONLY-NOT-A-SECRET`. Save locally. Use fictitious values only.
+  - Open **System Definition > Tables** → _New_; set `Label = Password Vault`, `Name = u_password_vault`, `Create module = selected`, `Create mobile module = cleared`, `Add module to menu = -- Create New --`, `New menu name = Password Vault`.
+  - `Controls`: `Create access controls = selected`, `User role = admin`. `Application Access`: `Accessible from = All application scopes`, `Can read = selected`, `Allow access to this table via web services = selected` → _Save_.
+  - On `Columns`, add `Password` (`String`) and `Asset` (`String`) → _Update_.
+- **B. Load and transform**
+  - Open **System Import Sets > Load Data**; `Import set table = Create table`, `Label = Password Import File`, `Table Name = u_password_import_file`, `Source of the import = File`, `File = passwords.xlsx` → _Submit_.
+  - _Create transform map_: `Name = Password Transform Map`, `Source Table = Password Import File [u_password_import_file]`, `Target Table = Password Vault [u_password_vault]`, `Active = selected`, `Run business rules = cleared` → _Save_.
+  - _Auto Map Matching Fields_ → verify `Field Maps` → _Transform_ → _Transform_. Open the resulting `ISET...` import set and inspect `Import Set Rows`; verify target records under **Password Vault > Password Vaults**.
 
 ### Lab 7.2.1 - Web service consumer
 
-🎯 **Goal**: Configure the Loaner Request application as a web service consumer to retrieve passwords via REST and include them in email notifications.
+🎯 **Goal**: Exercise a REST consumer and provider using the training instance and retrieve a matching vault record.
 
-- **A. Prepare web service scenario**
-  - Consumer: Loaner Request app sends `asset_tag`
-  - Provider: Password Vault returns `u_password`
-  - Same instance used as both consumer and provider
-  - Data source: `u_password_vault` table
+- **A. Explore the provider**
+  - Complete Lab 7.1.1 using only the fictitious value `TRAINING-ONLY-NOT-A-SECRET`. In `Global` scope, open **System Web Services > REST > REST API Explorer** → _Explore_ if prompted → `Retrieve records from a table (GET)`.
+  - Set `tableName = Password Vault (u_password_vault)`, `sysparm_query = u_asset=<test asset tag>`, `sysparm_fields = u_password`, and response format `application/json` → _Send_. Verify status `200` and the dummy value.
+- **B. Configure authentication**
+  - With `web_service_admin`, open **System Web Services > REST > REST Message** → _New_. Set `Name = Training vault lookup`, `Endpoint = https://<YOUR_TRAINING_INSTANCE_HOST>/api/now/table/u_password_vault`, and `Authentication type = Basic`.
+  - At `Basic auth profile`, use the reference lookup → _New_. Set `Name = Training vault profile`, and enter a disposable training account and password authorized to read the admin-protected vault → _Submit_. Select the profile on the REST message and _Submit_. Open the profile and use Form Header → _Copy sys_id_. This exercise uses an admin-protected sample table; use a least-privilege integration account and appropriate ACLs in real integrations.
+- **C. Create and test a consumer**
+  - In `Loaner Request` scope, Studio → _Create_ → `File` → `Server Development > Business Rule`. Set `Name = Retrieved Credentials`, `Table = Loaner Request`, `Active = selected`, `Advanced = selected`, `When = async`, `Insert = selected`, `Update = selected`.
+  - Set `Script` below, replacing the host and profile sys*id → \_Submit*. This adaptation uses the authentication profile rather than embedding a password and logs only the presence of the fictitious record:
+    ```javascript
+    (function executeRule(current, previous) {
+      if (current.getValue("item_type") != "cmdb_ci_computer") return;
+      var ci = current.cmdb_ci.getRefRecord();
+      if (!ci.isValidRecord() || !ci.getValue("asset_tag")) return;
+      var request = new sn_ws.RESTMessageV2();
+      request.setEndpoint(
+        "https://<YOUR_TRAINING_INSTANCE_HOST>/api/now/table/u_password_vault?sysparm_query=" +
+          encodeURIComponent("u_asset=" + ci.getValue("asset_tag")) +
+          "&sysparm_fields=u_password&sysparm_limit=1",
+      );
+      request.setHttpMethod("GET");
+      request.setAuthenticationProfile("basic", "<BASIC_AUTH_PROFILE_SYS_ID>");
+      request.setRequestHeader("Accept", "application/json");
+      var response = request.execute();
+      if (response.getStatusCode() != 200) {
+        gs.error(
+          "Training vault lookup failed: HTTP " + response.getStatusCode(),
+        );
+        return;
+      }
+      var result = JSON.parse(response.getBody()).result;
+      gs.info("Training vault record found: " + (result.length > 0));
+    })(current, previous);
+    ```
+  - In **Loaner Request > Open**, select `State = Ready for Pickup`, `Item type = Laptop`, and the `LNR` test computer from Lab 7.1.1 → _Update_. Inspect **System Logs > System Log > Application Logs** for `Training vault record found: true`.
+- **D. Test email integration and clean up**
+  - Open notification `Loaner Item Pick Up` → `What it will contain > Message HTML`; append the following, replacing the host and profile sys*id → \_Save*. If prompted, allow conversion to a Notification Email Script. It prints the fictitious value from Lab 7.1.1; never use a real secret here:
+    ```html
+    <mail_script>
+    var ci = current.cmdb_ci.getRefRecord();
+    if (current.getValue('item_type') == 'cmdb_ci_computer' && ci.isValidRecord()) {
+        var request = new sn_ws.RESTMessageV2();
+        request.setEndpoint('https://<YOUR_TRAINING_INSTANCE_HOST>/api/now/table/u_password_vault?sysparm_query=' +
+            encodeURIComponent('u_asset=' + ci.getValue('asset_tag')) + '&sysparm_fields=u_password&sysparm_limit=1');
+        request.setHttpMethod('GET');
+        request.setAuthenticationProfile('basic', '<BASIC_AUTH_PROFILE_SYS_ID>');
+        request.setRequestHeader('Accept', 'application/json');
+        var response = request.execute();
+        if (response.getStatusCode() == 200) {
+            var result = JSON.parse(response.getBody()).result;
+            if (result.length && result[0].u_password == 'TRAINING-ONLY-NOT-A-SECRET')
+                template.print('Training value: ' + result[0].u_password);
+        }
+    }
+    </mail_script>
+    ```
+  - Use a qualifying pickup record with the test laptop, empty reminder, and start date within 24 hours; run the `Loaner Item Pick Up` scheduled job with _Execute Now_. Inspect **System Mailboxes > Outbound > Outbox** → _Preview Email_ and verify `Training value: TRAINING-ONLY-NOT-A-SECRET`.
+  - Deactivate the `Retrieved Credentials` Business Rule, remove the added mail script or reference from the notification and delete its generated Notification Email Script, and remove the temporary REST message and authentication profile when no longer needed. Remove test output according to instance policy; rotate any credentials inadvertently exposed in logs, email, or script.
 
-- **B. Configure REST API (producer test)**
-  - Navigate to **System Web Services > REST > REST API Explorer**
-  - Select _Retrieve records from a table (GET)_
-  - Configure Path:
-    - tableName=`u_password_vault`
-  - Configure Query:
-    - sysparm_query=`u_asset=<asset_tag_value>`
-    - sysparm_fields=`u_password`
-  - Configure Header:
-    - Response format=`application/json`
+### Lab 7.2.2 - Publish the updated application
 
-- **C. Test REST API**
-  - Select _Send_
-  - Verify:
-    - HTTP Status=`200`
-    - Correct `u_password` returned
-  - Debug if needed
+🎯 **Goal**: Package application changes and selected demo data for installation or upgrade.
 
-- **D. Create async Business Rule for REST call**
-  - In **ServiceNow Studio**, select _Create_ > _File_
-  - Select **Server Development** > `Business Rule`
-  - Configure:
-    - Name=`Retrieved Credentials`
-    - Table=`Loaner Request`
-    - Active=`true`
-    - Advanced=`true`
-  - In **When to run**:
-    - When=`async`
-    - Insert=`true`
-    - Update=`true`
-  - In **Advanced Script**:
-    - Paste RESTMessageV2 snippet from REST API Explorer
-    - Modify script:
-      - Add condition:
-        - `if (current.item_type == "cmdb_ci_computer") { ... }`
-      - Replace hardcoded asset tag:
-        - Use `current.cmdb_ci.asset_tag`
-      - Update credentials:
-        - Replace password with instance login password
-      - Replace `gs.log` with `gs.info`
-      - Parse response:
-        - `var obj = JSON.parse(response.getBody());`
-        - `var myPass = obj.result[0].u_password;`
-        - `gs.info('u_password: ' + myPass);`
-  - Select _Save_
-
-- **E. Test Business Rule**
-  - Navigate to **Loaner Request > Open**
-  - Open record and set:
-    - State=`Ready for Pickup`
-    - Item type=`Laptop`
-    - Configuration item=`LNR laptop`
-  - Select _Update_
-  - Navigate to **System Logs > Application Logs**
-  - Verify password logged
-  - Set Business Rule Active=`false`
-  - Select _Save_
-
-- **F. Add script to Email Notification**
-  - In **ServiceNow Studio**, open **Loaner Item Pick Up Notification**
-  - In **Message HTML**:
-    - Add:
-      - `<mail_script>`
-      - Paste script body (no wrapper code)
-      - `</mail_script>`
-  - Modify script:
-    - Remove raw response logging
-    - Replace `gs.info` with `template.print`
-  - Select _Save_
-  - Confirm move to Email Scripts
-
-- **G. Test email with password**
-  - Ensure record meets criteria:
-    - State=`Ready for Pickup`
-    - Item type=`Laptop`
-    - Start date within leadtime
-    - `Pick up reminder` empty
-    - Configuration item=`LNR laptop`
-  - In **ServiceNow Studio**, execute:
-    - **Scheduled Script Execution > Loaner Item Pick Up**
-    - Select _Execute Now_
-  - Navigate to **System Mailboxes > Outbound > Outbox**
-  - Open email
-  - Select _Preview Email_
-  - Verify:
-    - Password included
-    - Fields resolved correctly
-
-- **H. Complete update set**
-  - Switch scope=`Loaner Request`
-  - In **ServiceNow Studio**, go to **Deployment > Update sets**
-  - Expand **Application: Loaner Request**
-  - Open update set=`LR-Module 7`
-  - Set:
-    - State=`Complete`
-    - Description=`Module 7 labs complete`
-  - Select _Update_
-  - Close tab
+- **A. Capture data and publish**
+  - Optional: Studio app details → **Source control > Commit changes** → select files → _Continue_ → comment `Loaner Request application with module 7 labs completed.` → _Commit files_ → _Close_.
+  - In the main instance, select `Loaner Request` scope → **Loaner Request > All** → Number column options → _Create Application Files_ → `Load When = New Install and Upgrades` → _OK_.
+  - In Studio app details, _More Options_ → _Publish_ → review → _Publish_ → _Done_.
+- **B. Update a destination instance**
+  - On the second instance, open **System Applications > My Company Applications > Installed**; refresh, choose the published version → _Update_ → _Install_ → _Close_. If prompted to map applications with custom tables, select _Install_ → _Close_.
+  - Verify the version and demo records in **Loaner Request > All**. This step is reference-only in the single training instance.
 
 ### Lab 8.1.1 - Automated Test Framework
 
-🎯 **Goal**: Create and execute Automated Test Framework (ATF) tests to validate user access and business rule behavior.
+🎯 **Goal**: Test form access and the start/end date Business Rule using ATF.
 
-- **A. Create an update set**
-  - Verify scope=`Loaner Request`
-  - In **ServiceNow Studio**, open **Apps > Loaner Request**
-  - Open the **Update set** widget
-  - Select _+ New_
-  - Name=`LR-Module 8`
-  - Select _Save_
-  - Select _Apply_
+- **A. Enable and create the test**
+  - Verify `Validate Start and End Dates` is active. In `Global` scope, open **Automated Test Framework > Administration > Properties**, enable test/test-suite execution → _Save_; return to `Loaner Request` scope.
+  - In Studio, create `Test`: `Name = My First Loaner Request ATF Test`, `Application = Loaner Request`, `Active = selected` → _Save_.
+- **B. Add ordered test steps**
+  - `1`: _Add Test Step_ → `Create a User`; `Active = selected`, `Groups = Loaner Request Admins`, `Impersonate this user = selected` → _Submit_.
+  - `2`: `Form > Open a New Form`; `Active = selected`, `Form UI = Standard UI`, `Table = Loaner Request` → _Submit_.
+  - `3`: `Form > Set Field Values`; same UI and table; `Requested for = Abel Tuter`, `Start date = today`, `End date = before today` → _Submit_.
+  - `4`: `Form > Submit a Form`; `Form UI = Standard UI`, `Assert type = Form submitted to server` → _Submit_.
+- **C. Run failing and passing cases**
+  - _Run Test_ → _Run Test_; observe the Client Test Runner, then _Go to Result_ → _Manage Attachments_ to inspect the failure screenshot. The invalid date should prevent submission.
+  - If an unrelated client error blocks the exercise, the guide provides `Actions on selected rows > Add all client errors to ignored list`; use only after reviewing the errors and understanding the impact.
+  - Edit step `3`: `Requested for = Abraham Lincoln`, `Start date = today`, `End date = after today` → _Update_; run again and verify all steps pass.
+  - Optional: commit changes with `Loaner Request application with module 8 labs completed.`
 
-- **B. Enable ATF execution**
-  - Switch scope=`Global`
-  - Navigate to **Automated Test Framework > Administration > Properties**
-  - Enable test/test suite execution
-  - Select _Save_
+### Lab 9.1.1 - Service Catalog user interface
 
-- **C. Create ATF test**
-  - Switch scope=`Loaner Request`
-  - Navigate to **Automated Test Framework > Tests**
-  - Select _New_
-  - Configure:
-    - Name=`My First Loaner Request ATF Test`
-    - Application=`Loaner Request`
-    - Active=`true`
-  - Select _Save_
+🎯 **Goal**: Replace the new-request form entry point with a Service Catalog record producer.
 
-- **D. Add Create User and Open Form steps**
-  - Select _Add Test Step_
-  - Choose `Create a User`
-    - Execution order=`1`
-    - Groups=`Loaner Request Admins`
-    - Impersonate=`true`
-    - Active=`true`
-  - Select _Submit_
-  - Add Test Step:
-    - Category=`Form`
-    - Step=`Open a New Form`
-    - Execution order=`2`
-    - Form UI=`Standard UI`
-    - Table=`Loaner Request`
-    - Active=`true`
-  - Select _Submit_
+- **A. Create the producer**
+  - In Studio, **Data > Table > Loaner Request** → _Additional Actions_ → `Advanced view` → _Add to Service Catalog_.
+  - Set `Name = Loaner Request`, `Short description = Submit a New Loaner Request`, `Category = Can We Help You?`; select `Requested for`, `Item type`, `Start date`, `End date`, `Depot`, `Other`, `Location to be used`, and `Description` → _Save and Open_.
+  - In the main instance, open **Self-Service > Service Catalog > Can We Help You? > Loaner Request** and inspect the initial form.
+- **B. Configure Catalog Builder**
+  - In Studio, **User Interface > Record Producer > Loaner Request** → _Edit in Catalog Builder_. Set item name and short description as above; set description to `Please enter your reservation request. When your item has been requested, someone from the Service Desk will contact you to discuss special requirements, options or conflicts, and to schedule a pick-up time and location.`
+  - `Destination`: `Record submission table = Loaner Request`; `Location`: `Catalogs = Service Catalog`, `Categories = Can We Help You?`, `Topics = empty`.
+  - Under `Questions`, edit and save labels: `Requested for` → `Who is this reservation for?`; `Item type` → `What would you like to reserve?`; `Start date` → `When will you start using the equipment?`; `End date` → `When will you return the equipment?`; `Depot` → `Where would you like to pick up this item?`; `Other` → `Specify other location.`; `Location to be used` → `Where will you use this equipment (country)?`; `Description` → `Please provide any special needs or comments here:`.
+  - Insert `Two column container`: `Title = Request details`, `Display title = cleared` → _Submit_. Move it above the questions. Arrange left column `Requested for`, `Start date`, `Depot`, `Location to be used`; right column `Item type`, `End date`, `Other`; leave `Description` outside.
+  - Edit `Start date` → `Annotation` → select `Show instructions`; enter `The start date for the request must be after today.` → _Save_ → _Review and submit_ → _Submit_. Preview and verify the help text.
+- **C. Script, link, and test**
+  - In the main instance, submit the producer and inspect the created Loaner Request. In Studio, open the producer → _Edit in Catalog Builder_ → `Questions` → edit the `Depot` question → inspect the stored value of its `Other` choice. Use that exact value in the comparison below; the example uses `other`.
+  - Return to the producer → `What it will contain > Script`; append the following adapted example below the default script → _Update_:
+    ```javascript
+    current.item_type = producer.item_type;
+    current.depot = producer.depot;
+    if (String(producer.depot) == "other") {
+      current.other = producer.other;
+    }
+    current.short_description =
+      "Reservation: " +
+      current.item_type.getDisplayValue() +
+      " from " +
+      current.depot.getDisplayValue();
+    current.state = 13;
+    ```
+  - Submit another producer request; verify the short description and `Requested` state.
+  - In **User Interface > Module > Create New**, set `Link type = URL (from Arguments)` and `Arguments = com.glideapp.servicecatalog_cat_item_view.do?v=1&sysparm_id=<record producer sys_id>`; obtain the ID from the producer Form Header → _Copy sys_id_.
+  - Refresh the main browser → **Loaner Request > Create New**; verify the producer opens. Test from the `All` menu, since an older favorite may retain its prior target.
 
-- **E. Add Set Field Values step (failure scenario)**
-  - Select _Add Test Step_
-  - Category=`Form`
-  - Step=`Set Field Values`
-  - Configure:
-    - Execution order=`3`
-    - Form UI=`Standard UI`
-    - Table=`Loaner Request`
-    - Active=`true`
-    - Field values:
-      - Requested for=`Abel Tuter`
-      - Start date=`Today`
-      - End date=`Before Today`
-  - Select _Submit_
+### Lab 9.1.2 - Enhancing the Service Catalog user interface
 
-- **F. Add Submit Form step**
-  - Select _Add Test Step_
-  - Category=`Form`
-  - Step=`Submit a Form`
-  - Configure:
-    - Execution order=`4`
-    - Form UI=`Standard UI`
-    - Assert type=`Form submitted to server`
-    - Active=`true`
-  - Select _Submit_
+🎯 **Goal**: Show and require the Other catalog variable only when the selected depot is Other.
 
-- **G. Run failing test**
-  - Select _Run Test_
-  - Select _Run Test_
-  - Observe Client Test Runner window
-  - Return to main window
-  - Select _Go to Result_
-  - Review failure:
-    - Download screenshot via _Manage Attachments_
-  - Expected result:
-    - Test fails due to invalid date logic (End < Start)
-  - Optional:
-    - Ignore client errors:
-      - Select failed step
-      - Actions > _Add all client errors to ignored list_
-      - Update
+- **A. Create behavior and test**
+  - Studio → **User Interface > Record Producer > Loaner Request** → _Edit in Catalog Builder_ → `UI Policy` → _Add new behavior_.
+  - `Details`: `Active = selected`, `Applies to = Loaner Request`, `Short description = Only show ‘Other’ field if Depot value is ‘Other’`. `Conditions`: `depot is Other`.
+  - `Actions` → _Add new action_: `Variable name = other`, `Mandatory = True`, `Read only = Leave alone`, `Visible = True`, `Value action = Leave alone`, `Field message type = None` → _Save_ → _Add behavior_ → _Review and submit_ → _Submit_.
+  - Open **Self-Service > Service Catalog > Can We Help You? > Loaner Request**; set the depot question to `Other` and verify `Specify other location` is visible and mandatory. Select a different depot and verify the variable becomes hidden and is no longer mandatory; switch back and verify both settings return.
 
-- **H. Modify test for passing scenario**
-  - Open test
-  - Edit **Set Field Values** step:
-    - Requested for=`Abraham Lincoln`
-    - Start date=`Today`
-    - End date=`After Today`
-  - Select _Update_
-  - Select _Run Test_ > _Run Test_
-  - Observe execution in Client Test Runner
-  - Verify:
-    - All steps pass
+### Lab 9.1.3 - Publish the Loaner Request app to an update set (optional)
 
-- **I. Complete update set**
-  - In **ServiceNow Studio**, navigate to **Deployment > Update sets**
-  - Expand **Application: Loaner Request**
-  - Open update set=`LR-Module 8`
-  - Set:
-    - State=`Complete`
-    - Description=`Module 8 labs complete`
-  - Select _Update_
-  - Close tab
+🎯 **Goal**: Commit and package the completed catalog-enhanced application.
+
+- **A. Commit and publish**
+  - If the application was connected to Git in Lab 3.4.1, optionally open Studio app details → **Source control > Commit changes** → review files → _Continue_ → `Commit comment = Loaner Request application with module 9.1 labs completed.` → _Commit files_ → _Close_.
+  - App details → _More Options_ → _Settings_ → _Publish to Update Set_; update the version and set `Description = Loaner Request application` → _Publish_ → _Done_. Review `Customer Updates`.
+  - Optional: use the update set's _Export to XML_ related link to retain a package for a personal developer instance.
+
+### Lab 9.2.1 - Outbound REST message (optional)
+
+🎯 **Goal**: Geocode requestor locations through an outbound REST message and display them on a map.
+
+- **A. Obtain the service key**
+  - Open `https://www.geoapify.com/pricing`, create a free account and project `Map page`; select `Geocoding API`, review the request parameters, and copy the project's API key.
+- **B. Configure the REST message**
+  - Studio → _Create_ → `File` → `Integrations (Outbound) > REST Message`; set `Name = Get Lat Long`, `Accessible from = This application scope only`, `Description = Retrieve Latitude and Longitude from Geoapify.`, `Endpoint = https://api.geoapify.com/v1/geocode/search` → _Submit_.
+  - Open `Default GET` → `HTTP Request > HTTP Query Parameters`: add `apiKey = <Geoapify API key>`, `Order = 100`; add `text = ${text}`, `Order = 200` → _Update_.
+  - On `Variable Substitutions`, _New_: `Name = text`, `Test value = Solana Beach, CA`, `Method = Default GET` → _Submit_; refresh the list → _Test_. Verify HTTP `200`, returned latitude/longitude, and expected accuracy.
+- **C. Create the map and module**
+  - Studio → _Create_ → `File` → `User Interface > Map Page`; set `Suffix = Requested for Locations`, `Type = Terrain`. Paste this adaptation of the course example, changing the scoped REST Message name and table name if needed → _Submit_. The checks skip records without a matching country or usable geocoding result:
+    ```javascript
+    // Let's go get all the active Loaner Requests where the requestor has a _city and country_ in their user record
+    var loaners = new GlideRecord("x_cdltd_loaner_r_0_loaner_request");
+    loaners.addEncodedQuery(
+      "active=true^requested_for.cityISNOTEMPTY^requested_for.countryISNOTEMPTY",
+    );
+    loaners.orderBy("number");
+    loaners.query();
+    // Now, loop through these results...
+    while (loaners.next()) {
+      // ...but, within THESE results, let's get the LABEL of the country field (via the sys_choice table), since our REST provider prefers that.
+      var countrygr = new GlideRecord("sys_choice");
+      countrygr.addQuery("name", "sys_user");
+      countrygr.addQuery("element", "country");
+      countrygr.addQuery("language", "en");
+      countrygr.addQuery("value", loaners.requested_for.country);
+      countrygr.query();
+      if (!countrygr.next()) continue;
+      var query = loaners.requested_for.city + "," + countrygr.label;
+      var r = new sn_ws.RESTMessageV2(
+        "x_cdltd_loaner_r_0.Get Lat Long",
+        "Default GET",
+      );
+      r.setStringParameterNoEscape("text", query);
+      var response = r.execute();
+      if (response.getStatusCode() != 200) continue;
+      var responseBody = response.getBody();
+      // Extract latitude and longitude values from REST Message response in JSON format
+      var responseJSON = JSON.parse(responseBody);
+      if (!responseJSON.features || !responseJSON.features.length) continue;
+      var myLat = responseJSON.features[0].properties.lat;
+      var myLong = responseJSON.features[0].properties.lon;
+      // Plot each 'Requested for' location on a Google map
+      var item = map.addItem(loaners);
+      item.latitude = String(myLat);
+      item.longitude = String(myLong);
+      item.dialog_title = loaners.getDisplayValue();
+      item.icon = "https://maps.google.com/mapfiles/ms/micons/yellow.png";
+      item.icon_width = "32";
+      item.icon_height = "32";
+    }
+    ```
+  - The code parses `features[0].properties.lat` and `.lon` and adds a yellow marker linked to each request.
+  - **Source inconsistency resolved from illustration**: the prose later says `addr`, but both the configured query parameter and completed-script screenshot use `text`; verify your HTTP method uses the same name.
+  - Create `Module`: `Title = Requestor Locations`, `Application Menu = Loaner Request`, `Order = 900`, `Roles = x_cdltd_loaner_r_0.admin`, `Link Type = Map Page`, `Map page = Requested for Locations` → _Submit_.
+- **D. Test**
+  - Ensure at least three active Loaner Requests have a `Requested for` user with city and country code; open **Loaner Request > Admin tools > Requestor Locations**. Verify yellow markers and select one to open its associated request.
+  - Optional: commit with `Loaner Request application with Lab 9.2.1 completed.` and use Lab 9.1.3 to package changes.

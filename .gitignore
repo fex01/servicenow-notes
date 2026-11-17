@@ -1,4 +1,10 @@
 *~
 .DS_Store
 *DiskStation*
+
+# Temporary working files and generated intermediates
+/output/
+
+# Only final course eBooks are tracked as PDFs
 *.pdf
+!/course-ebooks/**/*.pdf
