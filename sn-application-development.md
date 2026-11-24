@@ -339,8 +339,10 @@
   - Add `Start date` (`start_date`) and `End date` (`end_date`): type `Date/Time`, `Mandatory = selected`; place them on the form and _Save_.
   - Add `Item type` (`item_type`, `Choice`); configure `Laptop = cmdb_ci_computer`, `Mobile Phone = cmdb_ci_mobile_device`, `Projector = cmdb_ci_projector`; `Show choices as = Dropdown` → _Apply_ → _Save_. Refresh Studio and set default `cmdb_ci_computer`.
   - Add `Depot` (`depot`, `Choice`) with `New York = ny`, `London = london`, `Buenos Aires = ba`, `Santa Clara = sc`, `Singapore = singapore`, `Sydney = sydney`, and `Other = other`; use `Dropdown` and default `sc` → _Save_.
-  - Switch scope to `Global`; edit inherited `State` choices to `Requested = 13`, `Reserved = 14`, `Deployment Prep = 15`, `Ready for Pickup = 16`, `Checked Out = 17`, `Post Deployment = 18`, and `Closed Complete = 3`. Use `Dropdown`, confirm the override, and _Save_. Switch back to `Loaner Request`; set default `13` → _Save_.
-    - mark other choices as inactive
+  - Switch the application scope to `Global` → _Apply_. In the Loaner Request form, select the inherited `State` field → expand `Choices` → _Edit_.
+    - Configure `Requested = 13`, `Reserved = 14`, `Deployment Prep = 15`, `Ready for Pickup = 16`, `Checked Out = 17`, `Post Deployment = 18`, and `Closed Complete = 3`. delete other choices;
+    - Set `Show choices as = Dropdown` → _Apply_ → confirm the message that this creates an override → _Save_.
+    - Switch the application scope back to `Loaner Request` → _Apply_. Select the `State` field, set `Default value = Requested` (`13`) → _Save_.
   - Add `Location to be used` (`location_to_be_used`, `String`); place above `Depot`. Arrange the top section as left column `Number`, `Requested for`, `Configuration item`, `Assigned to`; right column `State`, `Start date`, `End date`, `Item type`, `Location to be used`, `Depot`; place `Short description` and `Description` full-width below.
   - Add `Log` section: `Additional comments`, `Work notes`, and `Activities (filtered)` formatter. Add a two-column `Statistics` section: left `Opened`, `Updated`, `Closed`; right `Opened by`, `Updated by`, `Closed by`, `Active` → _Save_.
 - **B. Create and test the Self Service view**
@@ -358,9 +360,27 @@
   - In `Advanced settings`, select `Apply to all views`, `On load`, and `Reverse if false`; clear `Inherit`. Set condition `Depot is Other`.
   - Add action `Field name = Other`, `Mandatory = True`, `Visible = True`, `Read only = Leave alone` → _Add UI Policy_ → _Save_.
 - **B. Add and test scripts**
-  - Open **Client Development > UI Policy > Make 'Other' field visible and mandatory** → `Advanced view` → `Script`; select `Run scripts`, `Run scripts in UI type = All`.
-  - Set true script to `function onCondition() { g_form.showFieldMsg('other', 'Where will you pick up the loaner?', 'info'); }`.
-  - Set false script to `function onCondition() { g_form.hideFieldMsg('other'); }` → _Update_.
+  - In the ServiceNow Studio Navigation Sidebar, select the `Loaner Request` app → **Client Development > UI Policy > Make 'Other' field visible and mandatory** → `Advanced view` → `Script`; select `Run scripts`, `Run scripts in UI type = All`.
+  - Set the true script to:
+
+    ```javascript
+    function onCondition() {
+      g_form.showFieldMsg(
+        "other",
+        "Where will you pick up the loaner?",
+        "info",
+      );
+    }
+    ```
+
+  - Set the false script to the following → _Update_:
+
+    ```javascript
+    function onCondition() {
+      g_form.hideFieldMsg("other");
+    }
+    ```
+
   - In a Loaner Request Default view, switch `Depot` to `Other`, away, and back; verify visibility, mandatory state, and exactly one message.
 
 ### Lab 4.2.2 - Scripting
@@ -370,6 +390,7 @@
 - **A. Set item type on change**
   - Studio → _Create_ → `File` → `Client Development` → `Client Script`; set `Name = Set Loaner Item Type`, `Table = Loaner Request`, `UI Type = Desktop`, `Type = onChange`, `Field name = Configuration item`, and `Description = Set Item type field automatically for mobiles.`
   - Replace the default script with the following course example → _Submit_. It uses an asynchronous `g_form.getReference` callback and case-insensitive matching:
+
     ```javascript
     function onChange(control, oldValue, newValue, isLoading, isTemplate) {
       if (isLoading) return;
@@ -404,10 +425,16 @@
     *****/
     }
     ```
+
   - Test a matching configuration item in a Loaner Request and verify the item type and read-only state.
+    - **Recommended approach:** Minimize server lookups; for a CI selected after the form loads, use asynchronous GlideAjax and return only the information needed. This example's `getReference()` callback is asynchronous, but retrieves the referenced record's fields. See [client-side scripting guidance](https://www.servicenow.com/docs/r/yokohama/application-development/scripts/client-script-best-practices.html).
+      - Make the Script Include client callable, restrict access with an ACL, and enforce record and field access in the server-side lookup. Ignore responses for a CI that is no longer selected.
+      - Prefer an authoritative CMDB attribute or class mapping over matching the CI name; enforce required data integrity server-side, since client read-only settings are not security controls.
+
 - **B. Pass location using a display rule**
   - Create `Business Rule`: `Name = Set Scratchpad Values`, `Table = Loaner Request`, `Active = selected`, `Advanced = selected`, `When = display`, `Order = 100`.
   - Set the Business Rule `Script` to the following → _Submit_:
+
     ```javascript
     (function executeRule(current, previous /*null when async*/) {
       g_scratchpad.city = current.requested_for.city;
@@ -416,7 +443,9 @@
       // By writing these values to the scratchpad, a client script can easily fetch them.
     })(current, previous);
     ```
+
   - Create `Client Script`: `Name = Set Loaner Location`, `Table = Loaner Request`, `UI Type = All`, `Type = onLoad`, `Description = Automatically set 'Location to be used' field value based on user location.` Set `Script` to the following → _Submit_:
+
     ```javascript
     function onLoad() {
       // This uses the dotwalking superpowers of the Scratchpad to use the requestor's city & state as the default location to be used. Make sure whomever you use for testing has values in their user record for this!
@@ -441,10 +470,13 @@
       }
     }
     ```
+
   - In `sys_user.list`, add and populate `City` and `Country code` for a test user. In **Loaner Request > All**, add `Requested for` and `Location to be used` through column controls → _Configure_ → _List Layout_. Set a blank-location record's `Requested for` in the list, save, and open the record to verify the location.
+
 - **C. Validate dates**
   - Create `Business Rule`: `Name = Validate Start and End Dates`, `Table = Loaner Request`, `Active = selected`, `Advanced = selected`, `When = before`, `Insert = selected`, `Update = selected`.
   - Set `Script` to the following → _Submit_. For `end_date < start_date`, it displays an error and aborts the transaction:
+
     ```javascript
     (function executeRule(current, previous /*null when async*/) {
       if (current.end_date < current.start_date) {
@@ -456,6 +488,7 @@
       }
     })(current, previous);
     ```
+
   - Create a record with end before start; verify that submission is rejected. Test equal start and end timestamps and verify that they are accepted. Open the Default form's `Policies and rules` to inspect related logic.
 
 ### Lab 4.3.1 - Publish to Update set
@@ -492,11 +525,24 @@
   - In Studio's user menu, _Elevate role_ → select `security_admin` → _Update_.
   - Open **Security > Access Control > x_cdltd_loaner_r_0_loaner_request**; locate the `read` ACL and replace the required user role with `x_cdltd_loaner_r_0.admin` → _Update_. Repeat for `delete`.
   - _Create_ → `File` → `Access Control` → _Continue_; create `Type = record`, `Operation = read`, `Decision type = Allow if`, `Name = Loaner Request / --None--`, `Active = selected`, `Admin overrides = selected`, required role `x_cdltd_loaner_r_0.user`, condition `Requested for is (dynamic) Me` → _Submit_ → verify → _Continue_.
-  - Create another record/read `Allow if` ACL for `Loaner Request / --None--`, with `Active`, `Admin overrides`, and `Advanced` selected; require `x_cdltd_loaner_r_0.user`; set `Advanced Condition` to `current.isNewRecord();` → _Submit_ → verify → _Continue_.
+  - Create another record/read `Allow if` ACL for `Loaner Request / --None--`, with `Active`, `Admin overrides`, and `Advanced` selected; require `x_cdltd_loaner_r_0.user`; set `Advanced Condition` to the following → _Submit_ → verify → _Continue_:
+
+    ```javascript
+    current.isNewRecord();
+    ```
+
   - Confirm the original `create` and `write` ACLs still require the user role. Remove `security_admin` elevation through the user menu.
+
 - **D. Force a view and test**
   - _Create_ → `File` → `View Rule [sysrule_view]`; set `Name = Users see only ESS view`, `Table = Loaner Request`, `Device type = Browser`, `Active = selected`, `Advanced = selected`.
-  - Inside `overrideView()`, use `if (!gs.hasRole('x_cdltd_loaner_r_0.admin')) { answer = 'ess'; }` → _Submit_.
+  - Inside `overrideView()`, use the following → _Submit_:
+
+    ```javascript
+    if (!gs.hasRole("x_cdltd_loaner_r_0.admin")) {
+      answer = "ess";
+    }
+    ```
+
   - Impersonate `Fred Luddy`: verify all modules, all records, create/edit/delete, and all views. Impersonate `Beth Anglin`: verify `Create New` and `Open`, creation, own requested-for records, and Self Service view. Impersonate `Abel Tuter`: verify no application access. End impersonation.
   - Optional: commit changed files with `Loaner Request application with Lab 5.1.1 completed.`
 
@@ -511,6 +557,7 @@
 - **B. Test Global caller access**
   - Studio → _Create_ → `File` → application/scope `Global` → `Scheduled Script Execution`; set `Name = Update LNRs from Global`, `Run = On Demand`.
   - Set `Script` to the following → _Submit_. The query limits the exercise to three non-closed records:
+
     ```javascript
     /*  
     Run this script from Global scope both BEFORE _and_ AFTER 
@@ -530,6 +577,7 @@
     }
     // No dice closing them out? Try checking the "Can update" box on the Loaner Table, then try again!
     ```
+
   - Open Loaner Request app details → _More Options_ → _Settings_ → `Restricted Caller Access Privileges`; execute the scheduled script using _Execute Now_. Refresh the privilege list and **Loaner Request > All**; verify records were not closed while `Can update` was cleared.
   - Return to the table's `Application Access`, select `Can update` → _Update_; _Execute Now_ again. Verify the records change and a write privilege appears.
   - Clear `Can update` → _Update_ to restore the prior setting.
@@ -543,7 +591,8 @@
   - Set `Label = Loaner Task`, `Extends table = Task`, `Create module = selected`, `Create mobile module = cleared`, `Add module to menu = Loaner Request`; on `Controls`, select `Auto-number` and `Create access controls`, and set `User role = x_cdltd_loaner_r_0.admin` → _Submit_. Do not add fields.
 - **B. Create the flow and trigger**
   - _Create_ → `File` → `Automation` → `Flow`; set `Flow name = Loaner Laptop`, `Application = Loaner Request`, `Description = Basic flow for assigning work on a loaner laptop.`, `Protection = --None--`, `Run As = User who initiates session`, and leave `Run with roles` empty → _Build flow_.
-  - _Add a trigger_ → `Record > Created or Updated`; set `Table = Loaner Request`, condition `Item Type is Laptop AND State is Reserved`, `Run Trigger = Once` → _Add Filter_ → _Done_.
+  - In the flow's `Trigger` section, select _Add a trigger_ → `Record > Created or Updated`; set `Table = Loaner Request`. If the condition rows are not visible, select _Add filters_ in the trigger configuration to reveal them.
+  - Under `Condition`, set `Item type is Laptop`, then select _and_ to add `State is Reserved`. Set `Run Trigger = Once` → _Done_. If both condition rows are already visible, no additional _Add filters_ action is needed.
 - **C. Add actions**
   - Add `ServiceNow Core > Wait For Condition`: `Record = Trigger > Loaner Request Record`, `Condition = State is Deployment Prep`.
   - Add `Create Task`: `Table = Loaner Task`, `Parent = Loaner Request Record`, `Priority = 3 - Moderate`, `Short description = Prepare the laptop for deployment.`, `Wait = selected`, annotation `Deployment Prep`.
@@ -555,7 +604,7 @@
   - Switch back to `Loaner Request`; verify the default is `Open` (`1`) → _Save_.
 - **E. Test and activate**
   - On a Loaner Request form, Form Header → **Configure > Related Lists** → add `Loaner Task --> Parent` → _Save_.
-  - In the flow, _Test_ → create a request with `Requested for = <user>`, `State = Reserved`, valid start/end dates, and `Item type = Laptop` → _Submit_ → select the record → _Run Test_.
+  - In the flow, _Test_ → create a request with `Requested for = Abel Tuter`, `State = Reserved`, valid start/end dates, and `Item type = Laptop` → _Submit_ → select the record → _Run Test_.
   - In execution details, open the request and set `State = Deployment Prep`; close the generated task as `Closed Complete`; set request state to `Post Deployment`; close the second task; refresh execution details and confirm the request reaches `Closed Complete`.
   - After a successful test, _Activate_ → confirm _Activate_.
 - **F. Set Reserved automatically**
@@ -587,6 +636,7 @@
   - _Create_ → `File` → `Server Development > Event Registration`; set `Suffix = pickUp`, `Table = Loaner Request`, `Fired by = Scheduled Script Execution: Loaner Item Pick Up`, `Description = Used to trigger an email to remind a user to pick up their loaner item.` → _Submit_.
 - **B. Create and test the scheduled script**
   - Create `Server Development > Scheduled Script Execution`: `Name = Loaner Item Pick Up`, `Active = selected`, `Run = Periodically`, `Repeat Interval = 1 hour`; set `Script` to the following → _Submit_:
+
     ```javascript
     var pickUpLeadTime =
       gs.getProperty("x_cdltd_loaner_r_0.pickup.leadtime", 24) * 60 * 60 * 1000;
@@ -616,8 +666,10 @@
       // fire the event to trigger the email notification!
     }
     ```
+
   - The script reads `x_cdltd_loaner_r_0.pickup.leadtime` (default `24` hours), finds `state = 16`, empty `pick_up_reminder`, and `start_date` within the lead time; it stamps the reminder and queues `x_cdltd_loaner_r_0.pickUp`.
   - Create or update qualifying records → _Execute Now_ → **System Logs > Events**; filter `Name contains loaner` and verify the events.
+
 - **C. Create and test the notification**
   - Create `Notification [sysevent_email_action]`: `Name = Loaner Item Pick Up`, `Table = Loaner Request`, `Category = Targeted Communication`, `Active = selected`.
   - `When to send`: `Send when = Event is fired`, `Event name = x_cdltd_loaner_r_0.pickUp`. In `Advanced view`, `Who will receive`: move `Requested for` to `Users/Groups in fields`.
@@ -778,14 +830,26 @@
     ```
 
   - The initializer reads the scoped pickup, return, and overdue properties; pickup methods find ready records without a reminder, stamp the record, and queue the pickup event.
+
 - **B. Call and test**
-  - Open `Loaner Item Pick Up` Scheduled Script Execution; replace its script with `var lutil = new LoanerUtils(); var plist = lutil.getNullPickupReminders(); for (var i = 0; i < plist.length; i++) { lutil.sendPickupReminder(plist[i]); }` → _Update_.
+  - Open `Loaner Item Pick Up` Scheduled Script Execution; replace its script with the following → _Update_:
+
+    ```javascript
+    var lutil = new LoanerUtils();
+    var plist = lutil.getNullPickupReminders();
+    for (var i = 0; i < plist.length; i++) {
+      lutil.sendPickupReminder(plist[i]);
+    }
+    ```
+
   - Create or modify a qualifying pickup request for a notification-enabled user → _Execute Now_; verify **System Logs > Events**, **System Logs > Emails**, and the populated `Pick up reminder` field.
   - Optional: commit changes with `Loaner Request application with module 6 labs completed.`
+
 - **C. Return and overdue challenge (optional)**
   - On the Default Loaner Request form, create a two-column `Reminders` section. Add `Return reminder` (`return_reminder`, `Date/Time`), `Last overdue reminder` (`last_overdue_reminder`, `Date/Time`), and `Overdue count` (`overdue_count`, `Integer`); move `Pick up reminder` there → _Save_.
   - Studio → _Create_ → `File` → `Server Development > Event Registration`; create each suffix `return` and `overdue` on `Table = Loaner Request`, using a description and `Fired by` value identifying the corresponding scheduled job. Their fully qualified event names use the application scope.
   - Create an active `Scheduled Script Execution` named `Loaner Return Reminder`, `Run = Periodically`, `Repeat Interval = 1 hour`; use the following example → _Submit_:
+
     ```javascript
     var utils = new LoanerUtils();
     var ids = utils.getNullReturnReminders();
@@ -793,7 +857,9 @@
       utils.sendReturnReminder(ids[i]);
     }
     ```
+
   - Create another active hourly `Scheduled Script Execution` named `Loaner Overdue Reminder`; use the following example → _Submit_. The helper checks the configured repeat interval before queuing an overdue reminder:
+
     ```javascript
     var utils = new LoanerUtils();
     var ids = utils.getOverdueRequests();
@@ -803,6 +869,7 @@
       }
     }
     ```
+
   - Create an active `Notification` for each event on `Table = Loaner Request`; select `Send when = Event is fired`, choose the matching scoped `return` or `overdue` event, and add `Requested for` under `Users/Groups in fields`. Supply subjects and messages identifying `${number}`, `${item_type}`, and `${end_date}`; _Submit_. These names and hourly schedules are a concrete example for the guide's open-ended challenge.
   - Test a notification-enabled requester with `State = Checked Out`, an end date within `return.remindtime`, and an empty `Return reminder`; _Execute Now_ on `Loaner Return Reminder` and verify the record, **System Logs > Events**, and **System Logs > Emails**. For overdue, use a past end date and a blank or sufficiently old `Last overdue reminder`; execute the overdue job and verify the timestamp, count, event, and email. Re-run before the interval expires and confirm no additional overdue reminder is queued.
 
@@ -823,17 +890,24 @@
 
 ### Lab 7.2.1 - Web service consumer
 
-🎯 **Goal**: Exercise a REST consumer and provider using the training instance and retrieve a matching vault record.
+🎯 **Goal**: Use REST API Explorer and a Business Rule to retrieve a matching vault record, then include a training value in a pickup notification.
 
-- **A. Explore the provider**
-  - Complete Lab 7.1.1 using only the fictitious value `TRAINING-ONLY-NOT-A-SECRET`. In `Global` scope, open **System Web Services > REST > REST API Explorer** → _Explore_ if prompted → `Retrieve records from a table (GET)`.
-  - Set `tableName = Password Vault (u_password_vault)`, `sysparm_query = u_asset=<test asset tag>`, `sysparm_fields = u_password`, and response format `application/json` → _Send_. Verify status `200` and the dummy value.
-- **B. Configure authentication**
-  - With `web_service_admin`, open **System Web Services > REST > REST Message** → _New_. Set `Name = Training vault lookup`, `Endpoint = https://<YOUR_TRAINING_INSTANCE_HOST>/api/now/table/u_password_vault`, and `Authentication type = Basic`.
-  - At `Basic auth profile`, use the reference lookup → _New_. Set `Name = Training vault profile`, and enter a disposable training account and password authorized to read the admin-protected vault → _Submit_. Select the profile on the REST message and _Submit_. Open the profile and use Form Header → _Copy sys_id_. This exercise uses an admin-protected sample table; use a least-privilege integration account and appropriate ACLs in real integrations.
-- **C. Create and test a consumer**
-  - In `Loaner Request` scope, Studio → _Create_ → `File` → `Server Development > Business Rule`. Set `Name = Retrieved Credentials`, `Table = Loaner Request`, `Active = selected`, `Advanced = selected`, `When = async`, `Insert = selected`, `Update = selected`.
-  - Set `Script` below, replacing the host and profile sys*id → \_Submit*. This adaptation uses the authentication profile rather than embedding a password and logs only the presence of the fictitious record:
+- **A. Preparation**
+  - Complete Lab 7.1.1 and identify an `LNR` laptop whose `Asset tag` matches a `Password Vault` record. The same training instance acts as both consumer and provider.
+  - For this exercise, use the fictitious vault value `TRAINING-ONLY-NOT-A-SECRET` and an isolated training account authorized to read the vault. The course's original example embeds an instance password in script and logs and emails the returned password; never use a real secret as the vault value in this exercise.
+- **B. Create a web service producer**
+  - In the main ServiceNow window, select `Global` scope → **System Web Services > REST > REST API Explorer** → _Explore_ if prompted → `Retrieve records from a table (GET)`.
+  - Set path parameter `tableName = Password Vault (u_password_vault)`; set query parameters `sysparm_query = u_asset=<laptop asset tag>` without spaces and `sysparm_fields = u_password`.
+  - Under request headers, set `Response format = application/json`.
+- **C. Test the web service producer**
+  - Select _Send_ → inspect `Response`; verify HTTP `200` and that the returned `u_password` is `TRAINING-ONLY-NOT-A-SECRET` for the selected asset. Resolve any access or query errors before continuing.
+- **D. Use a script in an email notification**
+  - In REST API Explorer, select _ServiceNow Script_ → _Select Snippet_ → copy the generated code stub and close the dialog.
+  - In ServiceNow Studio, select `Loaner Request` scope → _Create_ → `File` → `Server Development > Business Rule`; set `Name = Retrieved Credentials`, `Table = Loaner Request`, `Active = selected`, and `Advanced = selected`.
+  - On `When to run`, set `When = async`, `Insert = selected`, and `Update = selected`. On `Advanced > Script`, paste the generated stub inside the rule's function.
+  - Adapt the stub: run it only when `Item type = Laptop` (`cmdb_ci_computer`); replace the fixed asset tag in the endpoint with the current CI's asset tag; change `gs.log` to `gs.info`; parse the JSON response and log the returned training value. Put the condition inside the script, not in the Business Rule's `Condition` or `Filter Condition`, so the script body can also be used in the notification.
+  - The following is a complete equivalent reconstruction. Replace `<TRAINING_INSTANCE_HOST>`, `<TRAINING_USERNAME>`, and `<TRAINING_PASSWORD>` with your isolated training instance and account values → _Submit_. The value guard limits output to the fictitious value; embedding account credentials is the course's approach, not the safer approach described below.
+
     ```javascript
     (function executeRule(current, previous) {
       if (current.getValue("item_type") != "cmdb_ci_computer") return;
@@ -841,12 +915,12 @@
       if (!ci.isValidRecord() || !ci.getValue("asset_tag")) return;
       var request = new sn_ws.RESTMessageV2();
       request.setEndpoint(
-        "https://<YOUR_TRAINING_INSTANCE_HOST>/api/now/table/u_password_vault?sysparm_query=" +
+        "https://<TRAINING_INSTANCE_HOST>/api/now/table/u_password_vault?sysparm_query=" +
           encodeURIComponent("u_asset=" + ci.getValue("asset_tag")) +
           "&sysparm_fields=u_password&sysparm_limit=1",
       );
       request.setHttpMethod("GET");
-      request.setAuthenticationProfile("basic", "<BASIC_AUTH_PROFILE_SYS_ID>");
+      request.setBasicAuth("<TRAINING_USERNAME>", "<TRAINING_PASSWORD>");
       request.setRequestHeader("Accept", "application/json");
       var response = request.execute();
       if (response.getStatusCode() != 200) {
@@ -856,33 +930,47 @@
         return;
       }
       var result = JSON.parse(response.getBody()).result;
-      gs.info("Training vault record found: " + (result.length > 0));
+      if (
+        result.length &&
+        result[0].u_password == "TRAINING-ONLY-NOT-A-SECRET"
+      ) {
+        gs.info("u_password: " + result[0].u_password);
+      }
     })(current, previous);
     ```
-  - In **Loaner Request > Open**, select `State = Ready for Pickup`, `Item type = Laptop`, and the `LNR` test computer from Lab 7.1.1 → _Update_. Inspect **System Logs > System Log > Application Logs** for `Training vault record found: true`.
-- **D. Test email integration and clean up**
-  - Open notification `Loaner Item Pick Up` → `What it will contain > Message HTML`; append the following, replacing the host and profile sys*id → \_Save*. If prompted, allow conversion to a Notification Email Script. It prints the fictitious value from Lab 7.1.1; never use a real secret here:
+
+  - In **Loaner Request > Open**, open a request and set `State = Ready for Pickup`, `Item type = Laptop`, and `Configuration item = <matching LNR laptop>` → _Update_. In **System Logs > System Log > Application Logs**, verify `u_password: TRAINING-ONLY-NOT-A-SECRET`.
+  - In Studio, open the `Retrieved Credentials` Business Rule → clear `Active` → _Update_. Copy only the body inside the Business Rule function for the email script.
+  - In Studio's Navigation Sidebar, select `Loaner Request` and open the `Loaner Item Pick Up` Notification → `What it will contain > Message HTML`. Add `<mail_script>` and `</mail_script>` tags at the bottom; paste the Business Rule body between them. Remove any raw response logging and replace the final `gs.info` with `template.print`.
+  - The complete equivalent email script below uses the same placeholders and dummy-value guard → _Save_. If prompted, allow ServiceNow to move the code to a Notification Email Script.
+
     ```html
     <mail_script>
-    var ci = current.cmdb_ci.getRefRecord();
-    if (current.getValue('item_type') == 'cmdb_ci_computer' && ci.isValidRecord()) {
-        var request = new sn_ws.RESTMessageV2();
-        request.setEndpoint('https://<YOUR_TRAINING_INSTANCE_HOST>/api/now/table/u_password_vault?sysparm_query=' +
-            encodeURIComponent('u_asset=' + ci.getValue('asset_tag')) + '&sysparm_fields=u_password&sysparm_limit=1');
-        request.setHttpMethod('GET');
-        request.setAuthenticationProfile('basic', '<BASIC_AUTH_PROFILE_SYS_ID>');
-        request.setRequestHeader('Accept', 'application/json');
-        var response = request.execute();
-        if (response.getStatusCode() == 200) {
-            var result = JSON.parse(response.getBody()).result;
-            if (result.length && result[0].u_password == 'TRAINING-ONLY-NOT-A-SECRET')
-                template.print('Training value: ' + result[0].u_password);
+    if (current.getValue('item_type') == 'cmdb_ci_computer') {
+        var ci = current.cmdb_ci.getRefRecord();
+        if (ci.isValidRecord() && ci.getValue('asset_tag')) {
+            var request = new sn_ws.RESTMessageV2();
+            request.setEndpoint('https://<TRAINING_INSTANCE_HOST>/api/now/table/u_password_vault?sysparm_query=' +
+                encodeURIComponent('u_asset=' + ci.getValue('asset_tag')) + '&sysparm_fields=u_password&sysparm_limit=1');
+            request.setHttpMethod('GET');
+            request.setBasicAuth('<TRAINING_USERNAME>', '<TRAINING_PASSWORD>');
+            request.setRequestHeader('Accept', 'application/json');
+            var response = request.execute();
+            if (response.getStatusCode() == 200) {
+                var result = JSON.parse(response.getBody()).result;
+                if (result.length && result[0].u_password == 'TRAINING-ONLY-NOT-A-SECRET') {
+                    template.print('u_password: ' + result[0].u_password);
+                }
+            }
         }
     }
     </mail_script>
     ```
-  - Use a qualifying pickup record with the test laptop, empty reminder, and start date within 24 hours; run the `Loaner Item Pick Up` scheduled job with _Execute Now_. Inspect **System Mailboxes > Outbound > Outbox** → _Preview Email_ and verify `Training value: TRAINING-ONLY-NOT-A-SECRET`.
-  - Deactivate the `Retrieved Credentials` Business Rule, remove the added mail script or reference from the notification and delete its generated Notification Email Script, and remove the temporary REST message and authentication profile when no longer needed. Remove test output according to instance policy; rotate any credentials inadvertently exposed in logs, email, or script.
+
+  - Use a request with `State = Ready for Pickup`, empty `Pick up reminder`, start date within 24 hours, `Item type = Laptop`, and the matching `LNR` laptop. In Studio, open **Scheduled Script Execution > Loaner Item Pick Up** → _Execute Now_.
+  - Verify that `Pick up reminder` is populated; open **System Mailboxes > Outbound > Outbox**, open the notification record → _Preview Email_ → verify the fictitious value appears.
+  - **Safer credential handling:** The embedded Basic Auth account and password above follow the course's demonstration and are for an isolated training instance only. For real integrations, configure a Basic Auth or OAuth authentication profile and call it through `RESTMessageV2` rather than embedding credentials. Use a least-privilege integration account and an approved secret-delivery mechanism; do not log or email real passwords. Creating a Basic Auth profile requires the `web_service_admin` role; it is a role, not a user to impersonate. See [outbound REST authentication](https://www.servicenow.com/docs/r/api-reference/web-services/c_OutboundRESTAuth.html) and [create a Basic Auth profile](https://www.servicenow.com/docs/r/api-reference/web-services/t_CreateABasicAuthProfile.html).
+  - **Clean up:** Keep the Business Rule inactive; remove the added notification mail script and its generated Notification Email Script. Remove test output according to instance policy; rotate the disposable account credentials used in the scripts.
 
 ### Lab 7.2.2 - Publish the updated application
 
@@ -923,7 +1011,7 @@
   - Set `Name = Loaner Request`, `Short description = Submit a New Loaner Request`, `Category = Can We Help You?`; select `Requested for`, `Item type`, `Start date`, `End date`, `Depot`, `Other`, `Location to be used`, and `Description` → _Save and Open_.
   - In the main instance, open **Self-Service > Service Catalog > Can We Help You? > Loaner Request** and inspect the initial form.
 - **B. Configure Catalog Builder**
-  - In Studio, **User Interface > Record Producer > Loaner Request** → _Edit in Catalog Builder_. Set item name and short description as above; set description to `Please enter your reservation request. When your item has been requested, someone from the Service Desk will contact you to discuss special requirements, options or conflicts, and to schedule a pick-up time and location.`
+  - In Studio, **User Interface > Record Producer > Loaner Request** → _Edit in Catalog Builder_. Set description to `Please enter your reservation request. When your item has been requested, someone from the Service Desk will contact you to discuss special requirements, options or conflicts, and to schedule a pick-up time and location.`
   - `Destination`: `Record submission table = Loaner Request`; `Location`: `Catalogs = Service Catalog`, `Categories = Can We Help You?`, `Topics = empty`.
   - Under `Questions`, edit and save labels: `Requested for` → `Who is this reservation for?`; `Item type` → `What would you like to reserve?`; `Start date` → `When will you start using the equipment?`; `End date` → `When will you return the equipment?`; `Depot` → `Where would you like to pick up this item?`; `Other` → `Specify other location.`; `Location to be used` → `Where will you use this equipment (country)?`; `Description` → `Please provide any special needs or comments here:`.
   - Insert `Two column container`: `Title = Request details`, `Display title = cleared` → _Submit_. Move it above the questions. Arrange left column `Requested for`, `Start date`, `Depot`, `Location to be used`; right column `Item type`, `End date`, `Other`; leave `Description` outside.
@@ -931,6 +1019,7 @@
 - **C. Script, link, and test**
   - In the main instance, submit the producer and inspect the created Loaner Request. In Studio, open the producer → _Edit in Catalog Builder_ → `Questions` → edit the `Depot` question → inspect the stored value of its `Other` choice. Use that exact value in the comparison below; the example uses `other`.
   - Return to the producer → `What it will contain > Script`; append the following adapted example below the default script → _Update_:
+
     ```javascript
     current.item_type = producer.item_type;
     current.depot = producer.depot;
@@ -944,6 +1033,7 @@
       current.depot.getDisplayValue();
     current.state = 13;
     ```
+
   - Submit another producer request; verify the short description and `Requested` state.
   - In **User Interface > Module > Create New**, set `Link type = URL (from Arguments)` and `Arguments = com.glideapp.servicecatalog_cat_item_view.do?v=1&sysparm_id=<record producer sys_id>`; obtain the ID from the producer Form Header → _Copy sys_id_.
   - Refresh the main browser → **Loaner Request > Create New**; verify the producer opens. Test from the `All` menu, since an older favorite may retain its prior target.
@@ -979,6 +1069,7 @@
   - On `Variable Substitutions`, _New_: `Name = text`, `Test value = Solana Beach, CA`, `Method = Default GET` → _Submit_; refresh the list → _Test_. Verify HTTP `200`, returned latitude/longitude, and expected accuracy.
 - **C. Create the map and module**
   - Studio → _Create_ → `File` → `User Interface > Map Page`; set `Suffix = Requested for Locations`, `Type = Terrain`. Paste this adaptation of the course example, changing the scoped REST Message name and table name if needed → _Submit_. The checks skip records without a matching country or usable geocoding result:
+
     ```javascript
     // Let's go get all the active Loaner Requests where the requestor has a _city and country_ in their user record
     var loaners = new GlideRecord("x_cdltd_loaner_r_0_loaner_request");
@@ -1021,9 +1112,31 @@
       item.icon_height = "32";
     }
     ```
+
   - The code parses `features[0].properties.lat` and `.lon` and adds a yellow marker linked to each request.
   - **Source inconsistency resolved from illustration**: the prose later says `addr`, but both the configured query parameter and completed-script screenshot use `text`; verify your HTTP method uses the same name.
   - Create `Module`: `Title = Requestor Locations`, `Application Menu = Loaner Request`, `Order = 900`, `Roles = x_cdltd_loaner_r_0.admin`, `Link Type = Map Page`, `Map page = Requested for Locations` → _Submit_.
+
 - **D. Test**
   - Ensure at least three active Loaner Requests have a `Requested for` user with city and country code; open **Loaner Request > Admin tools > Requestor Locations**. Verify yellow markers and select one to open its associated request.
   - Optional: commit with `Loaner Request application with Lab 9.2.1 completed.` and use Lab 9.1.3 to package changes.
+
+### Lab 9.3.1 - Now Assist Build Agent in ServiceNow Studio (optional)
+
+🎯 **Goal**: Generate an equipment-loan application with Build Agent and evaluate it against the manually built Loaner Request app.
+
+- **A. Prepare the instance**
+  - Use a Personal Developer Instance (PDI): the course's training instance does not include Build Agent. Sign in with an account with the `admin` role and verify that Build Agent is installed and enabled. See [Build Agent configuration](https://www.servicenow.com/docs/r/application-development/configure-build-agent.html).
+  - Check the current prompt allowance before starting. ServiceNow currently documents 25 prompts per PDI per 30-day cycle; availability and limits can change. See [Accessing Build Agent](https://www.servicenow.com/docs/r/application-development/access-build-agent.html).
+- **B. Generate the application**
+  - Open **All > App Development > ServiceNow Studio**. If the Build Agent chat panel is closed, select _Open Build Agent_ in the status bar or the ServiceNow Otto icon in the application banner.
+  - Enter the course prompt: `Build an application that allows users to borrow office equipment such as laptops, mobile phones, and projectors.` → _Send_.
+  - Review the proposed plan; request changes if needed, then select _Approve plan_. Observe the tables, fields, relationships, and other components Build Agent creates.
+- **C. Review and refine**
+  - Compare the generated application with the manual Loaner Request app: review table structure, names, field types, relationships, and components added or omitted.
+  - Review roles and ACLs, required fields and reference qualifiers, form and catalog experiences, UI policies, Business Rules, and notifications. Test access and behavior before deployment.
+  - Identify assumptions introduced by the original prompt; optionally refine the prompt and compare the new result. Each submitted prompt uses the PDI allowance.
+  - If preserving or moving the experiment, use an appropriate application deployment method, such as an update set; review included changes and dependencies before applying it elsewhere. See [Source Control and Deployment](#source-control-and-deployment).
+- **Additional Build Agent information**
+  - [Getting started with Build Agent](https://servicenow.read.inkling.com/a/b/39150f3ad6644504ae8d102a643a728a/p/090b3e2b69eb4e49b537e050b66ccb1b) — the course link currently points back to the same Lab 9.3.1 page.
+  - [Creating an app with Build Agent](https://www.servicenow.com/docs/r/application-development/create-a-new-application-using-build-agent.html).

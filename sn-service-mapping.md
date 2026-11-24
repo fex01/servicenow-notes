@@ -4,6 +4,8 @@ Back to [SNow ITOM](./sn-itom.md)
 
 ## Resources
 
+- [KB: Troubleshooting guide for Service Mapping ML Connection Suggestions / Traffic Based Discovery](https://support.servicenow.com/kb?id=kb_article_view&sysparm_article=KB0963421)
+- [KB: ML readiness page warning: Application Fingerprinting or Connection Suggestion Training Job is stuck](https://support.servicenow.com/kb?id=kb_article_view&sysparm_article=KB1772050)
 - [KB: Probe to Pattern Migration: Procedure for switching from probe-based Discovery to pattern-based Discovery](https://support.servicenow.com/kb?id=kb_article_view&sysparm_article=KB0694477)
 
 ### Requirements CIS Voucher
